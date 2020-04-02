@@ -1,7 +1,7 @@
 // global variable
 var data;
 
-$.get('books.json', function(d) {
+$.getJSON('books.json', function(d) {
   data = JSON.parse(d);
   // loop through all books
   data.books.forEach(function(b) {
