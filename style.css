@@ -81,7 +81,7 @@ h1::before {
     position: absolute;
     top: 0;
     left: 0;
-    background-image: linear-gradient(to right bottom, #e8ece9, #000305);
+    background-image: linear-gradient(to right bottom, #ffffff, #000305);
     opacity: .1;
 }
 
@@ -159,13 +159,16 @@ h1::before {
     margin-left: 1rem;
 }
 
-.discount-icon {
+.discount-icon-active {
     position: absolute;
     top: 2px;
     right: 2px;
 }
+.discount-icon-hidden {
+    display: none;
+}
 
-.discount-icon span {
+.discount-icon-active span {
     width: 41px;
     height: 28px;
     display: flex;
@@ -206,11 +209,18 @@ h1::before {
     opacity: 0.8;
     background-color: #4CAF50;
     font-size: 16px;
-    cursor: pointer;
     text-align: center;
   }
-.volume-price {
+.volume-price-active {
     position:absolute;
     bottom: 1px;
     left: 2px;
+    font-size: 10px;
+    width: 50%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: rgb(0, 0, 0);
+}
+.volume-price-hidden {
+    display: none;
 }

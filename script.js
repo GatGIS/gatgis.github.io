@@ -1,19 +1,20 @@
-// global variable
-var data;
 
 $.get('sample.json', function(d) {
 	d.forEach(function(b) {
+		if (b.Atlaide == "None") {$AtlaideExist = "hidden"} else {$AtlaideExist = "active"}
+		if (b.Cenalitra == "None") {$ClExist = "hidden"} else {$ClExist = "active"}
+		if (b.Centi == "None") {$CenaOut = '-' + b.Euro+ ' %'} else {$CenaOut = b.Euro+'.'+b.Centi+'€'} 
 		$("#kartinas").append(`<figure class="card">
 		<div class="card__hero">
 			<img src="https://www.maxima.lv${b.Bilde}" alt="" class="card__img">
-			<div class="discount-icon">
-				<span class="discount-icon" style="background-image: url('https://www.maxima.lv/uploads/sale/empty-4613.png')">${b.Atlaide}</span>
+			<div class="discount-icon-${$AtlaideExist}">
+				<span class="discount-icon" style="background-image: url('/data/img/blue-block.png')">${b.Atlaide}</span>
 			</div>
 			<div class="price-icon">
-				<span class="block" style="price-icon">${b.Euro}.${b.Centi} €</span>
+				<span class="block" style="price-icon">${$CenaOut}</span>
 			</div>
-			<div class="volume-price">
-				<span class="volume-price">${b.Cenalitra}</span>
+			<div class="volume-price-${$ClExist}">
+				<span class="volume-price-active">${b.Cenalitra}</span>
 			</div>
 		</div>
 		<h2 class="card__name">${b.Prece}</h2>
@@ -24,7 +25,7 @@ $.get('sample.json', function(d) {
 $.get('sample.json', function(d) {
 	var $card, $hero, $name, $discount, $volumePrice, $footer;
 	$card = $('<figure class="card"></figure>');
-	$hero = $('<div class="cardhero"><img src="https://www.maxima.lv/$%7Bb.Bilde%7D" alt="" class="cardimg"></div>');
+	$hero = $('<div class="card__hero"><img src="https://www.maxima.lv/${b.Bilde}" alt="" class="card__img"></div>');
 	$name = $('<h2 class="cardname">${b.Prece}</h2>');
 	$discount = $('<p class="carddetail">${b.Atlaide}</p>');
 	$volumePrice = $('<p class="carddetail">${b.Cenalitra}</p>');
@@ -34,7 +35,7 @@ $.get('sample.json', function(d) {
 		.append($hero)
 		.append($name);
 
-	if (...) {
+	if (b.Atlaide == "Nav info") {
 		$card
 			.append($discount);
 	}

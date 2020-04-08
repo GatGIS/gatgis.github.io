@@ -1,5 +1,13 @@
 [
 {
+    "Prece": "Dzirkstošais vīns MARTINI ASTI 0,75 l, 7,5% alk.",
+    "Cenalitra": "7,99 €/l",
+    "Atlaide": "None",
+    "Euro": "5",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//dzirkstosais-vins-martini-asti-0-75-l-7-5-alk-00004.png?1586181562"
+},
+{
     "Prece": "Alus UŽAVAS gaišais, 4,6%, 500 ml",
     "Cenalitra": "2.58 €/l",
     "Atlaide": "-20%",
@@ -33,7 +41,7 @@
 },
 {
     "Prece": "Stiprs alkoholisks dzēriens CAPTAIN MORGAN SPICED, 35%, 1 l",
-    "Cenalitra": "Nav noradits",
+    "Cenalitra": "None",
     "Atlaide": "-24%",
     "Euro": "13",
     "Centi": "99",
@@ -41,7 +49,7 @@
 },
 {
     "Prece": "Degvīns RUSSKIJ STANDART, 40%, 1 l",
-    "Cenalitra": "Nav noradits",
+    "Cenalitra": "None",
     "Atlaide": "-40%",
     "Euro": "12",
     "Centi": "99",
@@ -89,7 +97,7 @@
 },
 {
     "Prece": "Viskijs J.WALKER RED LABEL, 40%, 1 l",
-    "Cenalitra": "Nav noradits",
+    "Cenalitra": "None",
     "Atlaide": "-24%",
     "Euro": "13",
     "Centi": "99",
@@ -137,8 +145,8 @@
 },
 {
     "Prece": "Alum GRIMBERGEN",
-    "Cenalitra": "Nav noradits",
-    "Atlaide": "Nav info",
+    "Cenalitra": "None",
+    "Atlaide": "None",
     "Euro": "25",
     "Centi": "None",
     "Bilde": "/uploads/sale/2020/sales_page/03/25//alum-grimbergen-00284.png?1585143267"
@@ -194,7 +202,7 @@
 {
     "Prece": "Degvīns ZEĻONAJA MARKA, 0,75 l",
     "Cenalitra": "13,27 €/l",
-    "Atlaide": "Nav info",
+    "Atlaide": "None",
     "Euro": "9",
     "Centi": "29",
     "Bilde": "/uploads/sale/2020/sales_page/03/25//degvins-zelonaja-marka-00291.png?1585143267"
@@ -202,7 +210,7 @@
 {
     "Prece": "Brendijs J.P. CHENET IMPERIALE, 0,75 l",
     "Cenalitra": "20,38 €/l",
-    "Atlaide": "Nav info",
+    "Atlaide": "None",
     "Euro": "10",
     "Centi": "19",
     "Bilde": "/uploads/sale/2020/sales_page/03/25//brendijs-j-p-chenet-imperiale-00292.png?1585143278"
@@ -210,14 +218,14 @@
 {
     "Prece": "Viskijs GRANT'S, 0,75 l",
     "Cenalitra": "16,13 €/l",
-    "Atlaide": "Nav info",
+    "Atlaide": "None",
     "Euro": "11",
     "Centi": "29",
     "Bilde": "/uploads/sale/2020/sales_page/03/25//viskijs-grant-s-00293.png?1585143278"
 },
 {
     "Prece": "Rums BACARDI, 0,75 l",
-    "Cenalitra": "Nav noradits",
+    "Cenalitra": "None",
     "Atlaide": "-29%",
     "Euro": "16",
     "Centi": "99",
@@ -225,7 +233,7 @@
 },
 {
     "Prece": "Viskijs BUSHMILLS, 0,75 l",
-    "Cenalitra": "Nav noradits",
+    "Cenalitra": "None",
     "Atlaide": "-34%",
     "Euro": "17",
     "Centi": "59",
@@ -240,211 +248,211 @@
     "Bilde": "/uploads/sale/2020/sales_page/03/25//konjaks-larsen-vsop-00296.png?1585143278"
 },
 {
-    "Prece": "Dzirkstošais vīns VALLOTAJ PROSECCO ROPE, 0,75 l, 11% alk.",
-    "Cenalitra": "7,32 €/l",
-    "Atlaide": "-28%",
-    "Euro": "5",
-    "Centi": "49",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//dzirkstosais-vins-vallotaj-prosecco-rope-00389.png?1585636115"
+    "Prece": "Alkoholiskais kokteilis CĒSU, 280 ml, 14% alk., divi veidi",
+    "Cenalitra": "4,96 €/l",
+    "Atlaide": "None",
+    "Euro": "1",
+    "Centi": "39",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alkoholiskais-kokteilis-cesu-00147.png?1586181539"
 },
 {
-    "Prece": "Vīns DON FERNANDO, 0,75 l, 11,5% alk., divi veidi, Spānija",
+    "Prece": "Vermuts MARTINI BIANCO, 1 l, 15% alk.",
+    "Cenalitra": "None",
+    "Atlaide": "-20%",
+    "Euro": "9",
+    "Centi": "39",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//vermuts-martini-bianco-00148.png?1586181539"
+},
+{
+    "Prece": "Dzirkstošais vīns TORLEY, 0,75 l, 10,5% vai 11% alk., divi veidi",
+    "Cenalitra": "5,32 €/l",
+    "Atlaide": "None",
+    "Euro": "3",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//dzirkstosais-vins-torley-00149.png?1586181578"
+},
+{
+    "Prece": "Sarkanvīns KAGOR PASTORAL, 0,75 l, 11,5% alk., Spānija",
     "Cenalitra": "3,99 €/l",
     "Atlaide": "-26%",
     "Euro": "2",
     "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//vins-don-fernando-00390.png?1585636115"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//sarkanvins-kagor-pastoral-00150.png?1586181578"
 },
 {
-    "Prece": "Vīns CASA CHARLIZE IGT, 0,75 l, 12% vai 13,5%, divi veidi, Itālija",
-    "Cenalitra": "7,99 €/l",
-    "Atlaide": "-33%",
-    "Euro": "5",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//vins-casa-charlize-igt-00391.png?1585636116"
-},
-{
-    "Prece": "Vīns JP CHENET, 0,75 l, 11%-12,5%, trīs veidi, Francija",
-    "Cenalitra": "6,65 €/l",
-    "Atlaide": "Nav info",
+    "Prece": "Vīns GRAN CASTILLO, 0,75 l, 11% vai 12% alk., trīs veidi, Spānija",
+    "Cenalitra": "6,39 €/l",
+    "Atlaide": "None",
     "Euro": "4",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//vins-jp-chenet-00392.png?1585636116"
-},
-{
-    "Prece": "Vīns JOHANN BRUNNER, 0,75 l, 9,5% vai 11% alk., divi veidi, Vācija",
-    "Cenalitra": "6,65 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "4",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//vins-johann-brunner-00393.png?1585636116"
-},
-{
-    "Prece": "Vīniem EPICURO, Itālija",
-    "Cenalitra": "Nav noradits",
-    "Atlaide": "Nav info",
-    "Euro": "30",
-    "Centi": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//viniem-epicuro-00394.png?1585636116"
-},
-{
-    "Prece": "Sarkanvīns DOLINI GRUZII ALAZANI, 0,75 l, 11% alk., divi veidi, Gruzija",
-    "Cenalitra": "7,32 €/l",
-    "Atlaide": "-35%",
-    "Euro": "5",
-    "Centi": "49",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//sarkanvins-dolini-gruzii-alazani-00395.png?1585636136"
-},
-{
-    "Prece": "Baltvīns DOLINI GRUZII ALAZANI, 0,75 l, 11% alk., divi veidi, Gruzija",
-    "Cenalitra": "6,65 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "4",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//baltvins-dolini-gruzii-alazani-00396.png?1585636136"
-},
-{
-    "Prece": "Vīns LINDEMAN’S, 0,75 l, 11,5% vai 13,5% alk., divi veidi, Austrālija",
-    "Cenalitra": "6,65 €/l",
-    "Atlaide": "-25%",
-    "Euro": "4",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//vins-lindeman-s-00397.png?1585636136"
-},
-{
-    "Prece": "Alus ALDARIS GAIŠAIS, 500 ml vai 568 ml, 5% alk.",
-    "Cenalitra": "no 1,39 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "0",
     "Centi": "79",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-aldaris-gaisais-00398.png?1585636111"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//vins-gran-castillo-00151.png?1586181578"
 },
 {
-    "Prece": "Alus MEŽPILS SPECIĀLAIS, 500 ml, 4,6% alk.",
-    "Cenalitra": "1,98 €/l",
-    "Atlaide": "-24%",
-    "Euro": "0",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-mezpils-specialais-00399.png?1585636111"
-},
-{
-    "Prece": "Alus VALMIERMUIŽA, 500 ml, 5,2% alk.",
-    "Cenalitra": "3,18 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "1",
-    "Centi": "59",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-valmiermuiza-00400.png?1585636101"
-},
-{
-    "Prece": "Alus BOCMANIS DZINTARJŪRAS, 1 l, 5,8% alk.",
-    "Cenalitra": "Nav noradits",
-    "Atlaide": "Nav info",
-    "Euro": "1",
-    "Centi": "25",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-bocmanis-dzintarjuras-00401.png?1585636101"
-},
-{
-    "Prece": "Alus HEINEKEN, 1 iepak./6x 500 ml, 5% alk.",
-    "Cenalitra": "1,66 €/l",
-    "Atlaide": "-42%",
+    "Prece": "Vīns TELIANI OLD GRUZIA, 0,75 l, 12% alk., divi veidi, Gruzija",
+    "Cenalitra": "6,65 €/l",
+    "Atlaide": "None",
     "Euro": "4",
     "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-heineken-00402.png?1585636101"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//vins-teliani-old-gruzia-00152.png?1586181578"
 },
 {
-    "Prece": "Alus RĪGAS GAIŠAIS vai BRŪVERIS BALTALUS, 500 ml, 4,5% vai 5,2% alk.",
-    "Cenalitra": "1,78 €/l",
-    "Atlaide": "Nav info",
+    "Prece": "Vīns MAIPO, 0,75 l, 12% vai 13% alk., divi veidi, Čile",
+    "Cenalitra": "6,39 €/l",
+    "Atlaide": "-21%",
+    "Euro": "4",
+    "Centi": "79",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//vins-maipo-00153.png?1586181578"
+},
+{
+    "Prece": "Alus BAUSKAS, 1 l, 4,8% vai 5,5% alk., divi veidi",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "1",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alus-bauskas-00154.png?1586181578"
+},
+{
+    "Prece": "Alus CĒSU BRŪŽA, 500 ml, 4,5%-5,4% alk., dažādi veidi",
+    "Cenalitra": "no 1,50 €/l",
+    "Atlaide": "None",
     "Euro": "0",
-    "Centi": "89",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//alus-rigas-gaisais-vai-bruveris-baltalus-00403.png?1585636101"
+    "Centi": "85",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alus-cesu-bruza-00155.png?1586181578"
 },
 {
-    "Prece": "Degvīns KATJUŠA, 0,5 l, 40% alk.",
-    "Cenalitra": "10,38 €/l",
-    "Atlaide": "-23%",
+    "Prece": "Alum LĪVU",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "25",
+    "Centi": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alum-livu-00156.png?1586181578"
+},
+{
+    "Prece": "Alus TĒRVETES SENČU, 500 ml, 4,5% alk",
+    "Cenalitra": "1,98 €/l",
+    "Atlaide": "None",
+    "Euro": "0",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alus-tervetes-sencu-00157.png?1586181578"
+},
+{
+    "Prece": "Alus TĒRVETE RADLER, 500 ml, 2,7% alk., divi veidi",
+    "Cenalitra": "1,90 €/l",
+    "Atlaide": "-26%",
+    "Euro": "0",
+    "Centi": "95",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alus-tervete-radler-00158.png?1586181578"
+},
+{
+    "Prece": "Alus CARLSBERG, 500 ml, 5% alk., divi veidi",
+    "Cenalitra": "1,70 €/l",
+    "Atlaide": "None",
+    "Euro": "0",
+    "Centi": "85",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//alus-carlsberg-00159.png?1586181582"
+},
+{
+    "Prece": "Degvīns STARIJ DRUZHE, 0,5 l, 40% alk.",
+    "Cenalitra": "10,18 €/l",
+    "Atlaide": "-28%",
     "Euro": "5",
-    "Centi": "19",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//degvins-katjusa-00404.png?1585636101"
+    "Centi": "09",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//degvins-starij-druzhe-00160.png?1586181582"
 },
 {
-    "Prece": "Degvīns BERJOZOVAJA ROŠČA, 0,5 l, 40% alk.",
+    "Prece": "Degvīns PEREPJOLKA, 0,5 l, 40% alk., trīs veidi",
+    "Cenalitra": "11,98 €/l",
+    "Atlaide": "-29%",
+    "Euro": "5",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//degvins-perepjolka-00161.png?1586181582"
+},
+{
+    "Prece": "Stiprs alkoholiskais dzēriens ARSEŅIČ, 0,5 l, 40% alk., dažādi veidi",
     "Cenalitra": "12,98 €/l",
     "Atlaide": "-22%",
     "Euro": "6",
     "Centi": "49",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//degvins-berjozovaja-rosca-00405.png?1585636101"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//stiprs-alkoholiskais-dzeriens-arsenic-00162.png?1586181582"
 },
 {
-    "Prece": "Degvīns BERJOZOVAJA ROŠČA, 0,7 l, 40% alk.",
-    "Cenalitra": "12,41 €/l",
-    "Atlaide": "-21%",
+    "Prece": "Stiprs alkoholiskais dzēriens BONAPARTE, 0,7 l, 38% alk.",
+    "Cenalitra": "11,70 €/l",
+    "Atlaide": "None",
     "Euro": "8",
-    "Centi": "69",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//degvins-berjozovaja-rosca-00406.png?1585636101"
+    "Centi": "19",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//stiprs-alkoholiskais-dzeriens-bonaparte-00163.png?1586181582"
 },
 {
-    "Prece": "Degvīns RUSSKIJ STANDART, 0,7 l, 40% alk.",
-    "Cenalitra": "15,70 €/l",
-    "Atlaide": "-39%",
-    "Euro": "10",
+    "Prece": "Konjaks HENNESSY VS, 0,35 l, 40% alk.",
+    "Cenalitra": "37,11 €/l",
+    "Atlaide": "None",
+    "Euro": "12",
     "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//degvins-russkij-standart-00407.png?1585636101"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//konjaks-hennessy-vs-00164.png?1586181582"
 },
 {
-    "Prece": "Stiprs alkoholiskais dzēriens BARONS MINHAUZENS, 0,5 l, 36% alk.",
-    "Cenalitra": "9,98 €/l",
-    "Atlaide": "Nav info",
+    "Prece": "Viskijs JACK DANIEL'S, 1 l, 40% alk.",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "24",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//viskijs-jack-daniel-s-00165.png?1586181582"
+},
+{
+    "Prece": "Džins LB, 0,7 l, 40% alk.",
+    "Cenalitra": "12,13 €/l",
+    "Atlaide": "None",
+    "Euro": "8",
+    "Centi": "49",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//dzins-lb-00166.png?1586181582"
+},
+{
+    "Prece": "Liķieris PASTURES IRISH CREAM, 0,7 l, 14,5% alk.",
+    "Cenalitra": "6,56 €/l",
+    "Atlaide": "-26%",
     "Euro": "4",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//stiprs-alkoholiskais-dzeriens-barons-minhauzens-00408.png?1585636101"
+    "Centi": "59",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//likieris-pastures-irish-cream-00167.png?1586181582"
 },
 {
-    "Prece": "Brendijs ARARAT 5*, 0,5 l, 40% alk.",
-    "Cenalitra": "21,98 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "10",
-    "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//brendijs-ararat-5-00409.png?1585636101"
+    "Prece": "Balzams STARORUSSKIJ, 0,5 l, 40% alk.",
+    "Cenalitra": "14,18 €/l",
+    "Atlaide": "-20%",
+    "Euro": "7",
+    "Centi": "09",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//balzams-starorusskij-00168.png?1586181582"
 },
 {
-    "Prece": "Viskijs JIM BEAM, 1 l, 40% alk.",
-    "Cenalitra": "Nav noradits",
+    "Prece": "Stiprs alkoholiskais dzēriens METAXA 5*, 0,7 l, 38% alk.",
+    "Cenalitra": "17,13 €/l",
+    "Atlaide": "-27%",
+    "Euro": "11",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//stiprs-alkoholiskais-dzeriens-metaxa-5-00254.png?1586181520"
+},
+{
+    "Prece": "Degvīns ABSOLUT, 1 l, 40% alk.",
+    "Cenalitra": "None",
     "Atlaide": "-20%",
     "Euro": "14",
+    "Centi": "49",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//degvins-absolut-00255.png?1586181520"
+},
+{
+    "Prece": "Viskijs TULLAMORE DEW, 1 l, 40% alk.",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "16",
     "Centi": "99",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//viskijs-jim-beam-00410.png?1585636113"
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//viskijs-tullamore-dew-00256.png?1586181521"
 },
 {
-    "Prece": "Balzams RĪGAS MELNAIS, 0,5 l, 30%-45% alk., dažādi veidi",
-    "Cenalitra": "17,18 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "8",
-    "Centi": "59",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//balzams-rigas-melnais-00411.png?1585636113"
-},
-{
-    "Prece": "Liķieris ŠARLOTE, 0,5 l, 17% alk., trīs veidi",
-    "Cenalitra": "11,38 €/l",
-    "Atlaide": "Nav info",
-    "Euro": "5",
-    "Centi": "69",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//likieris-sarlote-00412.png?1585636113"
-},
-{
-    "Prece": "Konjaks COURVOISIER VSOP, 0,7 l, 40% alk., kārbā",
-    "Cenalitra": "36,27 €/l",
-    "Atlaide": "-22%",
-    "Euro": "25",
-    "Centi": "39",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//konjaks-courvoisier-vsop-00413.png?1585636113"
-},
-{
-    "Prece": "\"Latvijas Balzams\" sidriem un alkoholiskajiem kokteiļiem",
-    "Cenalitra": "Nav noradits",
-    "Atlaide": "Nav info",
-    "Euro": "30",
-    "Centi": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/03/31//latvijas-balzams-sidriem-un-alkoholiskajiem-kokteiliem-00499.png?1585636105"
+    "Prece": "Liķieris JAGERMEISTER, 1 l, 35% alk.",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "15",
+    "Centi": "99",
+    "Bilde": "/uploads/sale/2020/sales_page/04/06//likieris-jagermeister-00257.png?1586181521"
 }
 ]
