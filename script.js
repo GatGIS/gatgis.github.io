@@ -30,9 +30,11 @@ $.get('sample.json', function(d) {
 		$("#kartinas").append($card);
   
 	$card.find(`.shop-${$Veikals}-icon`).hover(
-		function() {$card.find('.infotext').show(100);
+		function() {$card.find('.infotext').show(200);
+		$(this).animate({opacity: 0.6}, 200);
 	},
-		function() {$card.find('.infotext').hide(100);
+		function() {$card.find('.infotext').hide(200);
+		$(this).animate({opacity: 1}, 200);
 	}
 	);
   
