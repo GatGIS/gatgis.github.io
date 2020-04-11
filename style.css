@@ -219,8 +219,35 @@ h1::before {
     width: 50%;
     font-family: 'Roboto', sans-serif;
     font-size: 12px;
-    color: rgb(0, 0, 0);
+    color: rgb(17, 17, 17);
 }
 .volume-price-hidden {
     display: none;
 }
+.shop-maxima-icon {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    background-image: url('/data/img/maxima-icon.png');
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+}
+.infotext {
+    display: none;
+}
+.infotext2 {
+    position: absolute;
+    top: 30px;
+    left: 2px;
+    font-size: 10px;
+    width: 99%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: rgb(0, 0, 0);
+    background: rgb(255, 255, 255);
+    fill-opacity: 0.2;
+}
+
