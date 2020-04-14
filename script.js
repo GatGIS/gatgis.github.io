@@ -5,11 +5,13 @@ $.get('sample.json', function(d) {
 		if (b.Atlaide == "None") {$AtlaideExist = "hidden"} else {$AtlaideExist = "active"}
 		if (b.Cenalitra == "None") {$ClExist = "hidden"} else {$ClExist = "active"}
 		if (b.Centi == "None") {$CenaOut = '-' + b.Euro+ '%'} else {$CenaOut = b.Euro+'.'+b.Centi+'€'}
-		if (b.Veikals == "Maxima") {$Veikals = "maxima"}
+		if (b.Veikals == "Maxima") {$Veikals = "maxima"} else if(b.Veikals == "Rimi") {$Veikals = "rimi"}
+		if (b.Veikals == "Maxima") {$imgsrc = "https://www.maxima.lv" + b.Bilde} else if(b.Veikals == "Rimi") {$imgsrc = b.Bilde}
+		if (b.Bilde == "None") {$imgsrc = "/data/img/no-img-placehold.png"}
   
 		var $card = $(`<figure class="card">
 		<div class="card__hero">
-			<img src="https://www.maxima.lv${b.Bilde}" alt="" class="card__img">
+			<img src="${$imgsrc}" alt="" class="card__img">
 			<div class="discount-icon-${$AtlaideExist}">
 				<span class="discount-icon" style="background-image: url('/data/img/blue-block.png')">${b.Atlaide}</span>
 			</div>
