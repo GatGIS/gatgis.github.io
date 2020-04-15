@@ -8,10 +8,11 @@ $.get('sample.json', function(d) {
 		if (b.Veikals == "Maxima") {$Veikals = "maxima"} else if(b.Veikals == "Rimi") {$Veikals = "rimi"}
 		if (b.Veikals == "Maxima") {$imgsrc = "https://www.maxima.lv" + b.Bilde} else if(b.Veikals == "Rimi") {$imgsrc = b.Bilde}
 		if (b.Bilde == "None") {$imgsrc = "/data/img/no-img-placehold.png"}
+		if (b.Info == "Vecā cena: None") {$infotxt = ""} else {$infotxt = b.Info}
   
 		var $card = $(`<figure class="card">
 		<div class="card__hero">
-			<img src="${$imgsrc}" alt="" class="card__img">
+			<img src="${$imgsrc}" alt="/data/img/no-img-placehold.png" class="card__img">
 			<div class="discount-icon-${$AtlaideExist}">
 				<span class="discount-icon" style="background-image: url('/data/img/blue-block.png')">${b.Atlaide}</span>
 			</div>
@@ -23,7 +24,7 @@ $.get('sample.json', function(d) {
 			</div>
 			<div class="shop-${$Veikals}-icon" data-id="${currentID}"></div>
 			<div class="infotext" data-id="${currentID}">
-				<span class="infotext2">${b.Info}</span>
+				<span class="infotext2">${$infotxt}</span>
 			</div>
 		</div>
 		<h2 class="card__name">${b.Prece}</h2>
@@ -44,3 +45,33 @@ $.get('sample.json', function(d) {
 	});
   
   });
+//search baram
+function search() {
+	var inputvalue, productcard, productname, i;
+	inputvalue = document.getElementById("product-search").value.toLocaleLowerCase();
+	productcard = document.getElementsByClassName("card");
+	for (i=0; i<productcard.length;i++){
+		productname = productcard[i].innerText.toLocaleLowerCase();
+		if (productname.indexOf(inputvalue) != -1){
+			productcard[i].style.display = "";
+		} else{
+			productcard[i].style.display = "none";
+		}
+	}
+}
+/*
+const productlist=document.querySelector('cards-container');
+const searchBar=document.forms['product-search'].querySelector('input');
+searchBar.addEventListener('keyup', function(e){
+	const searchtext = e.target.value.toLowerCase();
+	const preces = productlist.getElementsByTagName('h2');
+	Array.from(preces).forEach(function(Arrayprece){
+		const Arraynosaukums = Arrayprece.firstElementChild.textContent;
+		if(Arraynosaukums.toLowerCase().indexOf(searchtext)!= -1) {
+			Arrayprece.style.display = 'block';
+		} else {
+			Arrayprece.style.display = 'none';
+		}
+	})
+})
+*/

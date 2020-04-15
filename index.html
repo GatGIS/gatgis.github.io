@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Bungee+Inline|Nunito+Sans|Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Inline|Nunito+Sans|Roboto|Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="script.js"></script>
     <title>Lūdzu, nē!</title>
@@ -17,7 +18,13 @@
 <body>
     <div class="container">
         <h1>Lūdzu,nē. Paldies</h1>
-        <div class="cards-container" id="kartinas">
+            <div class="search-bar-wrap">
+                <div class="search-bar">
+                    <input onkeyup="search()" id="product-search" class="searchTerm" type="text" placeholder="Meklēt...">
+                    <button class="searchButton" type="submit"><i class="fa fa-search"></i></button>     
+                </div>
+            </div>
+            <div class="cards-container" id="kartinas">
         </div>
     </div>
 
