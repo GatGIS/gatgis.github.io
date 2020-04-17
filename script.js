@@ -5,8 +5,8 @@ $.get('sample.json', function(d) {
 		if (b.Atlaide == "None") {$AtlaideExist = "hidden"} else {$AtlaideExist = "active"}
 		if (b.Cenalitra == "None") {$ClExist = "hidden"} else {$ClExist = "active"}
 		if (b.Centi == "None") {$CenaOut = '-' + b.Euro+ '%'} else {$CenaOut = b.Euro+'.'+b.Centi+'€'}
-		if (b.Veikals == "Maxima") {$Veikals = "maxima"} else if(b.Veikals == "Rimi") {$Veikals = "rimi"}
-		if (b.Veikals == "Maxima") {$imgsrc = "https://www.maxima.lv" + b.Bilde} else if(b.Veikals == "Rimi") {$imgsrc = b.Bilde}
+		if (b.Veikals == "Maxima") {$Veikals = "maxima"} else if(b.Veikals == "Rimi") {$Veikals = "rimi"} else if (b.Veikals == "Elvi"){$Veikals = "elvi"}
+		if (b.Veikals == "Maxima") {$imgsrc = "https://www.maxima.lv" + b.Bilde} else if(b.Veikals == "Rimi" || b.Veikals == "Elvi") {$imgsrc = b.Bilde}
 		if (b.Bilde == "None") {$imgsrc = "/data/img/no-img-placehold.png"}
 		if (b.Info == "Vecā cena: None") {$infotxt = ""} else {$infotxt = b.Info}
   
@@ -45,7 +45,7 @@ $.get('sample.json', function(d) {
 	});
   
   });
-//search baram
+//search bar filter
 function search() {
 	var inputvalue, productcard, productname, i;
 	inputvalue = document.getElementById("product-search").value.toLocaleLowerCase();
@@ -59,19 +59,3 @@ function search() {
 		}
 	}
 }
-/*
-const productlist=document.querySelector('cards-container');
-const searchBar=document.forms['product-search'].querySelector('input');
-searchBar.addEventListener('keyup', function(e){
-	const searchtext = e.target.value.toLowerCase();
-	const preces = productlist.getElementsByTagName('h2');
-	Array.from(preces).forEach(function(Arrayprece){
-		const Arraynosaukums = Arrayprece.firstElementChild.textContent;
-		if(Arraynosaukums.toLowerCase().indexOf(searchtext)!= -1) {
-			Arrayprece.style.display = 'block';
-		} else {
-			Arrayprece.style.display = 'none';
-		}
-	})
-})
-*/

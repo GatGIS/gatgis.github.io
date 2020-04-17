@@ -17,7 +17,8 @@ body {
     font-family: "Nunito Sans", sans-serif;
     color: #555;
     min-height: 100vh;
-    background: linear-gradient(to bottom right, #1f1e1e, #000000);
+    /*background: linear-gradient(to bottom right, #1f1e1e, #000000);*/
+    background-color: #1f1e1e;
 }
 
 h1 {
@@ -60,14 +61,14 @@ h1::before {
 .card {
     background: linear-gradient(to right, #000000, #0f0f0f);
 }
-.card:hover {
+/*.card:hover {
     box-shadow:0px 0px 10px #000000;
     -moz-transition: all 0.2s ease-in;
     -o-transition: all 0.2s ease-in;
     -webkit-transition: all 0.2s ease-in;
     transition: all 0.2s ease-in;
-    /*border: 2px solid #fff*/
 }
+*/
 
 .card__hero {
     position: relative;
@@ -216,6 +217,18 @@ h1::before {
     background-size: 40px 20px;
     z-index: 100;
 }
+.shop-elvi-icon {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    height: 20px;
+    width: 40px;
+    display: flex;
+    background-image: url('/data/img/elvi-icon.png');
+    background-repeat: no-repeat;
+    background-size: 40px 20px;
+    z-index: 100;
+}
 .infotext {
     display: none;
 }
@@ -244,7 +257,6 @@ h1::before {
     border-right: none;
     padding: 5px;
     height: 36px;
-    border-radius: 5px 0 0 5px;
     outline: none;
     color: #9DBFAF;
   }
@@ -253,7 +265,7 @@ h1::before {
     color: rgb(0, 0, 0);
   }
   
-  .searchButton {
+  .clearButton {
     width: 40px;
     height: 36px;
     border: 1px solid rgb(204, 139, 0);
@@ -261,11 +273,11 @@ h1::before {
     text-align: center;
     color: rgb(26, 24, 24);
     border-radius: 0 5px 5px 0;
-    cursor: pointer;
     font-size: 20px;
+    outline: none;
+    cursor: pointer;
   }
   
-  /*Resize the wrap to see the search bar change!*/
   .search-bar-wrap{
     width: 30%;
     position: relative;
@@ -273,3 +285,77 @@ h1::before {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+  .search-icon {
+    width: 40px;
+    height: 36px;
+    border: 1px solid rgb(204, 139, 0);
+    background:  rgb(204, 139, 0);
+    text-align: center;
+    color: rgb(26, 24, 24);
+    border-radius: 5px 0 0 5px;
+    font-size: 20px;
+    outline: none;
+}
+/*Mazajiem ekraaniem*/
+
+@media (max-width: 768px){
+h1{
+    display: none;
+}
+h1::before{
+    display: none;
+}
+body {
+    line-height: 1.7;
+    font-family: "Nunito Sans", sans-serif;
+    color: #555;
+    background-color: #1f1e1e;
+}
+.container {
+    width: auto;
+    margin: 0 auto;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 2rem;
+}
+.search-bar-wrap{
+    width: 50%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+}
+@media (max-width: 575.98px){
+    h1{
+        display: none;
+    }
+    h1::before{
+        display: none;
+    }
+    body {
+        line-height: 1.7;
+        font-family: "Nunito Sans", sans-serif;
+        color: #555;
+        background-color: #1f1e1e;
+    }
+    .container {
+        width: auto;
+        margin: 0 auto;
+    } 
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+    }
+    .search-bar-wrap{
+        width: 90%;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
