@@ -14,7 +14,7 @@ $.get('sample.json', function(d) {
 		<div class="card__hero">
 			<img src="${$imgsrc}" alt="/data/img/no-img-placehold.png" class="card__img">
 			<div class="discount-icon-${$AtlaideExist}">
-				<span class="discount-icon" style="background-image: url('/data/img/blue-block.png')">${b.Atlaide}</span>
+				<span class="discount-icon">${b.Atlaide}</span>
 			</div>
 			<div class="price-icon">
 				<span class="block" style="price-icon">${$CenaOut}</span>
@@ -34,7 +34,7 @@ $.get('sample.json', function(d) {
   
 	$card.find(`.shop-${$Veikals}-icon`).hover(
 		function() {$card.find('.infotext').show(200);
-		$(this).animate({opacity: 0.6}, 200);
+		$(this).animate({opacity: 0.4}, 200);
 	},
 		function() {$card.find('.infotext').hide(200);
 		$(this).animate({opacity: 1}, 200);
