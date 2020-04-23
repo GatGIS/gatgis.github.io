@@ -12,7 +12,7 @@ $.get('sample.json', function(d) {
   
 		var $card = $(`<figure class="card">
 		<div class="card__hero">
-			<img src="${$imgsrc}" alt="/data/img/no-img-placehold.png" class="card__img">
+			<img src="${$imgsrc}" loading="lazy" alt="/data/img/no-img-placehold.png" class="card__img">
 			<div class="discount-icon-${$AtlaideExist}">
 				<span class="discount-icon">${b.Atlaide}</span>
 			</div>
