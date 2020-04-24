@@ -48,10 +48,10 @@ $.get('sample.json', function(d) {
 //search bar filter
 function search() {
 	var inputvalue, productcard, productname, i;
-	inputvalue = document.getElementById("product-search").value.toLocaleLowerCase();
+	inputvalue = document.getElementById("product-search").value.toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	productcard = document.getElementsByClassName("card");
 	for (i=0; i<productcard.length;i++){
-		productname = productcard[i].innerText.toLocaleLowerCase();
+		productname = productcard[i].innerText.toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 		if (productname.indexOf(inputvalue) != -1){
 			productcard[i].style.display = "";
 		} else{
