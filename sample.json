@@ -1,19 +1,5 @@
 [
 {
-    "Prece": "Alum CĒSU PREMIUM",
-    "Cenalitra": "None",
-    "Atlaide": "None",
-    "Euro": "25",
-    "Centi": "None",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alum-cesu-premium-00004.png?1589209842",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "*Cena pie preces norādīta ar atlaidi. Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
     "Prece": "Vīniem SANTA RITA",
     "Cenalitra": "None",
     "Atlaide": "None",
@@ -648,525 +634,429 @@
     ]
 },
 {
-    "Prece": "Alkoholiskais kokteilis CĒSU G&GRAPEFRUIT, 280 ml, 14% alk.",
-    "Cenalitra": "5,32 €/l",
-    "Atlaide": "None",
+    "Prece": "Alkoholiskais kokteilis BLACK BALSAM, 275 ml, 12% alk., trīs veidi",
+    "Cenalitra": "5,78 €/l",
+    "Atlaide": "-20%",
     "Euro": "1",
-    "Centi": "49",
+    "Centi": "59",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alkoholiskais-kokteilis-cesu-g-grapefruit-00151.png?1589209873",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alkoholiskais-kokteilis-black-balsam-00153.png?1589828746",
     "Veikals": "Maxima",
     "Info": [
         "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Vīns LAVEL BLANC, 0,75 l, 10,5% vai 11% alk., divi veidi",
-    "Cenalitra": "5,05 €/l",
-    "Atlaide": "-33%",
-    "Euro": "3",
-    "Centi": "79",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//vins-lavel-blanc-00152.png?1589209873",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Vīns BLUE LIGHT RIESLING, 0,75 l, 8,5% alk., Vācija",
-    "Cenalitra": "5,32 €/l",
-    "Atlaide": "-39%",
-    "Euro": "3",
-    "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//vins-blue-light-riesling-00153.png?1589209873",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Vīns GRAN CASTILLO, 0,75 l, 11% vai 12% alk., trīs veidi, Spānija",
-    "Cenalitra": "6,39 €/l",
-    "Atlaide": "None",
-    "Euro": "4",
-    "Centi": "79",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//vins-gran-castillo-00154.png?1589209873",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Vīns DOĻINI GRUZII TBILISI, 0,75 l, 12% alk., divi veidi, Gruzija",
+    "Prece": "Vīns KGM ALAZANI VALLEY, 0,75 l, 12% vai 12,5% alk., divi veidi, Gruzija",
     "Cenalitra": "6,65 €/l",
     "Atlaide": "None",
     "Euro": "4",
     "Centi": "99",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//vins-dolini-gruzii-tbilisi-00155.png?1589209873",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//vins-kgm-alazani-valley-00154.png?1589828746",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Vīniem ITALIA",
+    "Prece": "Vīns MEERESTEIN, 0,75 l, 12,5% vai 14,5% alk., divi veidi, DĀR",
+    "Cenalitra": "5,32 €/l",
+    "Atlaide": "-29%",
+    "Euro": "3",
+    "Centi": "99",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//vins-meerestein-00155.png?1589828676",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Vīns TORRE ORIA RESERVA, 0,75 l, 13% alk., Spānija",
+    "Cenalitra": "5,99 €/l",
+    "Atlaide": "-36%",
+    "Euro": "4",
+    "Centi": "49",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//vins-torre-oria-reserva-00156.png?1589828676",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Vīns MAIPO, 0,75 l, 12,5% vai 13% alk., divi veidi, Čīle",
+    "Cenalitra": "6,39 €/l",
+    "Atlaide": "-21%",
+    "Euro": "4",
+    "Centi": "79",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//vins-maipo-00157.png?1589828676",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Vermuts BELFIORE BIANCO, 1 l, 15% alk.",
     "Cenalitra": "None",
     "Atlaide": "None",
-    "Euro": "30",
+    "Euro": "3",
+    "Centi": "89",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//vermuts-belfiore-bianco-00158.png?1589828676",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Dzirkstošais vīns PRINCE PAUL HENRY, 0,75 l, 10% alk.",
+    "Cenalitra": "5,19 €/l",
+    "Atlaide": "-34%",
+    "Euro": "3",
+    "Centi": "89",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//dzirkstosais-vins-prince-paul-henry-00159.png?1589828676",
+    "Veikals": "Maxima",
+    "Info": [
+        "*Cena pie preces norādīta ar atlaidi.<br>Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Alum MEŽPILS",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "20",
     "Centi": "None",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//viniem-italia-00156.png?1589209873",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alum-mezpils-00160.png?1589828676",
     "Veikals": "Maxima",
     "Info": [
-        "*Cena pie preces norādīta ar atlaidi. Piedāvājums spēkā 12.05. - 18.05."
+        "Latvijas produkts",
+        "*Cena pie preces norādīta ar atlaidi. Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Dzirkstošais vīns MARTINI, 0,75 l, 7,5% alk. ASTI",
-    "Cenalitra": "8,65 €/l",
+    "Prece": "Alum LĪVU",
+    "Cenalitra": "None",
     "Atlaide": "None",
-    "Euro": "6",
-    "Centi": "49",
+    "Euro": "20",
+    "Centi": "None",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//dzirkstosais-vins-martini-00157.png?1589209873",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alum-livu-00161.png?1589828676",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Latvijas produkts",
+        "*Cena pie preces norādīta ar atlaidi. Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Dzirkstošais vīns MARTINI, 0,75 l, 11,5% alk. PROSECCO",
-    "Cenalitra": "9,32 €/l",
-    "Atlaide": "-29%",
-    "Euro": "6",
+    "Prece": "Alum BAUSKAS",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "20",
+    "Centi": "None",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alum-bauskas-00162.png?1589828677",
+    "Veikals": "Maxima",
+    "Info": [
+        "Latvijas produkts",
+        "*Cena pie preces norādīta ar atlaidi. Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Alus LĀČPLĒSIS GAIŠAIS, 1 iepak./6x 568 ml, 5% alk.",
+    "Cenalitra": "1,17 €/l",
+    "Atlaide": "-33%",
+    "Euro": "3",
     "Centi": "99",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//dzirkstosais-vins-martini-00158.png?1589209873",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alus-lacplesis-gaisais-00163.png?1589828677",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Latvijas produkts",
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Vermuts MARTINI BIANCO, 1 l, 15% alk.",
-    "Cenalitra": "None",
-    "Atlaide": "-24%",
-    "Euro": "8",
-    "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//vermuts-martini-bianco-00159.png?1589209873",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Alus LĀČPLĒSIS, 500 ml vai 568 ml, 4,8% vai 5% alk.",
-    "Cenalitra": "no 1,27 €/l",
+    "Prece": "Alus ALDARIS GAIŠAIS, 500 ml vai 568 ml, 5% alk.",
+    "Cenalitra": "no 1,32 €/l",
     "Atlaide": "None",
     "Euro": "0",
-    "Centi": "72",
+    "Centi": "75",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-lacplesis-00160.png?1589209831",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alus-aldaris-gaisais-00164.png?1589828677",
     "Veikals": "Maxima",
     "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Alus TĒRVETES SENČU gaišais, 500 ml, 4,5% alk.",
-    "Cenalitra": "1,90 €/l",
+    "Prece": "Alus dzēriens CĒSU RADLER, 500 ml, 2,5% alk., trīs veidi",
+    "Cenalitra": "1,50 €/l",
     "Atlaide": "None",
     "Euro": "0",
-    "Centi": "95",
+    "Centi": "75",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-tervetes-sencu-gaisais-00161.png?1589209831",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//alus-dzeriens-cesu-radler-00165.png?1589828681",
     "Veikals": "Maxima",
     "Info": [
         "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Alus CĒSU BRŪŽA, 500 ml vai 568 ml, 4,5-5,4% alk., dažādi veidi",
-    "Cenalitra": "no 1,50 €/l",
-    "Atlaide": "None",
-    "Euro": "0",
-    "Centi": "85",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-cesu-bruza-00162.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Alus BOCMANIS DZINTARJŪRAS, 1 l, 5,8% alk.",
-    "Cenalitra": "None",
-    "Atlaide": "-21%",
-    "Euro": "1",
-    "Centi": "19",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-bocmanis-dzintarjuras-00163.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Alus CARLSBERG, 500 ml, 5% alk., nefiltrētais",
-    "Cenalitra": "1,70 €/l",
-    "Atlaide": "-29%",
-    "Euro": "0",
-    "Centi": "85",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-carlsberg-00164.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Jaunums",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Alus dzēriens TĒRVETES RADLER, 500 ml, 2,7% alk., divi veidi",
-    "Cenalitra": "1,90 €/l",
-    "Atlaide": "-26%",
-    "Euro": "0",
-    "Centi": "95",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//alus-dzeriens-tervetes-radler-00165.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Degvīns KATJUŠA, 0,5 l, 40% alk.",
-    "Cenalitra": "10,38 €/l",
-    "Atlaide": "-20%",
+    "Prece": "Degvīns TUTEJŠAJA, 0,5 l, 40% alk., divi veidi",
+    "Cenalitra": "10,18 €/l",
+    "Atlaide": "-28%",
     "Euro": "5",
-    "Centi": "19",
+    "Centi": "09",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//degvins-katjusa-00166.png?1589209831",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//degvins-tutejsaja-00166.png?1589828681",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Degvīns BERJOZOVAJA ROŠČA, 0,5 l, 40% alk.",
-    "Cenalitra": "12,58 €/l",
-    "Atlaide": "-24%",
-    "Euro": "6",
-    "Centi": "29",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//degvins-berjozovaja-rosca-00167.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Degvīns BERJOZOVAJA ROŠČA, 0,7 l, 40% alk.",
-    "Cenalitra": "12,13 €/l",
-    "Atlaide": "-23%",
-    "Euro": "8",
-    "Centi": "49",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//degvins-berjozovaja-rosca-00168.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Latvijas produkts",
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Degvīns ABSOLUT, 0,7 l, 40% alk.",
-    "Cenalitra": "16,56 €/l",
-    "Atlaide": "None",
-    "Euro": "11",
-    "Centi": "59",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//degvins-absolut-00169.png?1589209831",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Brendijs IMPERIAL XII, 0,7 l, 36% alk.",
-    "Cenalitra": "14,70 €/l",
-    "Atlaide": "None",
-    "Euro": "10",
-    "Centi": "29",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//brendijs-imperial-xii-00170.png?1589209885",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Brendijs ARARAT 5*, 0,5 l, 40% alk.",
-    "Cenalitra": "21,98 €/l",
-    "Atlaide": "None",
-    "Euro": "10",
+    "Prece": "Degvīns FINLANDIA, 1 l, 40% alk.",
+    "Cenalitra": "None",
+    "Atlaide": "-26%",
+    "Euro": "14",
     "Centi": "99",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//brendijs-ararat-5-00171.png?1589209885",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//degvins-finlandia-00167.png?1589828681",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Viskijs GRANT'S, 1 l, 40% alk.",
+    "Prece": "Degvīns HLIBNIJ DAR, 0,5 l, 40% alk., trīs veidi",
+    "Cenalitra": "11,78 €/l",
+    "Atlaide": "-31%",
+    "Euro": "5",
+    "Centi": "89",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//degvins-hlibnij-dar-00168.png?1589828681",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Liķieris MALONEY'S, 0,7 l, 14,5% alk.",
+    "Cenalitra": "6,13 €/l",
+    "Atlaide": "-31%",
+    "Euro": "4",
+    "Centi": "29",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//likieris-maloney-s-00169.png?1589828681",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Stiprs alkoholiskais dzēriens HEKTORS, 0,7 l, 32% alk.",
+    "Cenalitra": "8,84 €/l",
+    "Atlaide": "None",
+    "Euro": "6",
+    "Centi": "19",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//stiprs-alkoholiskais-dzeriens-hektors-00170.png?1589828681",
+    "Veikals": "Maxima",
+    "Info": [
+        "Latvijas produkts",
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Rums CARIBBA, 0,5 l, 35% vai 37,5% alk., trīs veidi",
+    "Cenalitra": "14,18 €/l",
+    "Atlaide": "-31%",
+    "Euro": "7",
+    "Centi": "09",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//rums-caribba-00171.png?1589828681",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Viskijs JIM BEAM, 1 l, 40% alk.",
     "Cenalitra": "None",
     "Atlaide": "None",
     "Euro": "14",
     "Centi": "99",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//viskijs-grant-s-00172.png?1589209885",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//viskijs-jim-beam-00172.png?1589828681",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
-    "Prece": "Liķieris PASTURES IRISH CREAM, 0,7 l, 14,5% alk.",
-    "Cenalitra": "6,56 €/l",
-    "Atlaide": "-26%",
-    "Euro": "4",
-    "Centi": "59",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//likieris-pastures-irish-cream-00173.png?1589209885",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Konjaks COURVOISIER VSOP kārbā, 0,7 l, 40% alk.",
-    "Cenalitra": "36,41 €/l",
-    "Atlaide": "-21%",
-    "Euro": "25",
-    "Centi": "49",
-    "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//konjaks-courvoisier-vsop-karba-00174.png?1589209885",
-    "Veikals": "Maxima",
-    "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
-    ]
-},
-{
-    "Prece": "Viskijs TULLAMORE DEW, 1 l, 40% alk.",
-    "Cenalitra": "None",
+    "Prece": "Konjaks HENNESSY VS, 0,35 l, 40% alk.",
+    "Cenalitra": "37,11 €/l",
     "Atlaide": "None",
-    "Euro": "16",
+    "Euro": "12",
     "Centi": "99",
     "Vecacena": "None",
-    "Bilde": "/uploads/sale/2020/sales_page/05/11//viskijs-tullamore-dew-00175.png?1589209885",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//konjaks-hennessy-vs-00173.png?1589828681",
     "Veikals": "Maxima",
     "Info": [
-        "Piedāvājums spēkā 12.05. - 18.05."
+        "Piedāvājums spēkā 19.05. - 25.05."
+    ]
+},
+{
+    "Prece": "Brendijs J.P.CHENET XO, 0,7 l, 36% alk.",
+    "Cenalitra": "15,70 €/l",
+    "Atlaide": "-21%",
+    "Euro": "10",
+    "Centi": "99",
+    "Vecacena": "None",
+    "Bilde": "/uploads/sale/2020/sales_page/05/18//brendijs-j-p-chenet-xo-00174.png?1589828681",
+    "Veikals": "Maxima",
+    "Info": [
+        "Piedāvājums spēkā 19.05. - 25.05."
     ]
 },
 {
     "Prece": "Alus LĀČPLĒSIS",
-    "Cenalitra": "3.4 L,1.17€ / L",
-    "Atlaide": "-42%",
-    "Euro": "3",
-    "Centi": "99",
-    "Vecacena": "6.99 €",
-    "Bilde": "None",
+    "Cenalitra": "0.568 L,1.39€ / L",
+    "Atlaide": "-27%",
+    "Euro": "0",
+    "Centi": "79",
+    "Vecacena": "1.09 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034752_LV.jpg",
     "Veikals": "Rimi",
-    "Info": "Vecā cena: 6.99 €"
+    "Info": "Vecā cena: 1.09 €"
 },
 {
-    "Prece": "Alus MEŽPILS SENČU",
+    "Prece": "Alus CARLSBERG",
+    "Cenalitra": "0.5 L,1.78€ / L",
+    "Atlaide": "-25%",
+    "Euro": "0",
+    "Centi": "89",
+    "Vecacena": "1.19 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034801_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 1.19 €"
+},
+{
+    "Prece": "Alus TĒRVETE RADLER",
     "Cenalitra": "0.5 L,1.90€ / L",
     "Atlaide": "-20%",
     "Euro": "0",
     "Centi": "95",
     "Vecacena": "1.19 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033618_LV.jpg",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034746_LV.jpg",
     "Veikals": "Rimi",
     "Info": "Vecā cena: 1.19 €"
 },
 {
-    "Prece": "Alus LIDO",
-    "Cenalitra": "0.5 L,2.10€ / L",
-    "Atlaide": "-29%",
+    "Prece": "Alus VALMIERMUIŽA",
+    "Cenalitra": "0.5 L,3.38€ / L",
+    "Atlaide": "-13%",
     "Euro": "1",
-    "Centi": "05",
-    "Vecacena": "1.49 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033624_LV.jpg",
+    "Centi": "69",
+    "Vecacena": "1.95 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034749_LV.jpg",
     "Veikals": "Rimi",
-    "Info": "Vecā cena: 1.49 €"
+    "Info": "Vecā cena: 1.95 €"
 },
 {
-    "Prece": "Alus CĒSU BRŪŽA",
-    "Cenalitra": "0.568 L,1.57€ / L",
-    "Atlaide": "None",
-    "Euro": "0",
-    "Centi": "89",
-    "Vecacena": "None",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033621_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: None"
-},
-{
-    "Prece": "Degvīns KOSKENKORVA",
-    "Cenalitra": "1 L,13.79€ / L",
-    "Atlaide": "-25%",
+    "Prece": "Stiprs alkoholisks dzēriens JAGERMEISTER",
+    "Cenalitra": "0.7 L,19.99€ / L",
+    "Atlaide": "-17%",
     "Euro": "13",
-    "Centi": "79",
-    "Vecacena": "18.49 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033638_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 18.49 €"
-},
-{
-    "Prece": "Vīns LAVEL BLANC",
-    "Cenalitra": "0.75 L,5.32€ / L",
-    "Atlaide": "-32%",
-    "Euro": "3",
     "Centi": "99",
-    "Vecacena": "5.89 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033555_LV.jpg",
+    "Vecacena": "16.99 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034819_LV.jpg",
     "Veikals": "Rimi",
-    "Info": "Vecā cena: 5.89 €"
+    "Info": "Vecā cena: 16.99 €"
 },
 {
-    "Prece": "Dzirkstošs, vīnu saturošs dzēriens BOSCA",
-    "Cenalitra": "0.75 L,3.99€ / L",
-    "Atlaide": "None",
-    "Euro": "2",
-    "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033606_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: None"
-},
-{
-    "Prece": "Vīns CALVET ROSE",
-    "Cenalitra": "0.75 L,9.32€ / L",
-    "Atlaide": "-22%",
-    "Euro": "6",
-    "Centi": "99",
-    "Vecacena": "8.99 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033603_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 8.99 €"
-},
-{
-    "Prece": "Viskijs TULLAMORE",
-    "Cenalitra": "0.7 L,18.56€ / L",
-    "Atlaide": "-21%",
-    "Euro": "12",
-    "Centi": "99",
-    "Vecacena": "16.59 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033627_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 16.59 €"
-},
-{
-    "Prece": "RĪGAS MELNAIS BALZAMS",
-    "Cenalitra": "1 GAB,15.99€ / GAB",
-    "Atlaide": "None",
+    "Prece": "Viskijs JIM BEAM",
+    "Cenalitra": "1 L,15.99€ / L",
+    "Atlaide": "-12%",
     "Euro": "15",
     "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033633_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: None"
-},
-{
-    "Prece": "Vīns SENSI",
-    "Cenalitra": "0.75 L,13.32€ / L",
-    "Atlaide": "-34%",
-    "Euro": "9",
-    "Centi": "99",
-    "Vecacena": "13.79 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033600_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 13.79 €"
-},
-{
-    "Prece": "Dzirkstošais vīrs DONELLI",
-    "Cenalitra": "0.75 L,7.99€ / L",
-    "Atlaide": "-47%",
-    "Euro": "5",
-    "Centi": "99",
-    "Vecacena": "11.49 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033552_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 11.49 €"
-},
-{
-    "Prece": "Sarkanvīns MARANI KINDZMARAULI",
-    "Cenalitra": "0.75 L,9.32€ / L",
-    "Atlaide": "-46%",
-    "Euro": "6",
-    "Centi": "99",
-    "Vecacena": "12.99 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033558_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 12.99 €"
-},
-{
-    "Prece": "Degvīns ABSOLUT VODKA",
-    "Cenalitra": "0.7 L,17.13€ / L",
-    "Atlaide": "None",
-    "Euro": "11",
-    "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033636_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: None"
-},
-{
-    "Prece": "Viskijs BALLENTINE'S",
-    "Cenalitra": "0.7 L,17.13€ / L",
-    "Atlaide": "None",
-    "Euro": "11",
-    "Centi": "99",
-    "Vecacena": "None",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033630_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: None"
-},
-{
-    "Prece": "Konjaks HENNESSY",
-    "Cenalitra": "0.5 L,37.98€ / L",
-    "Atlaide": "-22%",
-    "Euro": "18",
-    "Centi": "99",
-    "Vecacena": "24.65 €",
-    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051509/web-leaflet/LEAFLET_20200511033641_LV.jpg",
-    "Veikals": "Rimi",
-    "Info": "Vecā cena: 24.65 €"
-},
-{
-    "Prece": "Vīns FABER",
-    "Cenalitra": "0.75 L,7.45€ / L",
-    "Atlaide": "-37%",
-    "Euro": "5",
-    "Centi": "59",
-    "Vecacena": "8.95 €",
+    "Vecacena": "18.29 €",
     "Bilde": "None",
     "Veikals": "Rimi",
-    "Info": "Vecā cena: 8.95 €"
+    "Info": "Vecā cena: 18.29 €"
+},
+{
+    "Prece": "Degvīns ZELONAJA MARKA",
+    "Cenalitra": "1 L,11.99€ / L",
+    "Atlaide": "-39%",
+    "Euro": "11",
+    "Centi": "99",
+    "Vecacena": "16.49 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034813_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 16.49 €"
+},
+{
+    "Prece": "Vīns BLUE NUN",
+    "Cenalitra": "0.75 L,7.99€ / L",
+    "Atlaide": "-35%",
+    "Euro": "5",
+    "Centi": "99",
+    "Vecacena": "9.29 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034810_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 9.29 €"
+},
+{
+    "Prece": "Vīns MONTALTO",
+    "Cenalitra": "0.75 L,9.32€ / L",
+    "Atlaide": "-34%",
+    "Euro": "6",
+    "Centi": "99",
+    "Vecacena": "10.69 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034805_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 10.69 €"
+},
+{
+    "Prece": "Vīns LES MOUGEOETTES",
+    "Cenalitra": "0.75 L,7.99€ / L",
+    "Atlaide": "-43%",
+    "Euro": "5",
+    "Centi": "99",
+    "Vecacena": "10.65 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034807_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 10.65 €"
+},
+{
+    "Prece": "Stiprs alkoholisks dzēriens CAPTAIN MORGAN",
+    "Cenalitra": "0.7 L,17.13€ / L",
+    "Atlaide": "-17%",
+    "Euro": "11",
+    "Centi": "99",
+    "Vecacena": "14.59 €",
+    "Bilde": "https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020051912/web-leaflet/LEAFLET_20200515034817_LV.jpg",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 14.59 €"
+},
+{
+    "Prece": "Vīns RUPPERTSBERGER",
+    "Cenalitra": "3 L,5.33€ / L",
+    "Atlaide": "-27%",
+    "Euro": "15",
+    "Centi": "99",
+    "Vecacena": "21.99 €",
+    "Bilde": "None",
+    "Veikals": "Rimi",
+    "Info": "Vecā cena: 21.99 €"
 },
 {
     "Prece": "VĪNS GRAN CASTILLO",
@@ -1257,17 +1147,6 @@
     "Info": "0,5 l/alk. 30%; 11,98 €/l"
 },
 {
-    "Prece": "LIĶIERIS CANARI PINA COLADA",
-    "Cenalitra": "None",
-    "Atlaide": "None",
-    "Euro": "3",
-    "Centi": "99",
-    "Vecacena": "4.99€ - 5.49€",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/05/368258.jpg",
-    "Veikals": "Elvi",
-    "Info": "0,35 l/alk. 15%; 11,40 €/l"
-},
-{
     "Prece": "CĒSU ALUS MĪTAVA",
     "Cenalitra": "None",
     "Atlaide": "None",
@@ -1312,6 +1191,17 @@
     "Info": "0,5 l/alk. 4%; 2,10 €/l vai 1,90 €/l"
 },
 {
+    "Prece": "LIĶIERIS CANARI PINA COLADA",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "3",
+    "Centi": "99",
+    "Vecacena": "4.99€ - 5.49€",
+    "Bilde": "http://elvi.lv/wp-content/uploads/2020/05/368258.jpg",
+    "Veikals": "Elvi",
+    "Info": "0,35 l/alk. 15%; 11,40 €/l"
+},
+{
     "Prece": "STIPRS, ALKOHOLISKS DZĒRIENS OAKHEART",
     "Cenalitra": "None",
     "Atlaide": "None",
@@ -1345,15 +1235,15 @@
     "Info": "0,7 l/alk. 40%; 18,56 €/l"
 },
 {
-    "Prece": "BRENDIJS ST-RÉMY VSOP",
+    "Prece": "DZIRKSTOŠAIS VĪNS MARTINI",
     "Cenalitra": "None",
     "Atlaide": "None",
-    "Euro": "9",
+    "Euro": "6",
     "Centi": "99",
-    "Vecacena": "13.59€ - 14.49€",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/05/363164_St-Remy-VSOP-0.7.jpg",
+    "Vecacena": "8.79€ - 11.59€",
+    "Bilde": "http://elvi.lv/wp-content/uploads/2020/05/37229_372361.jpg",
     "Veikals": "Elvi",
-    "Info": "0,5 l/alk. 36%; 19,98 €/l"
+    "Info": "dažādi veidi; 0,75 l/alk. 7,5%, 11,5%; 9,32 €/l"
 },
 {
     "Prece": "NEFILTRĒTS BRŪŽA APIŅOTAIS ALUS",
@@ -1365,17 +1255,6 @@
     "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/235689_235688.jpg",
     "Veikals": "Elvi",
     "Info": "0,568 l vai 0,5 l/alk. 4,7%; no 1,39 €/l"
-},
-{
-    "Prece": "VISKIJS HIGH COMMISSIONER",
-    "Cenalitra": "None",
-    "Atlaide": "None",
-    "Euro": "11",
-    "Centi": "99",
-    "Vecacena": "12.79€ - 13.99€",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/36421.jpg",
-    "Veikals": "Elvi",
-    "Info": "0,7 l/alk. 40%; 17,13 €/l"
 },
 {
     "Prece": "DZIRKSTOŠAIS VĪNS CA‘ DI RAJO PROSECCO DOC BRUT",
@@ -1466,6 +1345,17 @@
     "Info": "ASV; dažādi veidi; 0,75 l/alk. 13,5 -14%; 11,99 €/l vai 10,65 €/l"
 },
 {
+    "Prece": "VISKIJS HIGH COMMISSIONER",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "11",
+    "Centi": "99",
+    "Vecacena": "12.79€ - 13.99€",
+    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/36421.jpg",
+    "Veikals": "Elvi",
+    "Info": "0,7 l/alk. 40%; 17,13 €/l"
+},
+{
     "Prece": "KONJAKS KĀRBĀ RENAULT CARTE NOIRE VSOP",
     "Cenalitra": "None",
     "Atlaide": "None",
@@ -1497,6 +1387,28 @@
     "Bilde": "http://elvi.lv/wp-content/uploads/2020/03/360934_Degvins_Stolichnaya_700ml.jpg",
     "Veikals": "Elvi",
     "Info": "0,7 l/alk. 40%; 18,56 €/l"
+},
+{
+    "Prece": "SARKANVĪNS VIEUX DOMAINE DE BLOIN",
+    "Cenalitra": "None",
+    "Atlaide": "None",
+    "Euro": "5",
+    "Centi": "99",
+    "Vecacena": "7.99€",
+    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/462376.jpg",
+    "Veikals": "Elvi",
+    "Info": "FRANCIJA; 0,75 l/alk. 13%; 7,99 €/l"
+},
+{
+    "Prece": "VĪNS12 E MEZZO",
+    "Cenalitra": "Pērkot +",
+    "Atlaide": "None",
+    "Euro": "9",
+    "Centi": "99",
+    "Vecacena": "Pērkot vairāk!",
+    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/462292_462293_462362.jpg",
+    "Veikals": "Elvi",
+    "Info": "ITĀLIJA; dažādi veidi; 0,75 l/alk. 12,5 %; 14,65 €/l vai 13,32 €/l"
 },
 {
     "Prece": "VĪNS UNICORN",
@@ -1642,28 +1554,6 @@
     "Info": "FRANCIJA; 0,75 l/alk. 13%; 7,99 €/l"
 },
 {
-    "Prece": "SARKANVĪNS VIEUX DOMAINE DE BLOIN",
-    "Cenalitra": "None",
-    "Atlaide": "None",
-    "Euro": "5",
-    "Centi": "99",
-    "Vecacena": "7.99€",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/462376.jpg",
-    "Veikals": "Elvi",
-    "Info": "FRANCIJA; 0,75 l/alk. 13%; 7,99 €/l"
-},
-{
-    "Prece": "VĪNS12 E MEZZO",
-    "Cenalitra": "Pērkot +",
-    "Atlaide": "None",
-    "Euro": "9",
-    "Centi": "99",
-    "Vecacena": "Pērkot vairāk!",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/04/462292_462293_462362.jpg",
-    "Veikals": "Elvi",
-    "Info": "ITĀLIJA; dažādi veidi; 0,75 l/alk. 12,5 %; 14,65 €/l vai 13,32 €/l"
-},
-{
     "Prece": "VĪNS LUPO NERO",
     "Cenalitra": "Pērkot 2+",
     "Atlaide": "None",
@@ -1717,27 +1607,5 @@
     "Bilde": "http://elvi.lv/wp-content/uploads/2020/02/462329.jpg",
     "Veikals": "Elvi",
     "Info": "AUSTRĀLIJA; dažādi veidi 0,75 l/alk. 12%, 13%, 14%; 9,32 €/l vai 7,99 €/l"
-},
-{
-    "Prece": "VĪNS SIERRA LOS ANDES",
-    "Cenalitra": "Pērkot 2+",
-    "Atlaide": "None",
-    "Euro": "7",
-    "Centi": "99",
-    "Vecacena": "Pērkot vairāk!",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/02/462287.jpg",
-    "Veikals": "Elvi",
-    "Info": "ARGENTĪNA; 0,75 l/alk. 13,5 % 11,99 €/l vai 10,65 €/l"
-},
-{
-    "Prece": "VĪNS SIERRA LOS ANDES",
-    "Cenalitra": "Pērkot 2+",
-    "Atlaide": "None",
-    "Euro": "7",
-    "Centi": "99",
-    "Vecacena": "Pērkot vairāk!",
-    "Bilde": "http://elvi.lv/wp-content/uploads/2020/02/462287.jpg",
-    "Veikals": "Elvi",
-    "Info": "ARGENTĪNA; 0,75 l/alk. 13,5 % 11,99 €/l vai 10,65 €/l"
 }
 ]
