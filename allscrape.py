@@ -24,11 +24,11 @@ def GetDataMaxima():
 	except:
 		print("Popups nav atrasts!")
 	#click dzerienu sadala
-	browser.find_element(By.XPATH, '/html/body/div[4]/div/div[3]/a[14]').click()
+	browser.find_element(By.XPATH, '/html/body/div[2]/div/div[3]/a[15]').click()
 	time.sleep(2)
 	#click "raadiit" button, lai ielaadeejas vairaak piedavajumi
 	try:
-		browser.find_element(By.XPATH, '/html/body/div[6]/div[4]/a').click()
+		browser.find_element(By.XPATH, '/html/body/div[4]/div[4]/a').click()
 		time.sleep(2)
 	except:
 		print("Nepastaav vairaakas lapas")
