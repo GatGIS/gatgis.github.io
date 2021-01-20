@@ -59,3 +59,17 @@ function search() {
 		}
 	}
 }
+//last update date field
+const dateTagClass = ".lastchange";
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function()
+{
+  if (this.readyState == 4 && this.status == 200)
+	{
+    let repo = JSON.parse(this.responseText);
+        var date = new Date(repo.updated_at).toISOString().substr(0, 19).replace('T', ' ');  
+      $(dateTagClass).text(`Atjaunots: ${date}`);
+	}
+};
+xhttp.open("GET", "https://api.github.com/repos/GatGIS/gatgis.github.io", true);
+xhttp.send();
