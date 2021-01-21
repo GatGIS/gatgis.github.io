@@ -297,6 +297,13 @@ h1::before {
     font-size: 20px;
     outline: none;
 }
+.lastchange{
+    width: 30%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 /*Mazajiem ekraaniem*/
 
 @media (max-width: 768px){
