@@ -6,7 +6,7 @@ function init(){
             zoom: 2
         }),
         layers: [
-            new.ol.layer.Tile({
+            new ol.layer.Tile({
                 source: new ol.source.OSM()
             })
         ],
