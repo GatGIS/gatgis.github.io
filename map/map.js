@@ -7,12 +7,29 @@ function init(){
         }),
         layers: [
             new ol.layer.Tile({
+                title: 'OSM',
                 source: new ol.source.OSM()
-            })
+            }),
+            new ol.layer.Tile({
+                title: 'LGIA Ortofoto',
+                source: new ol.source.TileArcGISRest({
+                  url: 'http://services.lgia.gov.lv/arcfree/rest/services/WMS_Ortofoto_v6/MapServer',
+                  //crossOrigin: 'anonymous',
+                  attributions:
+                    '© <a href="http://services.lgia.gov.lv/arcfree/rest/services"' +
+                    'target="_blank">LĢIA</a>',
+
+                }),
+              })
         ],
         target: 'map'
     })
     map.on('click', function(e){
         console.log(e.coordinate);
     })
+    var layerSwitcher = new LayerSwitcher({
+        reverse: true,
+        groupSelectStyle: 'group'
+    });
+    map.addControl(layerSwitcher);
 }
