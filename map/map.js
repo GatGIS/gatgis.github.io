@@ -13,7 +13,7 @@ function init(){
             new ol.layer.Tile({
                 title: 'LGIA Ortofoto',
                 source: new ol.source.TileArcGISRest({
-                  url: 'http://services.lgia.gov.lv/arcfree/rest/services/WMS_Ortofoto_v6/MapServer',
+                  url: 'https://services.lgia.gov.lv/arcfree/rest/services/WMS_Ortofoto_v6/MapServer',
                   //crossOrigin: 'anonymous',
                   attributions:
                     '© <a href="http://services.lgia.gov.lv/arcfree/rest/services"' +
