@@ -7,7 +7,16 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver import Chrome
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from datetime import date
+today = date.today()
+# dd/mm/YY
+d1 = today.strftime("%d/%m/%Y")
+#Explicit waits
+#try:
+#    element = WebDriverWait(browser, 10).until(
+#        EC.presence_of_element_located((By.ID, "myDynamicElement"))
+#    )
+#
 rinda = 0
 maximacount = rimicount = elvicount = 0
 def GetDataMaxima():
@@ -20,15 +29,18 @@ def GetDataMaxima():
 
 	try:
 		time.sleep(2)
+		#browser.find_element(By.XPATH, '/html/body/div[9]/div/div/a').click()
 		browser.find_element(By.XPATH, '/html/body/div[10]/div/div/a').click()
+		browser.find_element(By.XPATH, '/html/body/div[8]/div/div/a').click()
+		
 	except:
 		print("Popups nav atrasts!")
-	#click dzerienu sadala
-	browser.find_element(By.XPATH, '/html/body/div[2]/div/div[3]/a[15]').click()
+	#click alkohola sadala 
+	browser.find_element(By.XPATH, '/html/body/div[4]/div/div[3]/a[14]').click() 
 	time.sleep(2)
 	#click "raadiit" button, lai ielaadeejas vairaak piedavajumi
 	try:
-		browser.find_element(By.XPATH, '/html/body/div[4]/div[4]/a').click()
+		browser.find_element(By.XPATH, '/html/body/div[5]/div[4]/a').click()
 		time.sleep(2)
 	except:
 		print("Nepastaav vairaakas lapas")
@@ -36,7 +48,10 @@ def GetDataMaxima():
 	maximahtml = browser.execute_script("return document.documentElement.outerHTML")
 	soup = BeautifulSoup(maximahtml, "html.parser")
 	browser.quit()
-
+	##notiira veco json failu un sāk listu
+	#with open("sample.json", "w", encoding='utf8') as outfile: 
+	#		outfile.write('[\n')
+	#rinda=0
 	for prece in soup.findAll("div", class_= "col-third"):
 		cenainfo = prece.find('div', class_= "title").text
 		try:
@@ -66,7 +81,8 @@ def GetDataMaxima():
 				tagi.append(t.get('data-alt'))
 		except:
 			tagi=[]
-		#Katras preces dict->objekts kas tiek konvertets un pectam uz json 
+		#print((cenainfo + ' || ' + cenalitraa + ' || ' + atlaide + ' || ' + apaliEuro + ' || ' + apaliCenti))
+		#Katras preces dict->objekts kas tiek konvertets uz pectam uz json 
 		JsonObjekts ={
 			"Prece" : cenainfo, 
 			"Cenalitra" : cenalitraa, 
@@ -97,6 +113,7 @@ def GetDataRimi():
 	page = requests.get(url, headers=ua)
 
 	soup = BeautifulSoup(page.content, "html.parser")
+	#preces = soup.findAll("a", {"data-content-category" : "Alkohols"})
 	for prece in soup.findAll("a", {"data-content-category" : "Alkohols"}):
 		nosaukums = (prece.attrs['data-gtm-click-name'])
 		#piedNr = (prece.attrs['data-offer-id'])
@@ -106,8 +123,9 @@ def GetDataRimi():
 		except:
 			cenainfo2 = 'None'
 		try:
+			#atlaideprocunsplit = prece.find('div', class_="badge_c").text.strip()
 			atlaideprocunsplit = prece.find('div', class_="badge_c").find('div', class_="text").text.strip()
-			atlaideproc = "".join(line.strip() for line in atlaideprocunsplit.split("\n"))
+			atlaideproc = "".join(line.strip() for line in atlaideprocunsplit.split("\n")) 
 
 		except:
 			atlaideproc = 'None'
@@ -124,6 +142,7 @@ def GetDataRimi():
 		try:
 			divBilde = prece.find('div', class_="offer-card__image-cloudinary")
 			Bilde=divBilde.attrs.get('data-image-url')
+			#<div class="offer-card__image-cloudinary js-offer-image is-loaded" data-image-url="https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020041215/web-leaflet/LEAFLET_20200403053505_LV.jpg" style="background-image: url(&quot;https://rimibaltic-web-res.cloudinary.com/image/upload/b_white,c_fit,f_auto,h_320,q_auto,w_320/v2020041215/web-leaflet/LEAFLET_20200403053505_LV.jpg&quot;);"></div>
 			if Bilde is None:
 				Bilde = "None"
 		except:
@@ -148,6 +167,7 @@ def GetDataRimi():
 			rinda+=1
 	rimicount= ((rinda+1)-maximacount)
 	print(f"No RIMI nolasīti {rimicount} produkti")
+		#print(nosaukums + " || " + cenainfo2 + " || " + b4price + " || " + atlaideproc + " || " + apaliEuro + " || " + apaliCenti + " || " + piedNr)
 ###ELVI###
 def GetDataElvi():
 	global rinda, maximacount, rimicount, elvicount
@@ -165,6 +185,7 @@ def GetDataElvi():
 			browser.find_element_by_xpath("//*[text()='Rādīt vēl...']").click()
 		except:
 			print("Could not press Load more button!")
+			break
 	#nolasa html ar ielaadeetajiem obejktiem
 	elvihtml = browser.execute_script("return document.documentElement.outerHTML")
 	soup = BeautifulSoup(elvihtml, "html.parser")
@@ -176,7 +197,10 @@ def GetDataElvi():
 		cenainfo = prece.find('div', class_= "title").find('span').text
 		cena = prece.find('div', class_= "col discount").find('p').text[:-1]
 		apaliEuro, apaliCenti= cena.split(".")
-		b4price = prece.find('div', class_="col discount").find('span').text
+		try:
+			b4price = prece.find('div', class_="col discount").find('span').text
+		except:
+			b4price = "None"
 		if b4price == "Pērkot vairāk!":
 			cenalitra = "Pērkot " + prece.find('div', class_="tooltip moreless tooltipstered").text
 		else:
