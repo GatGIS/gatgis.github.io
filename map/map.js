@@ -24,7 +24,9 @@ function init(){
             new ol.layer.Tile({
                 title: 'Kadastrs',
                 source: new ol.source.TileWMS({
-                    url: 'https://lvmgeoserver.lvm.lv/geoserver/ows?layer=publicwfs%3AKadastra_karte',
+                    url: 'https://lvmgeoserver.lvm.lv/geoserver/ows',
+                    params: {'LAYERS': 'publicwfs:kkparcel', 'TILED': true},
+                    serverType: 'geoserver'
                 }),
             })
             ],
