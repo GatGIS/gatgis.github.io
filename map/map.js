@@ -10,7 +10,7 @@ function init(){
                 title: 'OSM',
                 source: new ol.source.OSM()
             }),
-            new ol.layer.Tile({
+            /*new ol.layer.Tile({
                 title: 'LGIA Ortofoto',
                 source: new ol.source.TileArcGISRest({
                   url: 'https://services.lgia.gov.lv/arcfree/rest/services/WMS_Ortofoto_v6/MapServer',
@@ -20,7 +20,15 @@ function init(){
                     'target="_blank">LĢIA</a>',
 
                 }),
+              }),*/
+            new ol.layer.Tile({
+              title: 'Ortofoto 7',
+              source: new ol.source.TileWMS({
+                  url: 'https://lvmgeoserver.lvm.lv/geoserver/ows',
+                  params: {'LAYERS': 'public:Orto_7cikls', 'TILED': true},
+                  serverType: 'geoserver'
               }),
+            }),              
             new ol.layer.Tile({
                 title: 'Kadastrs',
                 source: new ol.source.TileWMS({
