@@ -20,8 +20,14 @@ function init(){
                     'target="_blank">LĢIA</a>',
 
                 }),
-              })
-        ],
+              }),
+            new ol.layer.Tile({
+                title: 'Kadastrs',
+                source: new ol.source.TileWMS({
+                    url: 'https://lvmgeoserver.lvm.lv/geoserver/ows?service=wms&version=1.3.0&request=GetCapabilities&layer=publicwfs%3AKadastra_karte',
+                }),
+            })
+            ],
         target: 'map'
     })
     map.on('click', function(e){
