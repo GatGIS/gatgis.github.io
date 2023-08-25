@@ -1,0 +1,166 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+  h1 {
+    font-family: 'Impact', sans-serif;
+    font-size: 2rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    color: #610808;
+  }
+/* Style for language buttons */
+.language-button {
+  display: block;
+  width: 65%;
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin: 0 auto; /* Center horizontally */
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 2px solid #007bff; /* Default border style */
+}
+.language-button.selected {
+  border-color: #041425; /* Darker border for selected button */
+}
+
+/* Style for the Start Game button */
+#start-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  text-align: center;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#settings-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+}
+
+/* Style for the restart button */
+#restart-button {
+  padding: 8px 15px;
+  background-color: #006699;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Style for the restart button on hover */
+#restart-button:hover {
+  background-color: #004c66;
+}
+
+/* ... (other styles) */
+
+  
+  #game-container {
+    text-align: center;
+  }
+  #player-count {
+    width: 80%; /* Adjust width as needed */
+    margin: 0 auto; /* Center the slider */
+    display: block; /* Ensure the slider takes full width */
+  }
+  #timer {
+    width: 80%; /* Adjust width as needed */
+    margin: 0 auto; /* Center the slider */
+    display: block; /* Ensure the slider takes full width */
+  }
+  
+  #cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+    
+  }
+
+
+/* Add a common style for the unrevealed card */
+.card {
+    width: 160px;
+    height: 120px;
+    border: 2px solid #333;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #006699; /* A blue color for the back of the cards */
+    color: white;
+    border-radius: 10px; /* Rounded corners */
+  }
+  
+  /* Add a style for the revealed spy card */
+  .card.spy {
+    background-color: red;
+    color: white;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  /* Add a style for the revealed and grayed-out card */
+/* Add a style for the used card */
+.card.used {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+  
+  /* Add a style for the revealed card with red background */
+  .card.revealed {
+    background-color: red;
+    cursor: pointer;
+  }
+/* Add a style for the countdown timer */
+/* Add a style for the countdown timer */
+.countdown {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+/* Style for the "Back to Start" button */
+#back-to-start-button {
+  padding: 8px 15px;
+  background-color: #006699;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+#countdown-container {
+  text-align: center;
+}
+/* Style for the "Back to Start" button on hover */
+#back-to-start-button:hover {
+  background-color: #004c66;
+}
