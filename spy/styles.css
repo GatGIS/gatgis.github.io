@@ -1,3 +1,27 @@
+/* Disable text selection for the entire page */
+body {
+  user-select: none;
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For Internet Explorer/Edge */
+}
+
+/* Disable text selection for specific elements */
+.card,
+.language-button,
+#back-to-start-button,
+#restart-button,
+#start-button,
+#player-count,
+#timer,
+#player-count-value,
+#timer-value,
+.countdown {
+  user-select: none;
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For Internet Explorer/Edge */
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -94,10 +118,13 @@ body {
   }
   
   #cards-container {
+    height: 90vh;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 20px;
+    margin-bottom: 10vh;
+    overflow-y: auto;
+    margin-top: 15vh
     
   }
 
