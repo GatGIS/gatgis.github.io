@@ -188,6 +188,7 @@ function startCountdown() {
   updateCountdown();
 }
 
+
 function updateCountdown() {
   if (remainingTime <= 0) {
     clearInterval(countdownInterval);
@@ -227,7 +228,7 @@ function revealCard(card, location, cardIndex, spyIndex) {
     isCardRevealing = false; // Reset the flag after the reveal timeout
     randomLocation = location; // Assign randomLocation here, after the reveal
     checkAllUsed();
-  }, 1000);
+  }, 3000);
 }
 
 function checkAllUsed() {
