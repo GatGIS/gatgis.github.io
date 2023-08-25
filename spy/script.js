@@ -37,7 +37,20 @@ backToStartButton.addEventListener('click', backToStart);
 restartButton.addEventListener('click', restartGame);
 playerCountInput.addEventListener('input', updatePlayerCount);
 timerInput.addEventListener('input', updateTimer);
-startButton.addEventListener('click', startGame);
+startButton.addEventListener('click', () => {
+  const element = document.documentElement; // Fullscreen the entire document
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) { // Firefox
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) { // IE/Edge
+    element.msRequestFullscreen();
+  }
+  startGame();
+});
+
 
 updatePlayerCount();
 updateTimer();
