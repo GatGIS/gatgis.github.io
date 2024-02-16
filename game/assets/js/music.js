@@ -55,7 +55,7 @@ const setVolume = () => {
     });
 
     bgmBattleGuardian = new Howl({
-        src: ['./assets/bgm/battle_guardian.webm', './assets/bgm/battle_guardian.mp3'],
+        src: ['./assets/bgm/gaudeamus.mp3'],
         volume: volume.bgm * volume.master,
         loop: true
     });

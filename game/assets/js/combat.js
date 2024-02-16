@@ -245,7 +245,7 @@ const updateCombatLog = () => {
     if (enemyDead) {
         let button = document.createElement("div");
         button.className = "decision-panel";
-        button.innerHTML = `<button id="battleButton">Claim</button>`;
+        button.innerHTML = `<button id="battleButton">Razēt</button>`;
         combatLogBox.appendChild(button);
     }
 

@@ -118,7 +118,7 @@ const dungeonEvent = () => {
                         <button id="choice2">Ignorēt</button>
                     </div>`;
                 if (dungeon.progress.room == dungeon.progress.roomLimit) {
-                    addDungeonLog(`<span class="Heirloom">Tu atradi durvis uz Konventa zāli.</span>`, choices);
+                    addDungeonLog(`<span class="Mantots">Tu atradi durvis uz Konventa zāli.</span>`, choices);
                 } else {
                     addDungeonLog("Tu atradi durvis.", choices);
                 }
@@ -205,7 +205,7 @@ const dungeonEvent = () => {
                             <button id="choice1">Ziedot</button>
                             <button id="choice2">Ignorēt</button>
                         </div>`;
-                    addDungeonLog(`<span class="Legendary">Tu atradi konfuksi, kurš prasa aizdot naudu burgai. Vai vēlies viņam ziedot <i class="fas fa-coins" style="color: #FFD700;"></i><span class="Lietots">${nFormatter(cost)}</span>, lai saņemtu viņa svētību? (Svētības Līmenis.${player.blessing})</span>`, choices);
+                    addDungeonLog(`<span class="Leģendārs">Tu atradi konfuksi, kurš prasa aizdot naudu burgai. Vai vēlies viņam ziedot <i class="fas fa-coins" style="color: #FFD700;"></i><span class="Lietots">${nFormatter(cost)}</span>, lai saņemtu viņa svētību? (Svētības Līmenis.${player.blessing})</span>`, choices);
                     document.querySelector("#choice1").onclick = function () {
                         if (player.gold < cost) {
                             sfxDeny.play();
@@ -235,7 +235,7 @@ const dungeonEvent = () => {
                                 <button id="choice1">Ziedot</button>
                                 <button id="choice2">Ignorēt</button>
                             </div>`;
-                    addDungeonLog(`<span class="Heirloom">Tu vari uzrīkot Bēgšanu. Vai tērēsi rīkošanai <i class="fas fa-coins" style="color: #FFD700;"></i><span class="Lietots">${nFormatter(cost)}</span> latus? Tas padarīs uzdevumus grūtākus, bet arī uzlabos atrastā ekipējuma kvalitāti (Bēgšanas Līmenis.${curseLvl})</span>`, choices);
+                    addDungeonLog(`<span class="Mantots">Tu vari uzrīkot Bēgšanu. Vai tērēsi rīkošanai <i class="fas fa-coins" style="color: #FFD700;"></i><span class="Lietots">${nFormatter(cost)}</span> latus? Tas padarīs uzdevumus grūtākus, bet arī uzlabos atrastā ekipējuma kvalitāti (Bēgšanas Līmenis.${curseLvl})</span>`, choices);
                     document.querySelector("#choice1").onclick = function () {
                         if (player.gold < cost) {
                             sfxDeny.play();
@@ -263,7 +263,7 @@ const dungeonEvent = () => {
                                 <button id="choice1">Ieiet</button>
                                 <button id="choice2">Ignorēt</button>
                             </div>`;
-                    addDungeonLog(`<span class="Heirloom">Tu atradi mistērisku kambari. Šķiet, ka tajā kāds guļ.</span>`, choices);
+                    addDungeonLog(`<span class="Mantots">Tu atradi mistērisku kambari. Šķiet, ka tajā kāds guļ.</span>`, choices);
                     document.querySelector("#choice1").onclick = function () {
                         specialBossBattle();
                     }
@@ -282,7 +282,7 @@ const dungeonEvent = () => {
 const engageBattle = () => {
     showCombatInfo();
     startCombat(bgmBattleMain);
-    addCombatLog(`Tu uzskrēji ${enemy.name}.`);
+    addCombatLog(`Tev priekšā ${enemy.name}.`);
     updateDungeonLog();
 }
 
@@ -291,8 +291,8 @@ const mimicBattle = (type) => {
     generateRandomEnemy(type);
     showCombatInfo();
     startCombat(bgmBattleMain);
-    addCombatLog(`Tu uzskrēji ${enemy.name}.`);
-    addDungeonLog(`Tu uzskrēji ${enemy.name}.`);
+    addCombatLog(`Tev priekšā ${enemy.name}.`);
+    addDungeonLog(`Tev priekšā ${enemy.name}.`);
 }
 
 // Guardian boss fight
@@ -301,7 +301,7 @@ const guardianBattle = () => {
     generateRandomEnemy("guardian");
     showCombatInfo();
     startCombat(bgmBattleGuardian);
-    addCombatLog(`Floor Guardian ${enemy.name} is blocking your way.`);
+    addCombatLog(`Tev priekšā ir ${enemy.name}.`);
     addDungeonLog("Tu nonāc nākamajā stāvā.");
 }
 
@@ -310,8 +310,8 @@ const specialBossBattle = () => {
     generateRandomEnemy("sboss");
     showCombatInfo();
     startCombat(bgmBattleBoss);
-    addCombatLog(`Dungeon Monarch ${enemy.name} has awoken.`);
-    addDungeonLog(`Dungeon Monarch ${enemy.name} has awoken.`);
+    addCombatLog(`Tev priekšā ir ${enemy.name}.`);
+    addDungeonLog(`Tev priekšā ir ${enemy.name}.`);
 }
 
 // Flee from the monster
@@ -326,7 +326,7 @@ const fleeBattle = () => {
         addDungeonLog(`Bēgšana netiek ieskaitīta!`);
         showCombatInfo();
         startCombat(bgmBattleMain);
-        addCombatLog(`Tu uzdūries ${enemy.name}.`);
+        addCombatLog(`Tev priekšā ${enemy.name}.`);
         addCombatLog(`Bēgšana netiek ieskaitīta!`);
     }
 }

@@ -114,7 +114,7 @@ const openInventory = () => {
         let rarity = sellRarityElement.value;
 
         defaultModalElement.style.display = "flex";
-        if (rarity == "All") {
+        if (rarity == "Visi") {
             defaultModalElement.innerHTML = `
             <div class="content">
                 <p>Pārdot visu savu ekipējumu?</p>
@@ -126,7 +126,7 @@ const openInventory = () => {
         } else {
             defaultModalElement.innerHTML = `
             <div class="content">
-                <p>Pārdot visu <span class="${rarity}">${rarity}</span> equipment?</p>
+                <p>Pārdot visu <span class="${rarity}">${rarity}</span> ekipējumu?</p>
                 <div class="button-container">
                     <button id="sell-confirm">Pārdot visu</button>
                     <button id="sell-cancel">Atcelt</button>

@@ -703,22 +703,22 @@ const allocationPopup = () => {
             skillDesc.innerHTML = "Uzbrukumi nodara 8% uzdevuma atlikušās dzīvības uz katru sitienu.";
         }
         if (selectSkill.value == "Titan's Will") {
-            skillDesc.innerHTML = "Attacks deal extra 5% of your maximum health on hit.";
+            skillDesc.innerHTML = "Uzbrukumi nodara papildu 5% no tavas maksimālās dzīvības uz sitienu.";
         }
         if (selectSkill.value == "Devastator") {
-            skillDesc.innerHTML = "Deal 30% more damage but you lose 30% base attack speed.";
+            skillDesc.innerHTML = "Nodari 30% vairāk bojājumus, bet tu zaudē 30% uzbrukuma ātrumu.";
         }
         if (selectSkill.value == "Rampager") {
-            skillDesc.innerHTML = "Increase attack by 5 after each hit. Stack resets after battle.";
+            skillDesc.innerHTML = "Palielini uzbrukuma spēku par 5 pēc katra sitiena. Pēc cīņas šis bonuss pazūd.";
         }
         if (selectSkill.value == "Blade Dance") {
-            skillDesc.innerHTML = "Gain increased attack speed after each hit. Stack resets after battle.";
+            skillDesc.innerHTML = "Palielini uzbrukuma ātrumu pēc katra sitiena. Pēc cīņas šis bonuss pazūd.";
         }
         if (selectSkill.value == "Paladin's Heart") {
-            skillDesc.innerHTML = "You receive 25% less damage permanently.";
+            skillDesc.innerHTML = "Tu saņem par 25% mazākus bojājumus.";
         }
         if (selectSkill.value == "Aegis Thorns") {
-            skillDesc.innerHTML = "Enemies receive 15% of the damage they dealt.";
+            skillDesc.innerHTML = "Pretinieki saņem atpakaļ 15% no bojājumiem, ko nodara tev.";
         }
     }
 

@@ -38,10 +38,10 @@ const createEquipment = () => {
     const rarityChances = {
         "Lietots": 0.7,
         "Parasts": 0.2,
-        "Rare": 0.04,
-        "Epic": 0.03,
-        "Legendary": 0.02,
-        "Heirloom": 0.01
+        "Rets": 0.04,
+        "Episks": 0.03,
+        "Leģendārs": 0.02,
+        "Mantots": 0.01
     };
 
     const randomNumber = Math.random();
@@ -64,16 +64,16 @@ const createEquipment = () => {
         case "Parasts":
             loopCount = 3;
             break;
-        case "Rare":
+        case "Rets":
             loopCount = 4;
             break;
-        case "Epic":
+        case "Episks":
             loopCount = 5;
             break;
-        case "Legendary":
+        case "Leģendārs":
             loopCount = 6;
             break;
-        case "Heirloom":
+        case "Mantots":
             loopCount = 8;
             break;
     }
@@ -88,9 +88,9 @@ const createEquipment = () => {
     if (equipment.attribute == "Damage") {
         if (equipment.category == "Cirvis" || equipment.category == "Izkapts") {
             statTypes = damageyStats;
-        } else if (equipment.category == "Nazis" || equipment.category == "Korkuvilkis") {
+        } else if (equipment.category == "Nazis" || equipment.category == "Korķuviļķis") {
             statTypes = speedyStats;
-        } else if (equipment.category == "Amurs") {
+        } else if (equipment.category == "Āmurs") {
             statTypes = dmgDefStats;
         } else {
             statTypes = physicalStats;
@@ -167,7 +167,7 @@ const createEquipment = () => {
             loopCount--;
         } else if (equipment.rarity == "Episks" && loopCount > 6) {
             loopCount--;
-        } else if (equipment.rarity == "Legendars" && loopCount > 7) {
+        } else if (equipment.rarity == "Leģendārs" && loopCount > 7) {
             loopCount--;
         } else if (equipment.rarity == "Mantots" && loopCount > 9) {
             loopCount--;
@@ -263,7 +263,7 @@ const showItemInfo = (item, icon, type, i) => {
     itemInfo.innerHTML = `
             <div class="content">
                 <h3 class="${item.rarity}">${icon}${item.rarity} ${item.category}</h3>
-                <h5 class="lvltier ${item.rarity}"><b>Lv.${item.lvl} Tier ${item.tier}</b></h5>
+                <h5 class="lvltier ${item.rarity}"><b>Sem.${item.lvl} Bēgš. ${item.tier}</b></h5>
                 <ul>
                 ${item.stats.map(stat => {
         if (Object.keys(stat)[0] === "critRate" || Object.keys(stat)[0] === "critDmg" || Object.keys(stat)[0] === "atkSpd" || Object.keys(stat)[0] === "vamp") {
@@ -466,7 +466,7 @@ const unequipAll = () => {
 }
 
 const sellAll = (rarity) => {
-    if (rarity == "All") {
+    if (rarity == "Visi") {
         if (player.inventory.equipment.length !== 0) {
             sfxSell.play();
             for (let i = 0; i < player.inventory.equipment.length; i++) {
@@ -513,7 +513,7 @@ const createEquipmentPrint = (condition) => {
     let panel = `
         <div class="primary-panel" style="padding: 0.5rem; margin-top: 0.5rem;">
                 <h4 class="${item.rarity}"><b>${item.icon}${item.rarity} ${item.category}</b></h4>
-                <h5 class="${item.rarity}"><b>Lv.${item.lvl} Tier ${item.tier}</b></h5>
+                <h5 class="${item.rarity}"><b>Sem.${item.lvl} Bēgš. ${item.tier}</b></h5>
                 <ul>
                 ${item.stats.map(stat => {
         if (Object.keys(stat)[0] === "critRate" || Object.keys(stat)[0] === "critDmg" || Object.keys(stat)[0] === "atkSpd" || Object.keys(stat)[0] === "vamp") {
@@ -527,7 +527,7 @@ const createEquipmentPrint = (condition) => {
         </div>`;
     if (condition == "combat") {
         addCombatLog(`
-        ${enemy.name} izmeta <span class="${item.rarity}">${item.rarity} ${item.category}</span>.<br>${panel}`);
+        ${enemy.name} aiz sevis atstāja <span class="${item.rarity}">${item.rarity} ${item.category}</span>.<br>${panel}`);
     } else if (condition == "dungeon") {
         addDungeonLog(`
         Tu ieguvi <span class="${item.rarity}">${item.rarity} ${item.category}</span>.<br>${panel}`);

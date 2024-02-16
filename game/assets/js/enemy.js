@@ -43,7 +43,7 @@ const generateRandomEnemy = (condition) => {
         // Bosses
         'B!T!K!', 'Krāsu eksāmens', 'Bēgšana', 'Nodziedāšana', 'Gaudeamus Igitur', 'Filistru apzvanīšana', 'Vecais bargais Pīkols', 'Korporāciju teātra festivāls', 'Iepaukošana', 'Sausā ruka', 'Goda tiesa', 'Konventa tiesa', 'Kūriš', 'Nakts C!Q! dīvānā', 'Kaut kas smako C!Q! virtuvē',
         // Monarch
-        'Korporācijas Velobrauciens', 'Tukša Burga', 'Burgas parāds', 'Shiva', 'Behemoth', 'Blood Manipulation Feral', 'Thanatos', 'Darkness Angel Reaper', 'Zalaras, the Dragon Emperor'
+        'Korporācijas Velobrauciens', 'Tukša Burga', 'Burgas parāds', 'Animēts Filistrs', 'Polonēze Kalpaka ballē', 'C!Q! sakopšana pēc komerša', 'Alus menzūra', 'AntiBurshius', 'Deja ar meiteni'
     ];
     const enemyTypes = ['Offensive', 'Defensive', 'Balanced', 'Quick', 'Lethal'];
     let selectedEnemies = null;
@@ -72,7 +72,7 @@ const generateRandomEnemy = (condition) => {
                 ].includes(name));
             } else if (condition == "sboss") {
                 selectedEnemies = enemyNames.filter(name => [
-                    'Behemoth', 'Zalaras, the Dragon Emperor'
+                    'Polonēze Kalpaka ballē', 'Deja ar meiteni'
                 ].includes(name));
             } else {
                 selectedEnemies = enemyNames.filter(name => [
@@ -111,11 +111,11 @@ const generateRandomEnemy = (condition) => {
             // Select name and apply stats for Balanced enemies
             if (condition == "guardian") {
                 selectedEnemies = enemyNames.filter(name => [
-                    'Sausā ruka', 'Konventa tiesa', 'Konventa tiesa'
+                    'Sausā ruka', 'Konventa tiesa', 'Goda tiesa'
                 ].includes(name));
             } else if (condition == "sboss") {
                 selectedEnemies = enemyNames.filter(name => [
-                    'Burgas parāds', 'Shiva', 'Thanatos'
+                    'Burgas parāds', 'Animēts Filistrs', 'Alus menzūra'
                 ].includes(name));
             } else {
                 selectedEnemies = enemyNames.filter(name => [
@@ -137,7 +137,7 @@ const generateRandomEnemy = (condition) => {
                 ].includes(name));
             } else if (condition == "sboss") {
                 selectedEnemies = enemyNames.filter(name => [
-                    'Darkness Angel Reaper', 'Korporācijas Velobrauciens'
+                    'AntiBurshius', 'Korporācijas Velobrauciens'
                 ].includes(name));
             } else {
                 selectedEnemies = enemyNames.filter(name => [
@@ -159,7 +159,7 @@ const generateRandomEnemy = (condition) => {
                 ].includes(name));
             } else if (condition == "sboss") {
                 selectedEnemies = enemyNames.filter(name => [
-                    'Blood Manipulation Feral'
+                    'C!Q! sakopšana pēc komerša'
                 ].includes(name));
             } else {
                 selectedEnemies = enemyNames.filter(name => [
@@ -175,9 +175,9 @@ const generateRandomEnemy = (condition) => {
             break;
     }
     if (condition == "chest") {
-        enemy.name = "Mimic";
+        enemy.name = "Viltus lāde";
     } else if (condition == "door") {
-        enemy.name = "Door Mimic";
+        enemy.name = "Viltus durvis";
     }
     setEnemyImg();
 }
@@ -342,227 +342,227 @@ const setEnemyImg = () => {
     switch (enemy.name) {
         // Goblins
         case 'Kantu stunda':
-            enemy.image.name = 'goblin';
+            enemy.image.name = 'xgoblin';
             enemy.image.size = '50%';
             break;
         case 'Pauku stunda':
-            enemy.image.name = 'goblin_rogue';
+            enemy.image.name = 'xgoblin_rogue';
             enemy.image.size = '50%';
             break;
         case 'Melnais komeršs':
-            enemy.image.name = 'goblin_archer';
+            enemy.image.name = 'xgoblin_archer';
             enemy.image.size = '50%';
             break;
         case 'Deju nodarbība':
-            enemy.image.name = 'goblin_mage';
+            enemy.image.name = 'xgoblin_mage';
             enemy.image.size = '50%';
             break;
 
         // Wolf
         case 'Netīra glāze':
-            enemy.image.name = 'wolf';
+            enemy.image.name = 'xwolf';
             enemy.image.size = '50%';
             break;
         case 'Knēpgalda gatavošana':
-            enemy.image.name = 'wolf_black';
+            enemy.image.name = 'xwolf_black';
             enemy.image.size = '50%';
             break;
         case 'Trīs līķi':
-            enemy.image.name = 'wolf_winter';
+            enemy.image.name = 'xwolf_winter';
             enemy.image.size = '50%';
             break;
 
         // Slime
         case '5-minūšu referāts':
-            enemy.image.name = 'slime';
+            enemy.image.name = 'xslime';
             enemy.image.size = '50%';
             break;
         case 'Kanta vadīšana':
-            enemy.image.name = 'slime_angel';
+            enemy.image.name = 'xslime_angel';
             enemy.image.size = '50%';
             break;
         case 'Krāsu apgūšana':
-            enemy.image.name = 'slime_knight';
+            enemy.image.name = 'xslime_knight';
             enemy.image.size = '50%';
             break;
         case 'Burgas kārtošana':
-            enemy.image.name = 'slime_crusader';
+            enemy.image.name = 'xslime_crusader';
             enemy.image.size = '50%';
             break;
 
         // Orc
         case 'Bēgšanas organizēšana':
-            enemy.image.name = 'orc_swordsmaster';
+            enemy.image.name = 'xorc_swordsmaster';
             enemy.image.size = '50%';
             break;
         case 'Valpurģa nakts':
-            enemy.image.name = 'orc_axe';
+            enemy.image.name = 'xorc_axe';
             enemy.image.size = '50%';
             break;
         case 'Pauku turnīrs':
-            enemy.image.name = 'orc_archer';
+            enemy.image.name = 'xorc_archer';
             enemy.image.size = '50%';
             break;
         case 'Krāsu referāts':
-            enemy.image.name = 'orc_mage';
+            enemy.image.name = 'xorc_mage';
             enemy.image.size = '50%';
             break;
 
         // Spider
         case 'C!Q! sakopšana':
-            enemy.image.name = 'spider';
+            enemy.image.name = 'xspider';
             enemy.image.size = '50%';
             break;
         case 'C!Q! talka':
-            enemy.image.name = 'spider_red';
+            enemy.image.name = 'xspider_red';
             enemy.image.size = '50%';
             break;
         case 'Alus vakars':
-            enemy.image.name = 'spider_green';
+            enemy.image.name = 'xspider_green';
             enemy.image.size = '50%';
             break;
 
         // Skeleton
         case 'Literārais vakars':
-            enemy.image.name = 'skeleton_archer';
+            enemy.image.name = 'xskeleton_archer';
             enemy.image.size = '50%';
             break;
         case 'Viesu vakars':
-            enemy.image.name = 'skeleton_swordsmaster';
+            enemy.image.name = 'xskeleton_swordsmaster';
             enemy.image.size = '50%';
             break;
         case 'Dibināšanas komeršs':
-            enemy.image.name = 'skeleton_knight';
+            enemy.image.name = 'xskeleton_knight';
             enemy.image.size = '50%';
             break;
         case 'Krāsu atsegšanas komeršs':
             if (randomizeNum(1, 2) == 1) {
-                enemy.image.name = 'skeleton_mage1';
+                enemy.image.name = 'xskeleton_mage1';
             } else {
-                enemy.image.name = 'skeleton_mage2';
+                enemy.image.name = 'xskeleton_mage2';
             }
             enemy.image.size = '50%';
             break;
         case '18.novembra gājiens':
-            enemy.image.name = 'skeleton_pirate';
+            enemy.image.name = 'xskeleton_pirate';
             enemy.image.size = '50%';
             break;
         case 'Aristoteļa svētki':
-            enemy.image.name = 'skeleton_samurai';
+            enemy.image.name = 'xskeleton_samurai';
             enemy.image.size = '50%';
             break;
         case 'Muciņas nodošana':
-            enemy.image.name = 'skeleton_warrior';
+            enemy.image.name = 'xskeleton_warrior';
             enemy.image.size = '50%';
             break;
 
         // Mimic
-        case 'Mimic':
+        case 'Viltus lāde':
             enemy.image.name = 'mimic';
             enemy.image.size = '50%';
             break;
-        case 'Door Mimic':
+        case 'Viltus durvis':
             enemy.image.name = 'mimic_door';
             enemy.image.size = '50%';
             break;
 
         // Bosses
         case 'B!T!K!':
-            enemy.image.name = 'goblin_boss';
+            enemy.image.name = 'xgoblin_boss';
             enemy.image.size = '70%';
             break;
         case 'Krāsu eksāmens':
-            enemy.image.name = 'skeleton_boss';
+            enemy.image.name = 'xskeleton_boss';
             enemy.image.size = '50%';
             break;
         case 'Bēgšana':
-            enemy.image.name = 'spider_fire';
+            enemy.image.name = 'xspider_fire';
             enemy.image.size = '50%';
             break;
         case 'Nodziedāšana':
-            enemy.image.name = 'cerberus_ptolemaios';
+            enemy.image.name = 'xcerberus_ptolemaios';
             enemy.image.size = '50%';
             break;
         case 'Gaudeamus Igitur':
-            enemy.image.name = 'hellhound';
+            enemy.image.name = 'xhellhound';
             enemy.image.size = '50%';
             break;
         case 'Filistru apzvanīšana':
-            enemy.image.name = 'berthelot';
+            enemy.image.name = 'xberthelot';
             enemy.image.size = '50%';
             break;
         case 'Vecais bargais Pīkols':
-            enemy.image.name = 'slime_boss';
+            enemy.image.name = 'xslime_boss';
             enemy.image.size = '50%';
             break;
         case 'Korporāciju teātra festivāls':
-            enemy.image.name = 'zodiac_cancer';
+            enemy.image.name = 'xzodiac_cancer';
             enemy.image.size = '50%';
             break;
         case 'Iepaukošana':
-            enemy.image.name = 'alfadriel';
+            enemy.image.name = 'xalfadriel';
             enemy.image.size = '50%';
             break;
         case 'Sausā ruka':
-            enemy.image.name = 'tiamat';
+            enemy.image.name = 'xtiamat';
             enemy.image.size = '50%';
             break;
         case 'Konventa tiesa':
-            enemy.image.name = 'fallen_king';
+            enemy.image.name = 'xfallen_king';
             enemy.image.size = '50%';
             break;
-        case 'Konventa tiesa':
-            enemy.image.name = 'zodiac_aries';
+        case 'Goda tiesa':
+            enemy.image.name = 'xzodiac_aries';
             enemy.image.size = '50%';
             break;
         case 'Nakts C!Q! dīvānā':
-            enemy.image.name = 'spider_boss';
+            enemy.image.name = 'xspider_boss';
             enemy.image.size = '50%';
             break;
         case 'Kūriš':
-            enemy.image.name = 'ant_queen';
+            enemy.image.name = 'xant_queen';
             enemy.image.size = '50%';
             break;
         case 'Kaut kas smako C!Q! virtuvē':
-            enemy.image.name = 'wolf_boss';
+            enemy.image.name = 'xwolf_boss';
             enemy.image.size = '50%';
             break;
 
         // Special Boss
         case 'Korporācijas Velobrauciens':
-            enemy.image.name = 'spider_dragon';
+            enemy.image.name = 'xspider_dragon';
             enemy.image.size = '70%';
             break;
         case 'Tukša Burga':
-            enemy.image.name = 'skeleton_dragon';
+            enemy.image.name = 'xskeleton_dragon';
             enemy.image.size = '70%';
             break;
         case 'Burgas parāds':
-            enemy.image.name = 'firelord';
+            enemy.image.name = 'xfirelord';
             enemy.image.size = '70%';
             break;
-        case 'Shiva':
-            enemy.image.name = 'icemaiden';
+        case 'Animēts Filistrs':
+            enemy.image.name = 'xicemaiden';
             enemy.image.size = '70%';
             break;
-        case 'Behemoth':
-            enemy.image.name = 'behemoth';
+        case 'Polonēze Kalpaka ballē':
+            enemy.image.name = 'xbehemoth';
             enemy.image.size = '70%';
             break;
-        case 'Blood Manipulation Feral':
-            enemy.image.name = 'bm-feral';
+        case 'C!Q! sakopšana pēc komerša':
+            enemy.image.name = 'xbm-feral';
             enemy.image.size = '70%';
             break;
-        case 'Thanatos':
-            enemy.image.name = 'thanatos';
+        case 'Alus menzūra':
+            enemy.image.name = 'xthanatos';
             enemy.image.size = '70%';
             break;
-        case 'Darkness Angel Reaper':
-            enemy.image.name = 'da-reaper';
+        case 'AntiBurshius':
+            enemy.image.name = 'xda-reaper';
             enemy.image.size = '70%';
             break;
-        case 'Zalaras, the Dragon Emperor':
-            enemy.image.name = 'zalaras';
+        case 'Deja ar meiteni':
+            enemy.image.name = 'xzalaras';
             enemy.image.size = '70%';
             break;
     };
