@@ -1,0 +1,174 @@
+/* Base styles */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+  padding-bottom: 3rem;
+}
+
+/* Header */
+#header {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#timer {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+#incorrect-counter {
+  color: #e53935;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.range-value {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+.range-value .range-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: #111;
+}
+/* Language selector */
+.language-selector {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.language-selector label {
+  margin: 0;
+  font-weight: 500;
+}
+
+.language-selector select {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Progress bar */
+#progress-container {
+  height: 6px;
+  background-color: #e0e0e0;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+#progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Quiz cards */
+.card {
+  background-color: white;
+  margin: 1rem;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: background-color 0.3s ease;
+}
+
+.card-correct {
+  background-color: #eafbe7;
+}
+
+.card-incorrect {
+  background-color: #fff2f0;
+}
+
+/* Question text */
+.question {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Input group */
+.input-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.input-group input[type="text"],
+.input-group input[type="range"] {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.input-group input[type="text"].incorrect {
+  border-color: #e53935;
+}
+
+.input-group input[type="text"].correct {
+  border-color: #43a047;
+}
+
+.input-group button {
+  padding: 0.5rem 1rem;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.input-group button:hover {
+  background-color: #1976d2;
+}
+
+.range-value {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Win box */
+#win-message {
+  text-align: center;
+  background-color: #f0fff4;
+  border: 1px solid #c8e6c9;
+  border-radius: 12px;
+  margin: 1rem;
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  color: #2e7d32;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Secret reset */
+#secret-reset {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  opacity: 0.3;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}

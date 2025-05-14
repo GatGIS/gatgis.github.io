@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "langA": "What is the capital of France?",
+    "langB": "Kāda ir Francijas galvaspilsēta?",
+    "type": "open",
+    "answer": ["paris","parīze"]
+  },
+  {
+    "id": 2,
+    "langA": "What is 2 + 2?",
+    "langB": "Cik ir 2 + 2?",
+    "type": "number",
+    "min": 0,
+    "max": 10,
+    "answer": ["4"]
+  },
+    {
+    "id": 3,
+    "langA": "select year 1991?",
+    "langB": "izvēlies gadu 1991?",
+    "type": "number",
+    "min": 1800,
+    "max": 2025,
+    "answer": ["1991"]
+  }
+]
