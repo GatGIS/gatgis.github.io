@@ -1,4 +1,4 @@
-let currentLang = 'langB';
+let currentLang = localStorage.getItem('currentLang') || 'langB';
 let questions = [];
 let quizState = {
   answers: {},
@@ -36,12 +36,14 @@ const translations = {
     incorrectLabel: 'Nepareizi mēģinājumi'
   }
 };
-
+document.getElementById('language').value = currentLang;
 
 document.getElementById('language').addEventListener('change', (e) => {
   currentLang = e.target.value;
+  localStorage.setItem('currentLang', currentLang); // Save selection
   renderQuestions();
 });
+
 
 let timerInterval;
 function startTimer() {
@@ -227,12 +229,12 @@ function showWinBox() {
 
   const langText = {
     langA: `
-      🎉 You completed the task!<br><br>
+      🎉 You completed the quiz!<br><br>
       ⏱ Time: ${minutes}:${seconds}<br>
       ❌ Incorrect Attempts: ${quizState.incorrectCount}
     `,
     langB: `
-      🎉 Tu pabeidzi uzdevumu!<br><br>
+      🎉 Tu pabeidzi viktorīnu!<br><br>
       ⏱ Laiks: ${minutes}:${seconds}<br>
       ❌ Kļūdas: ${quizState.incorrectCount}
     `
