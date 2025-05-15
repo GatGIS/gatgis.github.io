@@ -25,13 +25,13 @@ function loadState() {
 const translations = {
   langA: {
     submit: 'Submit',
-    winMessage: '🎉 You did it!',
+    winMessage: '🎉 You did it, champ!',
     timeLabel: 'Time',
     incorrectLabel: 'Incorrect Attempts'
   },
   langB: {
     submit: 'Iesniegt',
-    winMessage: '🎉 Tu to paveici!',
+    winMessage: '🎉 Uzdevums pabeigts!',
     timeLabel: 'Laiks',
     incorrectLabel: 'Nepareizi mēģinājumi'
   }
@@ -229,12 +229,12 @@ function showWinBox() {
 
   const langText = {
     langA: `
-      🎉 You completed the quiz!<br><br>
+      🎉 You completed the task!<br><br>
       ⏱ Time: ${minutes}:${seconds}<br>
       ❌ Incorrect Attempts: ${quizState.incorrectCount}
     `,
     langB: `
-      🎉 Tu pabeidzi viktorīnu!<br><br>
+      🎉 Uzdevums pabeigts!<br><br>
       ⏱ Laiks: ${minutes}:${seconds}<br>
       ❌ Kļūdas: ${quizState.incorrectCount}
     `
