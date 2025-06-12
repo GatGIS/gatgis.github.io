@@ -1,10 +1,11 @@
-let currentLang = 'langA';
+let currentLang = localStorage.getItem('currentLang') || 'langB';
 let questions = [];
 let quizState = {
   answers: {},
   correct: [],
   incorrectCount: 0,
-  startTime: Date.now()
+  startTime: Date.now(),
+  winTime: null  // ← track when the user finished
 };
 
 function saveState() {
@@ -24,23 +25,25 @@ function loadState() {
 const translations = {
   langA: {
     submit: 'Submit',
-    winMessage: '🎉 You did it!',
+    winMessage: '🎉 You did it, champ!',
     timeLabel: 'Time',
     incorrectLabel: 'Incorrect Attempts'
   },
   langB: {
     submit: 'Iesniegt',
-    winMessage: '🎉 Tu to paveici!',
+    winMessage: '🎉 Uzdevums pabeigts!',
     timeLabel: 'Laiks',
     incorrectLabel: 'Nepareizi mēģinājumi'
   }
 };
-
+document.getElementById('language').value = currentLang;
 
 document.getElementById('language').addEventListener('change', (e) => {
   currentLang = e.target.value;
+  localStorage.setItem('currentLang', currentLang); // Save selection
   renderQuestions();
 });
+
 
 let timerInterval;
 function startTimer() {
@@ -53,23 +56,31 @@ function startTimer() {
     return `${mins}:${secs}`;
   }
 
-  function update() {
-    const elapsed = Date.now() - quizState.startTime;
-    timerEl.textContent = `Time: ${formatTime(elapsed)}`;
+  // If quiz is already completed, show static time
+  if (quizState.winTime) {
+    const elapsed = quizState.winTime - quizState.startTime;
+    timerEl.textContent = `⏱ ${formatTime(elapsed)}`;
+    return; // Don't start the interval
   }
 
-  update();
+  function update() {
+    const elapsed = Date.now() - quizState.startTime;
+    timerEl.textContent = `⏱ ${formatTime(elapsed)}`;
+  }
+
+  update(); // Initial display
   timerInterval = setInterval(update, 1000);
 }
 
+
 async function loadQuestions() {
-  loadState();
   const res = await fetch('questions.json');
   questions = await res.json();
   renderQuestions();
   updateProgressBar();
-  updateIncorrectCounter();
+  updateIncorrectCounter(); // this can stay to ensure accuracy
 }
+
 
 function updateProgressBar() {
   const progress = (quizState.correct.length / questions.length) * 100;
@@ -173,7 +184,7 @@ function renderQuestions() {
       saveState();
       updateProgressBar();
       updateIncorrectCounter();
-      checkWin();
+      checkWin(); // check on each answer
     };
 
     inputGroup.appendChild(input);
@@ -182,36 +193,56 @@ function renderQuestions() {
     card.appendChild(inputGroup);
     container.appendChild(card);
   });
+
+  // ✅ Call this AFTER all questions have been rendered
+  checkWin();
 }
 
+
 function checkWin() {
-  if (quizState.correct.length === questions.length) {
+  // If all questions are correct and not yet marked as completed
+  if (quizState.correct.length === questions.length && !quizState.winTime) {
+    quizState.winTime = Date.now();
+    saveState();
     clearInterval(timerInterval);
+    showWinBox();
+  }
 
-    const elapsed = Date.now() - quizState.startTime;
-    const totalTime = Math.floor(elapsed / 1000);
-    const minutes = String(Math.floor(totalTime / 60)).padStart(2, '0');
-    const seconds = String(totalTime % 60).padStart(2, '0');
-
-    // Avoid duplicate win message
-    if (document.getElementById('win-message')) return;
-
-    const winCard = document.createElement('div');
-    winCard.className = 'card';
-    winCard.id = 'win-message';
-
-    winCard.innerHTML = `
-      <div class="win-box">
-        <strong>${translations[currentLang].winMessage}</strong><br><br>
-        ⏱ ${translations[currentLang].timeLabel}: ${minutes}:${seconds}<br>
-        ❌ ${translations[currentLang].incorrectLabel}: ${quizState.incorrectCount}
-      </div>
-    `;
-
-    document.getElementById('quiz-container').appendChild(winCard);
+  // If already completed (e.g. page reloaded)
+  if (quizState.winTime) {
+    clearInterval(timerInterval);
+    showWinBox();
   }
 }
 
+function showWinBox() {
+  const container = document.getElementById('quiz-container');
+  if (document.getElementById('win-box')) return; // prevent duplicates
+
+  const elapsed = quizState.winTime - quizState.startTime;
+  const minutes = String(Math.floor(elapsed / 60000)).padStart(2, '0');
+  const seconds = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+
+  const winBox = document.createElement('div');
+  winBox.id = 'win-box';
+  winBox.className = 'card win-card';
+
+  const langText = {
+    langA: `
+      🎉 You completed the task!<br><br>
+      ⏱ Time: ${minutes}:${seconds}<br>
+      ❌ Incorrect Attempts: ${quizState.incorrectCount}
+    `,
+    langB: `
+      🎉 Uzdevums pabeigts!<br><br>
+      ⏱ Laiks: ${minutes}:${seconds}<br>
+      ❌ Kļūdas: ${quizState.incorrectCount}
+    `
+  };
+
+  winBox.innerHTML = `<div class="question">${langText[currentLang]}</div>`;
+  container.appendChild(winBox);
+}
 
 function normalize(text) {
   return text
@@ -221,13 +252,41 @@ function normalize(text) {
     .replace(/[^a-z0-9]/gi, '');
 }
 
-// Start the app
-startTimer();
-loadQuestions();
+// Initialize from saved state FIRST
+loadState();
+updateIncorrectCounter(); // ensures ❌ is up-to-date
+startTimer(); // uses winTime correctly if exists
+loadQuestions(); // fetches and renders questions
 
-document.getElementById('secret-reset').addEventListener('click', () => {
-  if (confirm("Reset all progress?")) {
+
+
+async function hashPassword(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+document.getElementById('secret-reset').addEventListener('click', async () => {
+  const confirmed = confirm("Reset all progress?");
+  if (!confirmed) return;
+
+  const input = prompt("Enter reset password:");
+  if (!input) return;
+
+  const trimmedInput = input.trim();
+  const inputHash = await hashPassword(trimmedInput);
+  const storedHash = "943bbbce935564cb99505d4668fcc04dace3df34282d5483d8b96fbaeada1c46"; // SHA-256 of 'parole'
+
+  console.log("Entered password:", trimmedInput);
+  console.log("Computed hash:  ", inputHash);
+  console.log("Expected hash:  ", storedHash);
+
+  if (inputHash === storedHash) {
     localStorage.removeItem('quizState');
     location.reload();
+  } else {
+    alert("Incorrect password. Reset aborted.");
   }
 });
