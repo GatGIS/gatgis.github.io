@@ -18,14 +18,59 @@
     #app.results-open #panel { height: 70vh; }
     /* Add transitions for smooth height change */
     #map, #panel { transition: height 0.3s; }
+
+    /* Floating map controls */
+    .map-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    .map-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+    .map-btn:hover {
+      background: #0056b3;
+    }
+    .layer-menu {
+      padding: 10px;
+      display: none;
+    }
+    .layer-menu label {
+      display: block;
+      margin: 5px 0;
+    }
+
+    /* Spacer styles */
+    :root {
+      --spacer-height: 20px; /* Default spacer height */
+    }
+    #bottomSpacer {
+      height: var(--spacer-height);
+      visibility: hidden; /* Visually hide the spacer but keep it in the document flow */
+    }
   </style>
 </head>
 <body>
   <!-- App wrapper: map on top, panel at bottom (mobile-first) -->
   <div id="app">
     <div id="map" class="map-area"></div>
+
     <div id="panel" class="panel-area"><!-- panel content injected by JS --></div>
   </div>
+
+  <!-- Always-visible bottom spacer so content never touches the viewport bottom -->
+  <div id="bottomSpacer" aria-hidden="true"></div>
 
   <!-- Libraries (ensure OL first, then layerswitcher) -->
   <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>

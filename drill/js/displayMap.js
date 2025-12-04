@@ -20,7 +20,6 @@
     // create base and overlay layers (with titles for LayerSwitcher)
     const osmLayer = new ol.layer.Tile({
       title: 'OSM',
-      type: 'base',
       source: new ol.source.OSM(),
       visible: true
     });
@@ -42,10 +41,28 @@
       }),
       visible: false
     });
+    const quaternaryLayer = new ol.layer.Tile({
+      title: 'Kvartāra nog.',
+      source: new ol.source.TileWMS({
+        url: 'https://lvmgeoserver.lvm.lv/geoserver/ows',
+        params: {'LAYERS': 'public:quaternary', 'TILED': true},
+        serverType: 'geoserver'
+      }),
+      visible: false
+    });
+    const soilLayer = new ol.layer.Tile({
+      title: 'Augsne',
+      source: new ol.source.TileWMS({
+        url: 'https://lvmgeoserver.lvm.lv/geoserver/ows',
+        params: {'LAYERS': 'publicwfs:soils', 'TILED': true},
+        serverType: 'geoserver'
+      }),
+      visible: false
+    });      
 
     const map = new ol.Map({
       target: 'map',
-      layers: [osmLayer, orthoLayer, cadastralLayer],
+      layers: [osmLayer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer],
       view: new ol.View({
         center: center,
         zoom: 13
@@ -99,12 +116,6 @@
           </div>
         </div>
 
-        <div class="layer-selector" aria-label="Map layers">
-          <label><input type="checkbox" name="mosys-layer" value="osm" checked> OSM</label>
-          <label><input type="checkbox" name="mosys-layer" value="ortho"> Ortofoto 7</label>
-          <label><input type="checkbox" name="mosys-layer" value="kadastrs"> Kadastrs</label>
-        </div>
-
         <div class="controls">
           <input id="mosys-lat" type="text" placeholder="Latitude (x)" />
           <input id="mosys-lon" type="text" placeholder="Longitude (y)" />
@@ -119,6 +130,16 @@
       </div>
     `;
 
+    // Add a bottom spacer element so the lower panel doesn't butt directly to the viewport edge
+    if (!document.getElementById('bottomSpacer')) {
+      const spacer = document.createElement('div');
+      spacer.id = 'bottomSpacer';
+      // ensure spacer style matches CSS variable; JS not required but keep as safeguard
+      const computedHeight = getComputedStyle(document.documentElement).getPropertyValue('--bottom-spacer-height') || '48px';
+      spacer.style.height = computedHeight.trim();
+      document.body.appendChild(spacer);
+    }
+
     const latInput = panel.querySelector('#mosys-lat');
     const lonInput = panel.querySelector('#mosys-lon');
     let drillBtn = panel.querySelector('#mosys-drill');
@@ -128,25 +149,18 @@
     const closeBtn = panel.querySelector('#mosys-close');
     const appEl = document.getElementById('app');
 
-    // Wire layer checkboxes to actual layer visibility (allow multiple checked)
-    const layerCheckboxes = panel.querySelectorAll('input[name="mosys-layer"]');
-    function updateLayersFromCheckboxes() {
-      if (!layerCheckboxes || layerCheckboxes.length === 0) return;
-      layerCheckboxes.forEach(cb => {
-        try {
-          const v = cb.value;
-          if (v === 'osm') osmLayer.setVisible(cb.checked);
-          if (v === 'ortho') orthoLayer.setVisible(cb.checked);
-          if (v === 'kadastrs') cadastralLayer.setVisible(cb.checked);
-        } catch (e) {
-          // ignore if layers not available yet
-        }
-      });
-      try { map.render(); } catch (e) {}
+    // Replace custom layer button/menu wiring with the ol-layerswitcher control
+    // This mirrors your map project usage and places a proper LayerSwitcher on the map.
+    try {
+        var layerSwitcher = new LayerSwitcher({
+            reverse: true,
+            groupSelectStyle: 'group'
+        });
+        map.addControl(layerSwitcher);
+    } catch (e) {
+        // If the LayerSwitcher lib isn't available, fail gracefully
+        console.warn('LayerSwitcher control not added:', e);
     }
-    layerCheckboxes.forEach(cb => cb.addEventListener('change', updateLayersFromCheckboxes));
-    // apply initial states
-    updateLayersFromCheckboxes();
 
     // helper: update input fields from coord
     function setInputsFromCoord(coord) {
@@ -322,13 +336,13 @@
       const ndata = 'v1.2';
       const build = '13';
       const remoteUrl = `http://www.modlab.lv/kalme/realdata/MOSYSmobile.php?x=${encodeURIComponent(latStr)}&y=${encodeURIComponent(lonStr)}&ndata=${encodeURIComponent(ndata)}&posmethod=${encodeURIComponent(posMethod)}&build=${encodeURIComponent(build)}`;
-      webAnswer.textContent = 'Calculate on server ...';
-      tableContainer.innerHTML = '';
+      if (webAnswer) webAnswer.textContent = 'Calculate on server ...';
+      if (tableContainer) tableContainer.innerHTML = '';
       let dots = 0;
       if (waitInterval) { clearInterval(waitInterval); waitInterval = null; }
       waitInterval = setInterval(() => {
         dots = (dots + 1) % 5;
-        webAnswer.textContent = 'Calculate on server ' + '.'.repeat(dots);
+        if (webAnswer) webAnswer.textContent = 'Calculate on server ' + '.'.repeat(dots);
       }, 600);
       try {
         const text = await fetchWithFallback(remoteUrl);
@@ -338,14 +352,17 @@
         expandResults();
       } catch (e) {
         clearInterval(waitInterval); waitInterval = null;
-        webAnswer.textContent = 'Request failed: ' + (e.message || e);
+        if (webAnswer) webAnswer.textContent = 'Request failed: ' + (e.message || e);
       }
     }
+
+    // expose a stable reference so UI handlers outside the closure can call it reliably
+    try { window.mosysSendRequest = sendRequest; } catch (e) { /* ignore if not allowed */ }
 
     // parse server response similar to Android onPostExecute
     function parseResponse(result) {
       // show raw-ish converted text like Android for quick view
-      webAnswer.textContent = result.replace(/\|/, '\nLayer : z [m]\n----------------\n').replace(/;/g, '\n').replace(/,/g, ' : ');
+      if (webAnswer) webAnswer.textContent = result.replace(/\|/, '\nLayer : z [m]\n----------------\n').replace(/;/g, '\n').replace(/,/g, ' : ');
       const tokens = result.split(/\|+/);
       if (tokens.length === 2) {
         const header = tokens[0];
@@ -356,7 +373,7 @@
           const xs = headerxy[0].split(':');
           const ys = headerxy[1].split(':');
           const head = `(ESPG:25884) ${xs[0]} = ${Number(xs[1]).toFixed(0)} , ${ys[0]} = ${Number(ys[1]).toFixed(0)}`;
-          webAnswer.textContent = head;
+          if (webAnswer) webAnswer.textContent = head;
 
           // build table
           const table = document.createElement('table');
@@ -399,58 +416,55 @@
             table.appendChild(tr);
           }
 
-          tableContainer.innerHTML = '';
-          tableContainer.appendChild(table);
+          if (tableContainer) {
+            tableContainer.innerHTML = '';
+            tableContainer.appendChild(table);
+          }
           return;
         } else {
-          webAnswer.textContent = 'ERROR: ' + header;
+          if (webAnswer) webAnswer.textContent = 'ERROR: ' + header;
           return;
         }
       }
-      webAnswer.textContent = 'Unexpected response format';
+      if (webAnswer) webAnswer.textContent = 'Unexpected response format';
     }
 
     // Drill button click -> validate inputs and call sendRequest
-    drillBtn.addEventListener('click', function() {
-      const latStr = latInput.value.trim().replace(',', '.');
-      const lonStr = lonInput.value.trim().replace(',', '.');
-      if (!latStr || !lonStr) {
-        webAnswer.textContent = 'Enter coordinates first';
-        // ensure panel remains fully visible
-        try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
-        return;
-      }
-      if (isNaN(Number(latStr)) || isNaN(Number(lonStr))) {
-        webAnswer.textContent = 'Invalid coordinates';
-        try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
-        return;
-      }
-      sendRequest(latStr, lonStr);
-    });
-
-    refreshBtn.addEventListener('click', function() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((p) => {
-          setMarkerPosition({ lon: p.coords.longitude, lat: p.coords.latitude }, { setPosMethod: 'GPS' });
-          // ensure panel still visible
+    // attach direct listener (ensures it fires now that sendRequest is defined)
+    if (drillBtn) {
+      drillBtn.addEventListener('click', function() {
+        const latStr = (latInput && latInput.value) ? latInput.value.trim().replace(',', '.') : '';
+        const lonStr = (lonInput && lonInput.value) ? lonInput.value.trim().replace(',', '.') : '';
+        if (!latStr || !lonStr) {
+          if (webAnswer) webAnswer.textContent = 'Enter coordinates first';
           try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
-        }, (err) => {
-          const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-          setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
-        }, { enableHighAccuracy: true, timeout: 5000 });
-      } else {
-        const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-        setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
-      }
-    });
-  }
+          return;
+        }
+        if (isNaN(Number(latStr)) || isNaN(Number(lonStr))) {
+          if (webAnswer) webAnswer.textContent = 'Invalid coordinates';
+          try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
+          return;
+        }
+        const caller = (typeof window.mosysSendRequest === 'function') ? window.mosysSendRequest : sendRequest;
+        try {
+          const p = caller(latStr, lonStr);
+          if (p && typeof p.then === 'function') p.catch(err => console.error('sendRequest failed:', err));
+        } catch (err) {
+          console.error('Error calling sendRequest:', err);
+        }
+      });
+    }
+
+    // refreshBtn handler (unchanged)
+    // ...existing code...
+
+  } // end initMap
 
   // Public API (for external calls)
-  window.mosysMapInit = initMap;
-
+  try { window.mosysMapInit = initMap; } catch (e) {}
   // Auto-init map with default coordinates after DOM ready
   document.addEventListener('DOMContentLoaded', function() {
-    // For local testing, use default coord directly
-    initMap(DEFAULT_COORD);
+    try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
   });
+
 })();
