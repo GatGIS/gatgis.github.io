@@ -1,0 +1,27 @@
+{
+  "appTitle": "MOSYS Web Application",
+  "welcomeMessage": "Welcome to the MOSYS Web Application!",
+  "loading": "Loading, please wait...",
+  "error": {
+    "generic": "An error occurred. Please try again.",
+    "location": "Unable to retrieve your location."
+  },
+  "map": {
+    "noLocation": "No location data available.",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "refresh": "Refresh"
+  },
+  "labels": {
+    "search": "Search for a location",
+    "currentLocation": "Current Location"
+  },
+  "messages": {
+    "locationUpdated": "Location updated successfully.",
+    "locationError": "There was an error updating your location."
+  }
+}

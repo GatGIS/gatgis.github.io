@@ -1,0 +1,100 @@
+/* Mobile-first layout and modern touch-friendly styles */
+:root{
+  --bg:#ffffff;
+  --muted:#f6f6f6;
+  --accent:#007AFF;
+  --danger:#e74c3c;
+  --text:#111;
+  --panel-gap:8px;
+  --touch-size:50px;
+  --font-base:16px;
+  --panel-height: 35vh; /* default; JS will increase if needed */
+}
+
+/* Ensure full-viewport app and allow small page scroll if needed */
+html,body,#app {
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  font-family:Inter, Roboto, Arial, Helvetica, sans-serif;
+  color:var(--text);
+  box-sizing:border-box;
+  overflow:hidden; /* avoid page scrollbar until results are opened */
+}
+
+/* App root */
+#app {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Map uses remaining space above panel */
+.map-area {
+  height: calc(100vh - var(--panel-height));
+  transition: height 260ms cubic-bezier(.22,.9,.25,1);
+  min-height: 120px;
+  width: 100%;
+}
+
+/* Panel fixed to bottom */
+.panel-area {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--panel-height);
+  transition: height 200ms ease;
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), #fff);
+  padding: 10px 12px;
+  box-sizing: border-box;
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden; /* no internal scroll until expanded */
+}
+
+/* header now contains buttons on the right */
+.mosys-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+/* top actions (buttons in header) */
+.top-actions {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* small variant if there's little space */
+.top-actions .mosys-btn { min-height:44px; padding:8px 10px; }
+
+/* When results open, override panel height via class (still respected by JS measurement) */
+#app.results-open { --panel-height: 70vh; }
+#app.results-open .panel-area { overflow:auto; }
+
+/* ensure controls can wrap and shrink */
+.controls { display:flex; gap:8px; width:100%; flex-wrap:wrap; align-items:center; }
+.controls input[type="text"]{ flex:1 1 calc(50% - 8px); min-width:0; height:48px; padding:10px; box-sizing:border-box; }
+
+/* keep buttons row but now not required to be at bottom */
+.buttons-row { display:flex; gap:10px; width:100%; }
+
+/* webAnswer wraps and is scrollable inside panel when expanded */
+.mosys-result { word-break: break-word; white-space: pre-wrap; overflow-wrap: anywhere; font-size:14px; padding-top:6px; }
+
+/* table compact */
+.mosys-table { width:100%; border-collapse:collapse; font-size:14px; }
+.mosys-table td { padding:10px 8px; border-bottom:1px solid #f2f2f6; }
+
+/* make sure very narrow screens stack inputs */
+@media (max-width:420px){
+  .controls input[type="text"] { flex-basis:100%; }
+  .top-actions .mosys-btn { min-height:48px; padding:10px 12px; font-size:15px; }
+}
