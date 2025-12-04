@@ -8,77 +8,71 @@
   --panel-gap:8px;
   --touch-size:50px;
   --font-base:16px;
-  --panel-height: 35vh; /* default; JS will increase if needed */
-  --bottom-spacer-height: 56px; /* adjust as needed */
+  --panel-height: 40vh; /* Increased default height to ensure content fits */
 }
 
-/* Always-visible bottom spacer (DOM element #bottomSpacer) */
-#bottomSpacer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--bottom-spacer-height);
-  pointer-events: none; /* allow interactions through it */
-  z-index: 9999; /* stays above most UI */
-  background: linear-gradient(to top, rgba(0,0,0,0.06), rgba(0,0,0,0)); /* subtle separation */
-}
-
-/* Constrain the whole app to 98% of the viewport height so 2% remains free at the bottom */
+/* Use 100% height to respect mobile browser UI. No more vh. */
 html, body, #app {
-  height: 98vh;      /* leave 2vh free at bottom */
-  min-height: 98vh;
+  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden; /* Prevent body scroll */
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Ensure map area and panel respect the reduced app height */
+/* The map now fills the remaining space above the panel */
 .map-area {
-  height: calc(98vh - var(--panel-height));
+  flex-grow: 1; /* Map takes up all available space */
   min-height: 120px;
   transition: height 260ms cubic-bezier(.22,.9,.25,1);
   width: 100%;
 }
 
 .panel-area {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--panel-height);
-  /* keep the panel inside the 98vh app area */
-  max-height: calc(98vh);
-  transition: height 200ms ease;
+  flex-shrink: 0; /* Panel should not shrink */
+  /* Use max-height so JS inline height won't permanently override our limit.
+     height:auto lets content determine layout while max-height enforces the panel size. */
+  height: auto;
+  max-height: var(--panel-height);
+  /* ensure smooth transition when the variable changes */
+  transition: max-height 200ms ease;
   box-shadow: 0 -6px 18px rgba(0,0,0,0.08);
   background: linear-gradient(180deg, rgba(255,255,255,0.98), #fff);
   padding: 10px 12px;
-  padding-bottom: calc(var(--bottom-spacer-height) + 12px); /* keep content above spacer */
   box-sizing: border-box;
-  z-index: 1300;
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* If some script still writes an inline height, ensure our max-height limit is enforced.
+   Remove !important once JS is fixed to respect the CSS variable. */
+.panel-area {
+  max-height: var(--panel-height) !important;
+}
+
+/* This is the main flex container for panel content. It will handle all scrolling. */
+.mosys-panel {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto; /* Allow vertical scrolling only when content overflows */
 }
-
-/* When results open allow scrolling inside the panel */
 #app.results-open { --panel-height: 70vh; }
-#app.results-open .panel-area { overflow: auto; }
-
-/* Bottom spacer overlay (always visible above the panel) */
-#bottomSpacer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--bottom-spacer-height);
-  pointer-events: none; /* allow interactions through it */
-  z-index: 9999; /* higher than .panel-area so it remains visible when panel expands */
-  background: linear-gradient(to top, rgba(0,0,0,0.08), rgba(0,0,0,0)); /* subtle visual gap */
+/* When results are open, make the table container fill remaining space and scroll */
+#app.results-open #mosys-tableContainer {
+  flex-grow: 1; /* Allow this element to grow */
+  min-height: 0; /* Necessary for flex-grow to work correctly in a column */
 }
 
-/* header now contains buttons on the right */
+
+/* header contains buttons on the right */
 .mosys-header {
   display:flex;
   align-items:center;
@@ -205,9 +199,34 @@ html, body, #app {
 }
 .mosys-btn.secondary:hover { transform: translateY(-1px); }
 
+/* Small circular Close (X) button used in header */
+.mosys-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  margin-left: 6px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #223;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+.mosys-close:hover { background: rgba(0,0,0,0.04); transform: translateY(-1px); }
+
+
+/* Make the close icon slightly larger on very small screens */
+@media (max-width:420px){
+  .mosys-close { width:40px; height:40px; border-radius:9px; font-size:18px; }
+}
+
 /* small-screen tweaks */
 @media (max-width:420px){
   :root { --bottom-spacer-height: 64px; }
   .mosys-btn { padding: 10px; font-size: 13px; border-radius: 8px; }
-  #bottomSpacer { height: 22px; }
 }

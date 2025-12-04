@@ -111,34 +111,21 @@
           <strong>MOSYS Drill</strong>
           <div class="top-actions">
             <button id="mosys-drill" class="mosys-btn primary">Drill</button>
-            <button id="mosys-refresh" class="mosys-btn secondary">Refresh</button>
-            <button id="mosys-close" class="mosys-close" style="display:none">Close</button>
+            <button id="mosys-refresh" class="mosys-btn secondary">Refresh GPS</button>
+            <!-- Close as compact X icon -->
+            <button id="mosys-close" class="mosys-close" style="display:none" aria-label="Close results" title="Close results">✕</button>
           </div>
         </div>
-
+  
         <div class="controls">
           <input id="mosys-lat" type="text" placeholder="Latitude (x)" />
           <input id="mosys-lon" type="text" placeholder="Longitude (y)" />
         </div>
-
-        <div class="buttons-row" style="margin-top:6px;">
-          <!-- retained for layout parity; empty or for extra actions -->
-        </div>
-
+  
         <div id="mosys-webAnswer" class="mosys-result"></div>
         <div id="mosys-tableContainer"></div>
       </div>
     `;
-
-    // Add a bottom spacer element so the lower panel doesn't butt directly to the viewport edge
-    if (!document.getElementById('bottomSpacer')) {
-      const spacer = document.createElement('div');
-      spacer.id = 'bottomSpacer';
-      // ensure spacer style matches CSS variable; JS not required but keep as safeguard
-      const computedHeight = getComputedStyle(document.documentElement).getPropertyValue('--bottom-spacer-height') || '48px';
-      spacer.style.height = computedHeight.trim();
-      document.body.appendChild(spacer);
-    }
 
     const latInput = panel.querySelector('#mosys-lat');
     const lonInput = panel.querySelector('#mosys-lon');
@@ -224,32 +211,41 @@
     }
 
     // Dynamic panel fit: compute required panel height so header + top-actions + controls fit
+    // This function calculates the minimum height needed for the panel to display its essential content
+    // (header, controls, and initial webAnswer message) without scrolling, and then sets --panel-height.
     function ensurePanelFits() {
       const docH = window.innerHeight || document.documentElement.clientHeight;
       // if results are open, respect results-open (70vh); still ensure it's not smaller than required
       const resultsOpen = appEl && appEl.classList.contains('results-open');
-      // measure required pixel height of panel content we want visible (header + layer-selector + controls + small padding)
-      const headerEl = panel.querySelector('.mosys-header');
-      const layerEl = panel.querySelector('.layer-selector');
-      const controlsEl = panel.querySelector('.controls');
 
-      let neededPx = 0;
-      if (headerEl) neededPx += headerEl.getBoundingClientRect().height;
-      if (layerEl) neededPx += layerEl.getBoundingClientRect().height;
-      if (controlsEl) neededPx += controlsEl.getBoundingClientRect().height;
-      // include webAnswer minimal area (single line) and padding
-      neededPx += 80; // safety padding for small webAnswer area and spacing
+      const panelAreaEl = document.getElementById('panel'); // The .panel-area div
+      const mosysPanelEl = panelAreaEl.querySelector('.mosys-panel');
+
+      // The most reliable way to get the required height is to measure the scrollHeight
+      // of the inner container, which includes all its children and their gaps.
+      let neededPx = mosysPanelEl.scrollHeight;
+
+      // We must also add the vertical padding of the outer .panel-area container itself,
+      // as scrollHeight does not account for the padding of its parent.
+      const panelAreaStyles = getComputedStyle(panelAreaEl);
+      const panelPaddingTop = parseFloat(panelAreaStyles.paddingTop) || 0;
+      const panelPaddingBottom = parseFloat(panelAreaStyles.paddingBottom) || 0;
+      neededPx += panelPaddingTop + panelPaddingBottom;
+
+      // Add a small buffer (e.g., 2px) to prevent floating point rounding issues
+      // that can sometimes still cause a scrollbar to appear.
+      neededPx += 2;
 
       // convert to vh and clamp
       let neededVh = (neededPx / docH) * 100;
-      if (neededVh < 20) neededVh = 20; // ensure panel not tiny
-      if (neededVh > 80) neededVh = 80; // cap
+      if (neededVh < 20) neededVh = 20; // Ensure panel is not too tiny, min 20vh
+      if (neededVh > 80) neededVh = 80; // Cap panel height at 80vh to always leave some map visible
       if (resultsOpen) {
         // prefer results-open value (70vh), but ensure it's at least neededVh
         neededVh = Math.max(neededVh, 70);
       } else {
         // default target (use variable but ensure it meets neededVh)
-        neededVh = Math.max(neededVh, 35);
+        // No longer force a minimum of 35vh. Use the calculated height.
       }
       // set CSS var on root
       document.documentElement.style.setProperty('--panel-height', neededVh + 'vh');
@@ -259,7 +255,10 @@
     }
 
     // call ensurePanelFits now and on resize/orientation change
-    ensurePanelFits();
+    // Use a setTimeout to ensure the browser has finished rendering before we measure.
+    // This prevents a race condition where we calculate the height too early.
+    setTimeout(ensurePanelFits, 0);
+
     window.addEventListener('resize', ensurePanelFits);
     window.addEventListener('orientationchange', ensurePanelFits);
 
@@ -298,8 +297,8 @@
     // Proxy fallback: AllOrigins -> ThingProxy
     async function fetchWithFallback(remoteUrl) {
       const proxies = [
-        'https://api.allorigins.win/raw?url=',
         'https://api.codetabs.com/v1/proxy?quest=',
+        'https://api.allorigins.win/raw?url=',
         'https://corsproxy.io/?'
       ];
 
@@ -462,9 +461,34 @@
 
   // Public API (for external calls)
   try { window.mosysMapInit = initMap; } catch (e) {}
-  // Auto-init map with default coordinates after DOM ready
-  document.addEventListener('DOMContentLoaded', function() {
-    try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
-  });
 
+  // On load: try to get user's location first (GPS). If it fails or times out, fallback to DEFAULT_COORD.
+  document.addEventListener('DOMContentLoaded', function() {
+    if (navigator.geolocation) {
+      const geoOpts = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 };
+      let settled = false;
+      const onSuccess = (pos) => {
+        if (settled) return;
+        settled = true;
+        try { initMap({ lon: pos.coords.longitude, lat: pos.coords.latitude }); } catch (e) { console.error('initMap failed:', e); }
+      };
+      const onError = (err) => {
+        if (settled) return;
+        settled = true;
+        console.warn('Geolocation failed, using default coords:', err && err.message);
+        try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
+      };
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, geoOpts);
+      // Safety fallback: if callbacks don't fire, use default after timeout.
+      setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
+        }
+      }, 8000);
+    } else {
+      try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
+    }
+  });
+ 
 })();
