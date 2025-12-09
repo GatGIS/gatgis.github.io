@@ -16,7 +16,7 @@ const createEquipment = () => {
 
     // Generate random equipment name and type based on attribute
     if (equipment.attribute == "Damage") {
-        const equipmentCategories = ["Rapieris", "Cirvis", "Āmurs", "Nazis", "Korķuviļķis", "Izkapts"];
+        const equipmentCategories = ["Rapieris", "Cirvis", "Āmurs", "Nazis", "Korķuviļķis", "Kantikums"];
         equipment.category = equipmentCategories[Math.floor(Math.random() * equipmentCategories.length)];
         equipment.type = "Weapon";
     } else if (equipment.attribute == "Defense") {
@@ -86,7 +86,7 @@ const createEquipment = () => {
     const dmgDefStats = ["hp", "def", "atk", "atk", "critRate", "critDmg"];
     let statTypes;
     if (equipment.attribute == "Damage") {
-        if (equipment.category == "Cirvis" || equipment.category == "Izkapts") {
+        if (equipment.category == "Cirvis" || equipment.category == "Kantikums") {
             statTypes = damageyStats;
         } else if (equipment.category == "Nazis" || equipment.category == "Korķuviļķis") {
             statTypes = speedyStats;
@@ -226,8 +226,8 @@ const equipmentIcon = (equipment) => {
         return '<i class="ra ra-bowie-knife"></i>';
     } else if (equipment == "Korķuviļķis") {
         return '<i class="ra ra-chain"></i>';
-    } else if (equipment == "Izkapts") {
-        return '<i class="ra ra-scythe"></i>';
+    } else if (equipment == "Kantikums") {
+        return '<i class="ra ra-book"></i>';
     } else if (equipment == "Smokings") {
         return '<i class="ra ra-vest"></i>';
     } else if (equipment == "Krekls") {
@@ -235,11 +235,11 @@ const equipmentIcon = (equipment) => {
     } else if (equipment == "Uzvalks") {
         return '<i class="ra ra-vest"></i>';
     } else if (equipment == "1l kauss") {
-        return '<i class="ra ra-shield"></i>';
+        return '<i class="ra ra-beer"></i>';
     } else if (equipment == "0.5l kauss") {
-        return '<i class="ra ra-heavy-shield"></i>';
+        return '<i class="ra ra-coffee-mug"></i>';
     } else if (equipment == "0.3l kauss") {
-        return '<i class="ra ra-round-shield"></i>';
+        return '<i class="ra ra-corked-tube"></i>';
     } else if (equipment == "Komiltoņa deķelis") {
         return '<i class="ra ra-knight-helmet"></i>';
     } else if (equipment == "Filistra deķelis") {
