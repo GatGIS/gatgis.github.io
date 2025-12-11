@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Sheets Leaderboard Testa App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Krustdēla Kambaris Līderu Saraksta Tests</h1>
+    <p>Šī lapa ļauj pārbaudīt datu nolasīšanu un pievienošanu jūsu Google Apps Script Web App.</p>
+    
+    <h2>Datu pievienošana (POST)</h2>
+    <form id="scoreForm">
+        <label for="name">Spēlētāja Vārds (Name):</label>
+        <input type="text" id="name" value="Testa Lietotājs" required>
+
+        <label for="score">Rezultāts (Score):</label>
+        <input type="number" id="score" value="1000" required>
+        
+        <label for="timePlayed">Spēles Laiks (Time Played, Opcija):</label>
+        <input type="text" id="timePlayed" value="00:05:00">
+
+        <label for="level">Līmenis (Level, Opcija):</label>
+        <input type="number" id="level" value="3">
+
+        <label for="floor">Stāvs (Floor, Opcija):</label>
+        <input type="number" id="floor" value="15">
+        
+        <button type="submit">Pievienot rezultātu</button>
+    </form>
+
+    <h2>Līderu saraksta nolasīšana (GET)</h2>
+    <button onclick="getLeaderboard()">Ielādēt Līderu Sarakstu</button>
+
+    <h2>Rezultāti</h2>
+    <div id="results">Pievienošanas/Ielādes rezultāti parādīsies šeit.</div>
+    <div id="leaderboardTable"></div>
+</div>
+
+<script>
+    // *************************************************************************
+    // OBLIGĀTI AIZVIETOJIET ŠO VIETTUARI AR SAVU PUBLICĒTO WEB APP URL
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwsV-PSo7zicn9aPLF20jf38w-j7zXshI_ga2E2305r-V1xjLwSAubY3vMg_HSJlRgm/exec"; 
+    // *************************************************************************
+
+    const resultsDiv = document.getElementById('results');
+    const tableDiv = document.getElementById('leaderboardTable');
+
+    // === 1. Datu pievienošana (POST) ===
+    document.getElementById('scoreForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const score = document.getElementById('score').value;
+        const timePlayed = document.getElementById('timePlayed').value;
+        const level = document.getElementById('level').value;
+        const floor = document.getElementById('floor').value;
+
+        submitScore(name, score, timePlayed, level, floor);
+    });
+
+    async function submitScore(name, score, timePlayed, level, floor) {
+        resultsDiv.textContent = 'Pievieno rezultātu...';
+        
+        const scoreData = {
+            Name: name,
+            Score: parseFloat(score),
+            'Time Played': timePlayed,
+            Level: parseInt(level) || '',
+            Floor: parseInt(floor) || ''
+        };
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(scoreData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
+            }
+
+            const data = await response.json();
+            resultsDiv.textContent = `POST Atbilde:\nStatus: ${data.status}\nZiņojums: ${data.message}\nID: ${data.ID}`;
+            
+        } catch (error) {
+            resultsDiv.textContent = `Kļūda pievienojot ierakstu: ${error.message}`;
+            console.error("POST Kļūda:", error);
+        }
+    }
+
+    // === 2. Datu nolasīšana (GET) ===
+    async function getLeaderboard() {
+        resultsDiv.textContent = 'Ielādē līderu sarakstu...';
+        
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
+            }
+
+            const data = await response.json();
+            resultsDiv.textContent = `GET Atbilde:\nStatus: ${data.status}\nIerakstu skaits: ${data.leaderboard.length}`;
+            
+            if (data.status === 'success' && data.leaderboard.length > 0) {
+                displayTable(data.leaderboard);
+            } else {
+                tableDiv.innerHTML = '<p>Līderu saraksts ir tukšs.</p>';
+            }
+
+        } catch (error) {
+            resultsDiv.textContent = `Kļūda iegūstot datus: ${error.message}`;
+            console.error("GET Kļūda:", error);
+        }
+    }
+
+    // Funkcija, kas izvada datus tabulā
+    function displayTable(leaderboardData) {
+        let html = '<table><thead><tr>';
+        const headers = ['Name', 'Score', 'Time Played', 'Level', 'Floor', 'Timestamp', 'ID']; 
+        
+        // Izveido tabulas galveni
+        headers.forEach(h => {
+            html += `<th>${h}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        // Pievieno datus
+        leaderboardData.forEach(entry => {
+            html += '<tr>';
+            html += `<td>${entry.Name}</td>`;
+            html += `<td>${entry.Score}</td>`;
+            html += `<td>${entry['Time Played']}</td>`;
+            html += `<td>${entry.Level}</td>`;
+            html += `<td>${entry.Floor}</td>`;
+            // Vienkāršs datuma formatējums
+            html += `<td>${new Date(entry.Timestamp).toLocaleString()}</td>`;
+            html += `<td>${entry.ID}</td>`;
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        tableDiv.innerHTML = html;
+    }
+</script>
+</body>
+</html>
