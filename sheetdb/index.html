@@ -108,7 +108,7 @@
 <script>
     // *************************************************************************
     // OBLIGĀTI AIZVIETOJIET ŠO VIETTUARI AR SAVU PUBLICĒTO WEB APP URL
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwsV-PSo7zicn9aPLF20jf38w-j7zXshI_ga2E2305r-V1xjLwSAubY3vMg_HSJlRgm/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC7ivX6jNIDFXQjWyb7P6YeOFcZ_yKs9U_fLlSBKSZLCrsuDAOaIFkUxPyKy69NhsU/exec"; 
     // *************************************************************************
 
     const resultsDiv = document.getElementById('results');
@@ -128,37 +128,36 @@
     });
 
     async function submitScore(name, score, timePlayed, level, floor) {
-        resultsDiv.textContent = 'Pievieno rezultātu...';
+    resultsDiv.textContent = 'Pievieno rezultātu...';
+    
+    // Izveido URLSearchParams objektu veidlapas datu sūtīšanai
+    const formBody = new URLSearchParams();
+    formBody.append('Name', name);
+    formBody.append('Score', score);
+    formBody.append('Time Played', timePlayed);
+    formBody.append('Level', level);
+    formBody.append('Floor', floor);
+
+    try {
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            // SVARĪGI: Neievietojam 'Content-Type: application/json'
+            // Lai pārlūks automātiski iestatītu application/x-www-form-urlencoded
+            body: formBody // Sūta veidlapas datus
+        });
         
-        const scoreData = {
-            Name: name,
-            Score: parseFloat(score),
-            'Time Played': timePlayed,
-            Level: parseInt(level) || '',
-            Floor: parseInt(floor) || ''
-        };
-
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(scoreData)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
-            }
-
-            const data = await response.json();
-            resultsDiv.textContent = `POST Atbilde:\nStatus: ${data.status}\nZiņojums: ${data.message}\nID: ${data.ID}`;
-            
-        } catch (error) {
-            resultsDiv.textContent = `Kļūda pievienojot ierakstu: ${error.message}`;
-            console.error("POST Kļūda:", error);
+        if (!response.ok) {
+            throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
         }
+
+        const data = await response.json();
+        resultsDiv.textContent = `POST Atbilde:\nStatus: ${data.status}\nZiņojums: ${data.message}\nID: ${data.ID}`;
+        
+    } catch (error) {
+        resultsDiv.textContent = `Kļūda pievienojot ierakstu: ${error.message}`;
+        console.error("POST Kļūda:", error);
     }
+}
 
     // === 2. Datu nolasīšana (GET) ===
     async function getLeaderboard() {
