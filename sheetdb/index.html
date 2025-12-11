@@ -161,34 +161,33 @@
 
     // === 2. Datu nolasīšana (GET) ===
     async function getLeaderboard() {
-        resultsDiv.textContent = 'Ielādē līderu sarakstu...';
+    resultsDiv.textContent = 'Ielādē līderu sarakstu...';
+    
+    try {
+        // VIENKĀRŠOTS GET PIEPRASĪJUMS: Noņemam visas galvenes
+        const response = await fetch(WEB_APP_URL, {
+            method: 'GET'
+            // Izņemam `headers` daļu, lai nodrošinātu, ka tas ir vienkāršs pieprasījums.
+        });
         
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
-            }
-
-            const data = await response.json();
-            resultsDiv.textContent = `GET Atbilde:\nStatus: ${data.status}\nIerakstu skaits: ${data.leaderboard.length}`;
-            
-            if (data.status === 'success' && data.leaderboard.length > 0) {
-                displayTable(data.leaderboard);
-            } else {
-                tableDiv.innerHTML = '<p>Līderu saraksts ir tukšs.</p>';
-            }
-
-        } catch (error) {
-            resultsDiv.textContent = `Kļūda iegūstot datus: ${error.message}`;
-            console.error("GET Kļūda:", error);
+        if (!response.ok) {
+            throw new Error(`HTTP Kļūda! Statuss: ${response.status}`);
         }
+
+        const data = await response.json();
+        resultsDiv.textContent = `GET Atbilde:\nStatus: ${data.status}\nIerakstu skaits: ${data.leaderboard.length}`;
+        
+        if (data.status === 'success' && data.leaderboard.length > 0) {
+            displayTable(data.leaderboard);
+        } else {
+            tableDiv.innerHTML = '<p>Līderu saraksts ir tukšs.</p>';
+        }
+
+    } catch (error) {
+        resultsDiv.textContent = `Kļūda iegūstot datus: ${error.message}`;
+        console.error("GET Kļūda:", error);
     }
+}
 
     // Funkcija, kas izvada datus tabulā
     function displayTable(leaderboardData) {
