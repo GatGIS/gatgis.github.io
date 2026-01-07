@@ -148,6 +148,90 @@
         // If the LayerSwitcher lib isn't available, fail gracefully
         console.warn('LayerSwitcher control not added:', e);
     }
+    // GPS control + accuracy circle + label: add a small map-top-right button that centers on user's location
+    try {
+      // vector layer to show accuracy circle (meters in EPSG:3857)
+      const accuracySource = new ol.source.Vector();
+      const accuracyLayer = new ol.layer.Vector({
+        source: accuracySource,
+        style: new ol.style.Style({
+          fill: new ol.style.Fill({ color: 'rgba(0,122,255,0.08)' }),
+          stroke: new ol.style.Stroke({ color: 'rgba(0,122,255,0.35)', width: 2 })
+        })
+      });
+      map.addLayer(accuracyLayer);
+
+      // precision overlay near the marker (hidden by default)
+      const precisionEl = document.createElement('div');
+      precisionEl.className = 'gps-precision';
+      precisionEl.style.display = 'none';
+      const precisionOverlay = new ol.Overlay({ element: precisionEl, positioning: 'bottom-center', offset: [0, -12] });
+      map.addOverlay(precisionOverlay);
+      let precisionTimer = null;
+
+      function doGpsRefresh() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((p) => {
+            const lon = p.coords.longitude, lat = p.coords.latitude;
+            setMarkerPosition({ lon, lat }, { setPosMethod: 'GPS' });
+            // Draw accuracy circle (coords.accuracy in meters)
+            try {
+              accuracySource.clear();
+              const center = ol.proj.fromLonLat([lon, lat]);
+              const radius = Number(p.coords.accuracy) || 0;
+              const circ = new ol.Feature(new ol.geom.Circle(center, radius));
+              accuracySource.addFeature(circ);
+              // show temporary precision overlay near the marker
+              precisionEl.textContent = '± ' + Math.round(p.coords.accuracy) + ' m';
+              precisionEl.style.display = 'block';
+              precisionOverlay.setPosition(center);
+              if (precisionTimer) clearTimeout(precisionTimer);
+              precisionTimer = setTimeout(() => {
+                try { precisionEl.style.display = 'none'; precisionOverlay.setPosition(undefined); } catch (e) {}
+              }, 3000);
+            } catch (e) { /* ignore drawing errors */ }
+            // update GPS button label if present
+            try {
+              if (gpsAccuracyLabel) {
+                gpsAccuracyLabel.textContent = '± ' + Math.round(p.coords.accuracy) + ' m';
+                gpsAccuracyLabel.style.display = 'block';
+              }
+            } catch (e) {}
+            try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
+          }, (err) => {
+            const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
+            setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
+            try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+          }, { enableHighAccuracy: true, timeout: 5000 });
+        } else {
+          const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
+          setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
+          try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+        }
+      }
+
+      const gpsEl = document.createElement('div');
+      gpsEl.className = 'ol-control ol-unselectable ol-gps';
+      const gpsBtn = document.createElement('button');
+      gpsBtn.type = 'button';
+      gpsBtn.title = 'Center on my location';
+      // Google-like location SVG (simple target icon)
+      gpsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">'
+        + '<circle cx="12" cy="12" r="7" fill="none" stroke="#007AFF" stroke-width="1.6"/>'
+        + '<circle cx="12" cy="12" r="2.6" fill="#007AFF"/>'
+        + '</svg>';
+      gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); doGpsRefresh(); });
+      gpsEl.appendChild(gpsBtn);
+      // accuracy label
+      const gpsAccuracyLabel = document.createElement('div');
+      gpsAccuracyLabel.className = 'ol-gps-accuracy';
+      gpsAccuracyLabel.style.display = 'none';
+      gpsEl.appendChild(gpsAccuracyLabel);
+      map.addControl(new ol.control.Control({ element: gpsEl }));
+    } catch (e) {
+      // don't break map if custom control fails
+      console.warn('GPS control not added:', e);
+    }
 
     // helper: update input fields from coord
     function setInputsFromCoord(coord) {
@@ -279,6 +363,15 @@
 
     // GPS refresh: center marker on current view center or use browser geolocation
     refreshBtn.addEventListener('click', function() {
+      // Prefer the shared GPS routine if available (shows accuracy and label)
+      try {
+        if (typeof doGpsRefresh === 'function') {
+          doGpsRefresh();
+          return;
+        }
+      } catch (e) {}
+
+      // Fallback: previous behavior
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((p) => {
           setMarkerPosition({ lon: p.coords.longitude, lat: p.coords.latitude }, { setPosMethod: 'GPS' });

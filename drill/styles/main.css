@@ -230,3 +230,54 @@ html, body, #app {
   :root { --bottom-spacer-height: 64px; }
   .mosys-btn { padding: 10px; font-size: 13px; border-radius: 8px; }
 }
+
+/* Small GPS control placed on map (uses OpenLayers control container) */
+.ol-gps {
+  position: absolute;
+  top: 10px;
+  right: 10px; /* align with LayerSwitcher on the right */
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ol-gps button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.ol-gps button:hover { transform: translateY(-2px); }
+.ol-gps-accuracy {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #007AFF;
+  background: rgba(255,255,255,0.95);
+  padding: 2px 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  white-space: nowrap;
+}
+
+/* ensure LayerSwitcher sits at top-right with small offset */
+.ol-layerswitcher, .layer-switcher, .layerswitcher { top: 76px !important; right: 10px !important; }
+
+/* small popup label near marker showing precision briefly */
+.gps-precision {
+  background: rgba(255,255,255,0.95);
+  color: #007AFF;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  font-size: 13px;
+  pointer-events: none;
+}
