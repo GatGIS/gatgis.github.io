@@ -588,13 +588,10 @@
       const geoOpts = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
       navigator.geolocation.getCurrentPosition((pos) => {
         try {
-          // center map and update marker, but don't re-init the whole map
-          if (window.mosysMapInit) {
-            // find existing marker logic: call doGpsRefresh if available
-            try { if (typeof doGpsRefresh === 'function') { doGpsRefresh(); return; } } catch (e) {}
-            // fallback: center marker using exposed init behaviour
-            try { const mapInit = window.mosysMapInit; } catch (e) {}
-          }
+          // Prefer updating via shared routine if available
+          try { if (typeof doGpsRefresh === 'function') { doGpsRefresh(); return; } } catch (e) {}
+          // otherwise set marker directly from the obtained position
+          try { setMarkerPosition({ lon: pos.coords.longitude, lat: pos.coords.latitude }, { setPosMethod: 'GPS' }); } catch (e) {}
         } catch (e) { /* ignore */ }
       }, (err) => {
         // ignore errors — map is already visible with default coords
