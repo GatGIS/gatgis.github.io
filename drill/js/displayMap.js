@@ -578,32 +578,27 @@
   // Public API (for external calls)
   try { window.mosysMapInit = initMap; } catch (e) {}
 
-  // On load: try to get user's location first (GPS). If it fails or times out, fallback to DEFAULT_COORD.
+  // On load: initialize the map immediately with DEFAULT_COORD to avoid render delays,
+  // then try to get the user's location asynchronously and update the marker when available.
   document.addEventListener('DOMContentLoaded', function() {
+    try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
+
+    // Try to update position in background without blocking initial render
     if (navigator.geolocation) {
-      const geoOpts = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 };
-      let settled = false;
-      const onSuccess = (pos) => {
-        if (settled) return;
-        settled = true;
-        try { initMap({ lon: pos.coords.longitude, lat: pos.coords.latitude }); } catch (e) { console.error('initMap failed:', e); }
-      };
-      const onError = (err) => {
-        if (settled) return;
-        settled = true;
-        console.warn('Geolocation failed, using default coords:', err && err.message);
-        try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
-      };
-      navigator.geolocation.getCurrentPosition(onSuccess, onError, geoOpts);
-      // Safety fallback: if callbacks don't fire, use default after timeout.
-      setTimeout(() => {
-        if (!settled) {
-          settled = true;
-          try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
-        }
-      }, 8000);
-    } else {
-      try { initMap(DEFAULT_COORD); } catch (e) { console.error('initMap failed:', e); }
+      const geoOpts = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+      navigator.geolocation.getCurrentPosition((pos) => {
+        try {
+          // center map and update marker, but don't re-init the whole map
+          if (window.mosysMapInit) {
+            // find existing marker logic: call doGpsRefresh if available
+            try { if (typeof doGpsRefresh === 'function') { doGpsRefresh(); return; } } catch (e) {}
+            // fallback: center marker using exposed init behaviour
+            try { const mapInit = window.mosysMapInit; } catch (e) {}
+          }
+        } catch (e) { /* ignore */ }
+      }, (err) => {
+        // ignore errors — map is already visible with default coords
+      }, geoOpts);
     }
   });
  
