@@ -220,7 +220,8 @@
         + '<circle cx="12" cy="12" r="7" fill="none" stroke="#007AFF" stroke-width="1.6"/>'
         + '<circle cx="12" cy="12" r="2.6" fill="#007AFF"/>'
         + '</svg>';
-      gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); doGpsRefresh(); });
+      gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); doGpsRefresh(); try { gpsBtn.blur(); } catch(e){} });
+      gpsBtn.addEventListener('mouseup', function () { try { gpsBtn.blur(); } catch(e){} });
       gpsEl.appendChild(gpsBtn);
       // accuracy label
       const gpsAccuracyLabel = document.createElement('div');
@@ -228,6 +229,28 @@
       gpsAccuracyLabel.style.display = 'none';
       gpsEl.appendChild(gpsAccuracyLabel);
       map.addControl(new ol.control.Control({ element: gpsEl }));
+
+      // initial accuracy read: populate GPS label and circle on page load (no centering)
+      try {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((p) => {
+            try {
+              if (gpsAccuracyLabel) {
+                gpsAccuracyLabel.textContent = '± ' + Math.round(p.coords.accuracy) + ' m';
+                gpsAccuracyLabel.style.display = 'block';
+              }
+              // draw circle at actual device location to give immediate visual cue
+              accuracySource.clear();
+              const center = ol.proj.fromLonLat([p.coords.longitude, p.coords.latitude]);
+              const radius = Number(p.coords.accuracy) || 0;
+              const circ = new ol.Feature(new ol.geom.Circle(center, radius));
+              accuracySource.addFeature(circ);
+            } catch (e) { /* ignore */ }
+          }, (err) => {
+            try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+          }, { enableHighAccuracy: true, timeout: 5000 });
+        }
+      } catch (e) {}
     } catch (e) {
       // don't break map if custom control fails
       console.warn('GPS control not added:', e);
