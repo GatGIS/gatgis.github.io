@@ -340,3 +340,18 @@ html, body, #app {
 }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Styles migrated from drill/index.html <style> block to central stylesheet */
+/* ensure map fills available area */
+#map { width: 100%; height: 80vh; }
+#panel { width: 100%; height: 20vh; }
+#app.results-open #map { height: 30vh; }
+#app.results-open #panel { height: 70vh; }
+/* Add transitions for smooth height change */
+#map, #panel { transition: height 0.3s; }
+
+/* Spacer styles moved from index.html */
+#bottomSpacer { height: var(--spacer-height, 20px); visibility: hidden; }
+
+/* utility hidden class used by JS to toggle element visibility */
+.hidden { display: none !important; }

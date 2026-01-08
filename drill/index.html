@@ -18,56 +18,7 @@
   <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@3.8.3/dist/ol-layerswitcher.css" />
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="styles/main.css">
-  <style>
-    /* ensure map fills available area */
-    #map { width: 100%; height: 80vh; }
-    #panel { width: 100%; height: 20vh; }
-    #app.results-open #map { height: 30vh; }
-    #app.results-open #panel { height: 70vh; }
-    /* Add transitions for smooth height change */
-    #map, #panel { transition: height 0.3s; }
-
-    /* Floating map controls */
-    .map-controls {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      overflow: hidden;
-      z-index: 1000;
-    }
-    .map-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      width: 100%;
-      text-align: left;
-    }
-    .map-btn:hover {
-      background: #0056b3;
-    }
-    .layer-menu {
-      padding: 10px;
-      display: none;
-    }
-    .layer-menu label {
-      display: block;
-      margin: 5px 0;
-    }
-
-    /* Spacer styles */
-    :root {
-      --spacer-height: 20px; /* Default spacer height */
-    }
-    #bottomSpacer {
-      height: var(--spacer-height);
-      visibility: hidden; /* Visually hide the spacer but keep it in the document flow */
-    }
-  </style>
+  <!-- Styles consolidated into styles/main.css -->
 </head>
 <body>
   <!-- App wrapper: map on top, panel at bottom (mobile-first) -->

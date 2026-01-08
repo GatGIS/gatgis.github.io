@@ -130,7 +130,7 @@
             <button id="mosys-drill" class="mosys-btn primary">Drill</button>
             <button id="mosys-refresh" class="mosys-btn secondary">Refresh GPS</button>
             <!-- Close as compact X icon -->
-            <button id="mosys-close" class="mosys-close" style="display:none" aria-label="Close results" title="Close results">✕</button>
+            <button id="mosys-close" class="mosys-close hidden" aria-label="Close results" title="Close results">✕</button>
           </div>
         </div>
   
@@ -421,12 +421,12 @@
     // run ensurePanelFits when showing results or collapsing
     function expandResults() {
       if (appEl) appEl.classList.add('results-open');
-      if (closeBtn) closeBtn.style.display = 'inline-flex';
+      if (closeBtn) try { closeBtn.classList.remove('hidden'); } catch(e) { closeBtn.style.display = 'inline-flex'; }
       ensurePanelFits();
     }
     function collapseResults() {
       if (appEl) appEl.classList.remove('results-open');
-      if (closeBtn) closeBtn.style.display = 'none';
+      if (closeBtn) try { closeBtn.classList.add('hidden'); } catch(e) { closeBtn.style.display = 'none'; }
       tableContainer.innerHTML = '';
       webAnswer.textContent = '';
       ensurePanelFits();
