@@ -59,10 +59,18 @@
       }),
       visible: false
     });      
-
+    const t10Layer = new ol.layer.Tile({
+      title: 'Topo10',
+      source: new ol.source.TileWMS({
+        url: 'https://lvmgeoserver.lvm.lv/geoserver/ows',
+        params: {'LAYERS': 'public:Topo10DTM_contours', 'TILED': true},
+        serverType: 'geoserver'
+      }),
+      visible: false
+    });
     const map = new ol.Map({
       target: 'map',
-      layers: [osmLayer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer],
+      layers: [osmLayer, t10Layer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer],
       view: new ol.View({
         center: center,
         zoom: 13
