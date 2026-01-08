@@ -1,7 +1,7 @@
 (function () {
   // Default coordinate (lon, lat) used if geolocation isn't available
   // Updated start location to user's location: lat 56.9361061, lon 24.0625166
-  const DEFAULT_COORD = { lon: 24.0625166, lat: 56.9361061 };
+  const DEFAULT_COORD = { lon: 24.0998371, lat: 56.9462801 };
 
   function initMap(centerLonLat) {
     // Ensure OpenLayers (ol) is available
