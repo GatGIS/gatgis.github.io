@@ -257,6 +257,8 @@ html, body, #app {
   padding: 0;
 }
 .ol-gps button:hover { transform: translateY(-2px); }
+.ol-gps button:focus { outline: none; box-shadow: none; }
+.ol-gps button, .ol-gps button:active { -webkit-tap-highlight-color: transparent; }
 .ol-gps-accuracy {
   margin-top: 4px;
   font-size: 12px;
@@ -281,3 +283,48 @@ html, body, #app {
   font-size: 13px;
   pointer-events: none;
 }
+
+/* small spinner used inside GPS control */
+.gps-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-top-color: #007AFF;
+  animation: spin 1s linear infinite;
+  box-sizing: border-box;
+  margin-top: 4px;
+}
+.mosys-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  /* visible on light backgrounds: subtle dark ring with accent on top */
+  border: 3px solid rgba(0,0,0,0.12);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+.mosys-spinner-overlay {
+  position: absolute;
+  inset: 0; /* fill the button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* left-inline spinner used beside the Drill button */
+.mosys-spinner-left {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

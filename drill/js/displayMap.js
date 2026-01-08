@@ -93,6 +93,15 @@
 
     map.addLayer(markerLayer);
 
+    // accuracy/precision variables (hoisted so handlers can access them)
+    let accuracySource = null;
+    let accuracyLayer = null;
+    let precisionEl = null;
+    let precisionOverlay = null;
+    let precisionTimer = null;
+    let gpsAccuracyLabel = null;
+    let mosysSpinner = null;
+
     // --- NEW: controls, request + parsing logic ----------------
     let waitInterval = null;
 
@@ -151,8 +160,8 @@
     // GPS control + accuracy circle + label: add a small map-top-right button that centers on user's location
     try {
       // vector layer to show accuracy circle (meters in EPSG:3857)
-      const accuracySource = new ol.source.Vector();
-      const accuracyLayer = new ol.layer.Vector({
+      accuracySource = new ol.source.Vector();
+      accuracyLayer = new ol.layer.Vector({
         source: accuracySource,
         style: new ol.style.Style({
           fill: new ol.style.Fill({ color: 'rgba(0,122,255,0.08)' }),
@@ -162,12 +171,12 @@
       map.addLayer(accuracyLayer);
 
       // precision overlay near the marker (hidden by default)
-      const precisionEl = document.createElement('div');
+      precisionEl = document.createElement('div');
       precisionEl.className = 'gps-precision';
       precisionEl.style.display = 'none';
-      const precisionOverlay = new ol.Overlay({ element: precisionEl, positioning: 'bottom-center', offset: [0, -12] });
+      precisionOverlay = new ol.Overlay({ element: precisionEl, positioning: 'bottom-center', offset: [0, -12] });
       map.addOverlay(precisionOverlay);
-      let precisionTimer = null;
+      precisionTimer = null;
 
       function doGpsRefresh() {
         if (navigator.geolocation) {
@@ -198,15 +207,18 @@
               }
             } catch (e) {}
             try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
+            try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
           }, (err) => {
             const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
             setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
             try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+            try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
           }, { enableHighAccuracy: true, timeout: 5000 });
         } else {
           const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
           setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
           try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+          try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
         }
       }
 
@@ -220,15 +232,22 @@
         + '<circle cx="12" cy="12" r="7" fill="none" stroke="#007AFF" stroke-width="1.6"/>'
         + '<circle cx="12" cy="12" r="2.6" fill="#007AFF"/>'
         + '</svg>';
-      gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); doGpsRefresh(); try { gpsBtn.blur(); } catch(e){} });
+      gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); try { if (gpsSpinner) gpsSpinner.style.display = 'inline-block'; } catch(e){}; doGpsRefresh(); try { gpsBtn.blur(); } catch(e){} });
       gpsBtn.addEventListener('mouseup', function () { try { gpsBtn.blur(); } catch(e){} });
       gpsEl.appendChild(gpsBtn);
+      // small spinner inside gps control
+      const gpsSpinner = document.createElement('div');
+      gpsSpinner.className = 'gps-spinner';
+      gpsSpinner.style.display = 'none';
+      gpsEl.appendChild(gpsSpinner);
       // accuracy label
       const gpsAccuracyLabel = document.createElement('div');
       gpsAccuracyLabel.className = 'ol-gps-accuracy';
       gpsAccuracyLabel.style.display = 'none';
       gpsEl.appendChild(gpsAccuracyLabel);
       map.addControl(new ol.control.Control({ element: gpsEl }));
+
+      // panel-level spinner for MOSYS requests (created later inside Drill button)
 
       // initial accuracy read: populate GPS label and circle on page load (no centering)
       try {
@@ -284,7 +303,7 @@
       drillBtn = document.createElement('button');
       drillBtn.id = 'mosys-drill';
       drillBtn.className = 'mosys-btn primary';
-      drillBtn.textContent = 'Drill';
+      drillBtn.innerHTML = '<span class="drill-label">Drill</span>';
       panel.querySelector('.top-actions').appendChild(drillBtn);
     }
     if (!refreshBtn) {
@@ -294,6 +313,18 @@
       refreshBtn.textContent = 'Refresh';
       panel.querySelector('.top-actions').appendChild(refreshBtn);
     }
+
+    // create MOSYS spinner to the left of the Drill button (inline)
+    try {
+      if (!mosysSpinner && drillBtn) {
+        const topActions = panel.querySelector('.top-actions') || panel;
+        mosysSpinner = document.createElement('div');
+        mosysSpinner.className = 'mosys-spinner mosys-spinner-left';
+        mosysSpinner.style.display = 'none';
+        // insert spinner before the drill button so it appears to the left
+        try { topActions.insertBefore(mosysSpinner, drillBtn); } catch (e) { try { drillBtn.parentNode.insertBefore(mosysSpinner, drillBtn); } catch (err) { /* ignore */ } }
+      }
+    } catch (e) { /* ignore */ }
 
     // initialize marker and inputs from currentCoord
     setInputsFromCoord(currentCoord);
@@ -310,6 +341,10 @@
           const ll = ol.proj.toLonLat(evt.coordinate);
           setMarkerPosition({ lon: ll[0], lat: ll[1] }, { setPosMethod: 'MAP' });
           webAnswer.textContent = 'Position set from map (posmethod=MAP)';
+          // remove previous accuracy visuals when user manually sets position
+          try { if (accuracySource) accuracySource.clear(); } catch (e) {}
+          try { if (precisionEl) { precisionEl.style.display = 'none'; precisionOverlay.setPosition(undefined); } } catch (e) {}
+          try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
           ensurePanelFits();
         } catch (e) {}
       });
@@ -452,6 +487,7 @@
       const build = '13';
       const remoteUrl = `http://www.modlab.lv/kalme/realdata/MOSYSmobile.php?x=${encodeURIComponent(latStr)}&y=${encodeURIComponent(lonStr)}&ndata=${encodeURIComponent(ndata)}&posmethod=${encodeURIComponent(posMethod)}&build=${encodeURIComponent(build)}`;
       if (webAnswer) webAnswer.textContent = 'Calculate on server ...';
+      try { if (mosysSpinner) mosysSpinner.style.display = 'inline-block'; } catch (e) {}
       if (tableContainer) tableContainer.innerHTML = '';
       let dots = 0;
       if (waitInterval) { clearInterval(waitInterval); waitInterval = null; }
@@ -462,11 +498,13 @@
       try {
         const text = await fetchWithFallback(remoteUrl);
         clearInterval(waitInterval); waitInterval = null;
+        try { if (mosysSpinner) mosysSpinner.style.display = 'none'; } catch (e) {}
         parseResponse(text);
         // show expanded results area after parsing
         expandResults();
       } catch (e) {
         clearInterval(waitInterval); waitInterval = null;
+        try { if (mosysSpinner) mosysSpinner.style.display = 'none'; } catch (err) {}
         if (webAnswer) webAnswer.textContent = 'Request failed: ' + (e.message || e);
       }
     }
