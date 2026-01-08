@@ -259,6 +259,13 @@ html, body, #app {
 .ol-gps button:hover { transform: translateY(-2px); }
 .ol-gps button:focus { outline: none; box-shadow: none; }
 .ol-gps button, .ol-gps button:active { -webkit-tap-highlight-color: transparent; }
+.ol-gps button, .ol-gps button:focus, .ol-gps button:active {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #fff !important; /* keep white background even when focused/active */
+  color: inherit;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
 .ol-gps-accuracy {
   margin-top: 4px;
   font-size: 12px;

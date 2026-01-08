@@ -234,6 +234,8 @@
         + '</svg>';
       gpsBtn.addEventListener('click', function (evt) { evt.stopPropagation(); try { if (gpsSpinner) gpsSpinner.style.display = 'inline-block'; } catch(e){}; doGpsRefresh(); try { gpsBtn.blur(); } catch(e){} });
       gpsBtn.addEventListener('mouseup', function () { try { gpsBtn.blur(); } catch(e){} });
+      // also blur on touchend to avoid persisted focus/selection on mobile
+      gpsBtn.addEventListener('touchend', function () { try { gpsBtn.blur(); } catch(e){} });
       gpsEl.appendChild(gpsBtn);
       // small spinner inside gps control
       const gpsSpinner = document.createElement('div');
