@@ -280,6 +280,11 @@ html, body, #app {
 /* ensure LayerSwitcher sits at top-right with small offset */
 .ol-layerswitcher, .layer-switcher, .layerswitcher { top: 76px !important; right: 10px !important; }
 
+/* Move OpenLayers rotate (north) control to top-left under the zoom controls
+  so it doesn't overlap map-top-right GPS control. */
+.ol-zoom { top: 10px !important; left: 10px !important; right: auto !important; }
+.ol-rotate { top: 80px !important; left: 10px !important; right: auto !important; }
+
 /* small popup label near marker showing precision briefly */
 .gps-precision {
   background: rgba(255,255,255,0.95);
