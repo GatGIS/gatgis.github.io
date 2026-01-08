@@ -222,6 +222,10 @@
         }
       }
 
+      // expose doGpsRefresh and a small marker setter to the global scope so page-load geolocation can trigger it
+      try { window.mosysDoGpsRefresh = doGpsRefresh; } catch (e) {}
+      try { window.mosysSetMarker = function(lon, lat) { try { setMarkerPosition({ lon: lon, lat: lat }, { setPosMethod: 'GPS' }); } catch (e) {} }; } catch (e) {}
+
       const gpsEl = document.createElement('div');
       gpsEl.className = 'ol-control ol-unselectable ol-gps';
       const gpsBtn = document.createElement('button');
@@ -629,9 +633,9 @@
       navigator.geolocation.getCurrentPosition((pos) => {
         try {
           // Prefer updating via shared routine if available
-          try { if (typeof doGpsRefresh === 'function') { doGpsRefresh(); return; } } catch (e) {}
-          // otherwise set marker directly from the obtained position
-          try { setMarkerPosition({ lon: pos.coords.longitude, lat: pos.coords.latitude }, { setPosMethod: 'GPS' }); } catch (e) {}
+          try { if (typeof window.mosysDoGpsRefresh === 'function') { window.mosysDoGpsRefresh(); return; } } catch (e) {}
+          // otherwise set marker directly from the obtained position via global helper
+          try { if (typeof window.mosysSetMarker === 'function') { window.mosysSetMarker(pos.coords.longitude, pos.coords.latitude); } else { /* no-op */ } } catch (e) {}
         } catch (e) { /* ignore */ }
       }, (err) => {
         // ignore errors — map is already visible with default coords
