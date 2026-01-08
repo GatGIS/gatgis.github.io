@@ -233,6 +233,38 @@
       // expose doGpsRefresh and a small marker setter to the global scope so page-load geolocation can trigger it
       try { window.mosysDoGpsRefresh = doGpsRefresh; } catch (e) {}
       try { window.mosysSetMarker = function(lon, lat) { try { setMarkerPosition({ lon: lon, lat: lat }, { setPosMethod: 'GPS' }); } catch (e) {} }; } catch (e) {}
+      try {
+        window.mosysApplyPosition = function(p) {
+          try {
+            const lon = p.coords.longitude, lat = p.coords.latitude;
+            // move marker and center
+            try { setMarkerPosition({ lon, lat }, { setPosMethod: 'GPS' }); } catch (e) {}
+            // draw accuracy circle
+            try {
+              if (accuracySource) {
+                accuracySource.clear();
+                const center = ol.proj.fromLonLat([lon, lat]);
+                const radius = Number(p.coords.accuracy) || 0;
+                const circ = new ol.Feature(new ol.geom.Circle(center, radius));
+                accuracySource.addFeature(circ);
+              }
+            } catch (e) {}
+            // update GPS label
+            try { if (gpsAccuracyLabel) { gpsAccuracyLabel.textContent = '± ' + Math.round(p.coords.accuracy) + ' m'; gpsAccuracyLabel.style.display = 'block'; } } catch (e) {}
+            // show temporary precision overlay
+            try {
+              if (precisionEl && precisionOverlay) {
+                precisionEl.textContent = '± ' + Math.round(p.coords.accuracy) + ' m';
+                precisionEl.style.display = 'block';
+                const center = ol.proj.fromLonLat([lon, lat]);
+                precisionOverlay.setPosition(center);
+                if (precisionTimer) clearTimeout(precisionTimer);
+                precisionTimer = setTimeout(() => { try { precisionEl.style.display = 'none'; precisionOverlay.setPosition(undefined); } catch (e) {} }, 3000);
+              }
+            } catch (e) {}
+          } catch (e) {}
+        };
+      } catch (e) {}
 
       const gpsEl = document.createElement('div');
       gpsEl.className = 'ol-control ol-unselectable ol-gps';
@@ -640,9 +672,10 @@
       const geoOpts = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
       navigator.geolocation.getCurrentPosition((pos) => {
         try {
-          // Prefer updating via shared routine if available
+          // Use the obtained Position directly to update marker and accuracy visuals
+          try { if (typeof window.mosysApplyPosition === 'function') { window.mosysApplyPosition(pos); return; } } catch (e) {}
+          // Fallbacks: prefer doGpsRefresh if available, otherwise set marker only
           try { if (typeof window.mosysDoGpsRefresh === 'function') { window.mosysDoGpsRefresh(); return; } } catch (e) {}
-          // otherwise set marker directly from the obtained position via global helper
           try { if (typeof window.mosysSetMarker === 'function') { window.mosysSetMarker(pos.coords.longitude, pos.coords.latitude); } else { /* no-op */ } } catch (e) {}
         } catch (e) { /* ignore */ }
       }, (err) => {
