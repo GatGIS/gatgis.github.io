@@ -576,26 +576,20 @@
                     const lKey = findKey('LITOLOGY');
                     const sVal = sKey ? props[sKey] : (props.SEDIMENTINDEX || props.sedimentindex || '');
                     const lVal = lKey ? props[lKey] : (props.LITOLOGY || props.lithology || props.litoLOGY || '');
-                    // insert a caption row at the top of the table results
+                    // insert a small info block above the MOSYS result table (not inside it)
                     try {
                       if (tableContainer) {
-                        const tableEl = tableContainer.querySelector('table');
-                        if (tableEl) {
-                          const hdr = tableEl.querySelector('thead');
-                          const infoRow = document.createElement('tr');
-                          const infoCell = document.createElement('td');
-                          infoCell.setAttribute('colspan', '4');
-                          infoCell.style.background = '#eef6ff';
-                          infoCell.style.fontWeight = '700';
-                          infoCell.style.padding = '8px';
-                          infoCell.textContent = `Kvartārs: ${sVal}    - ${lVal}`;
-                          infoRow.appendChild(infoCell);
-                          if (hdr && hdr.parentNode) {
-                            hdr.parentNode.insertBefore(infoRow, hdr.nextSibling);
-                          } else {
-                            tableEl.insertBefore(infoRow, tableEl.firstChild);
-                          }
-                        }
+                        // remove previous info if present
+                        try { const prev = tableContainer.querySelector('#quaternary-info'); if (prev) prev.remove(); } catch (e) {}
+                        const infoDiv = document.createElement('div');
+                        infoDiv.id = 'quaternary-info';
+                        infoDiv.className = 'quaternary-info';
+                        infoDiv.style.background = '#eef6ff';
+                        infoDiv.style.fontWeight = '700';
+                        infoDiv.style.padding = '8px';
+                        infoDiv.style.marginBottom = '8px';
+                        infoDiv.textContent = `Kvartārs: ${sVal} — ${lVal}`;
+                        tableContainer.insertBefore(infoDiv, tableContainer.firstChild);
                       }
                     } catch (e) { /* ignore UI insertion errors */ }
                   }

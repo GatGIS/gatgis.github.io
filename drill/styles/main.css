@@ -355,3 +355,10 @@ html, body, #app {
 
 /* utility hidden class used by JS to toggle element visibility */
 .hidden { display: none !important; }
+
+/* Quaternary WMS info block displayed above MOSYS results */
+.quaternary-info {
+  font-size: 14px;
+  color: #0b3d91;
+  border-radius: 6px;
+}
