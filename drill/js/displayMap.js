@@ -217,16 +217,18 @@
             try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
             try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
           }, (err) => {
-            const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-            setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
-            try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+            // GPS failed: inform user instead of setting a possibly misleading marker
+            try { if (gpsAccuracyLabel) { gpsAccuracyLabel.textContent = 'Enable GPS'; gpsAccuracyLabel.style.display = 'block'; } } catch (e) {}
             try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
+            try { if (precisionEl) { precisionEl.style.display = 'none'; precisionOverlay.setPosition(undefined); } } catch (e) {}
+            // hide message after a moment
+            try { setTimeout(() => { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; }, 4000); } catch (e) {}
           }, { enableHighAccuracy: true, timeout: 5000 });
         } else {
-          const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-          setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
-          try { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; } catch (e) {}
+          // no geolocation API available
+          try { if (gpsAccuracyLabel) { gpsAccuracyLabel.textContent = 'Enable GPS'; gpsAccuracyLabel.style.display = 'block'; } } catch (e) {}
           try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
+          try { setTimeout(() => { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; }, 4000); } catch (e) {}
         }
       }
 
@@ -482,12 +484,14 @@
           // ensure panel still visible
           try { panel.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
         }, (err) => {
-          const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-          setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
+          // GPS not available / permission denied — inform user instead of moving marker
+          try { if (gpsAccuracyLabel) { gpsAccuracyLabel.textContent = 'Enable GPS'; gpsAccuracyLabel.style.display = 'block'; } } catch (e) {}
+          try { if (gpsSpinner) gpsSpinner.style.display = 'none'; } catch (e) {}
+          try { setTimeout(() => { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; }, 4000); } catch (e) {}
         }, { enableHighAccuracy: true, timeout: 5000 });
       } else {
-        const viewCenter = ol.proj.toLonLat(map.getView().getCenter());
-        setMarkerPosition({ lon: viewCenter[0], lat: viewCenter[1] }, { setPosMethod: 'GPS' });
+        try { if (gpsAccuracyLabel) { gpsAccuracyLabel.textContent = 'Enable GPS'; gpsAccuracyLabel.style.display = 'block'; } } catch (e) {}
+        try { setTimeout(() => { if (gpsAccuracyLabel) gpsAccuracyLabel.style.display = 'none'; }, 4000); } catch (e) {}
       }
     });
 
