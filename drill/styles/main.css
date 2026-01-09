@@ -397,16 +397,45 @@ html, body, #app {
   border-radius: 10px;
   max-width: 92vw;
   max-height: 80vh;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden; /* keep overall popup from creating horizontal page scroll */
   padding: 10px;
+  box-sizing: border-box;
 }
 .legend-popup.hidden { display: none; }
 .legend-popup .legend-inner { display:flex; flex-direction:column; gap:8px; }
-.legend-popup .legend-content { display:flex; flex-direction:column; gap:12px; align-items:center; padding:12px; }
+.legend-popup .legend-content { display:flex; flex-direction:column; gap:12px; align-items:center; padding:12px; box-sizing: border-box; }
 /* Each legend item is a full-width block that centers the image */
-.legend-popup .legend-item { width: 100%; display:flex; flex-direction:column; align-items:center; }
+.legend-popup .legend-item { width: 100%; display:block; }
 .legend-popup .legend-item .legend-title { width: 100%; text-align: left; font-weight: 700; margin-bottom: 6px; }
-.legend-popup .legend-item img { max-width: 96vw; width: auto; height: auto; max-height: 85vh; object-fit: contain; display:block; margin: 0 auto; }
+.legend-popup .legend-item .legend-embed { width: 100%; display:block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.legend-popup .legend-item .legend-embed img {
+  /* Allow natural image width, but constrain height; user can scroll horizontally if image wider than popup */
+  width: auto;
+  max-width: none;
+  height: auto;
+  max-height: 85vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Mobile: use larger width for legends so they are readable */
+@media (max-width: 600px) {
+  .legend-popup {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  /* Do not force width on mobile; allow horizontal scrolling if legend is wider */
+  .legend-popup .legend-item .legend-embed img { width: auto; max-width: none; }
+}
 .legend-popup .legend-close { align-self:flex-end; background:transparent; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 8px; cursor:pointer; }
 .legend-loading { color:#666; font-size:14px; padding:12px; }
 .legend-error { color:#a33; font-size:14px; padding:12px; }

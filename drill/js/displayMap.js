@@ -221,8 +221,10 @@
             u.searchParams.set('VERSION', '1.3.0');
             u.searchParams.set('LAYER', info.layer);
             // prefer transparent background
-            u.searchParams.set('TRANSPARENT', 'TRUE');
-            const legendUrl = u.toString();
+                u.searchParams.set('TRANSPARENT', 'TRUE');
+                // Request higher DPI but avoid forcing WIDTH (server scaling can distort legends)
+                try { u.searchParams.set('FORMAT_OPTIONS', 'dpi:120'); } catch (e) {}
+                const legendUrl = u.toString();
             // show a loading placeholder while image loads and wrap in a vertical block
             if (legendContent) {
               legendContent.innerHTML = '';
@@ -230,26 +232,28 @@
               block.className = 'legend-item';
               block.style.marginBottom = '12px';
               const title = document.createElement('div');
-              title.style.fontWeight = '700';
-              title.style.marginBottom = '6px';
+              title.className = 'legend-title';
               title.textContent = layer.get('title') || info.layer;
               block.appendChild(title);
+              const embed = document.createElement('div');
+              embed.className = 'legend-embed';
               const placeholder = document.createElement('div');
               placeholder.className = 'legend-loading';
               placeholder.textContent = 'Loading…';
-              block.appendChild(placeholder);
+              embed.appendChild(placeholder);
 
               const img = document.createElement('img');
               img.alt = 'Legend for ' + (layer.get('title') || info.layer);
               img.onload = function () {
-                try { block.removeChild(placeholder); } catch (e) {}
-                block.appendChild(img);
+                try { embed.removeChild(placeholder); } catch (e) {}
+                embed.appendChild(img);
               };
               img.onerror = function () {
-                try { block.removeChild(placeholder); } catch (e) {}
-                const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; block.appendChild(err);
+                try { embed.removeChild(placeholder); } catch (e) {}
+                const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; embed.appendChild(err);
               };
               try { img.src = legendUrl; } catch (e) { placeholder.textContent = 'Legend URL error'; }
+              block.appendChild(embed);
               legendContent.appendChild(block);
             }
             legendPopup.classList.remove('hidden');
@@ -370,6 +374,7 @@
                 u.searchParams.set('VERSION', '1.3.0');
                 u.searchParams.set('LAYER', info.layer);
                 u.searchParams.set('TRANSPARENT', 'TRUE');
+                try { u.searchParams.set('FORMAT_OPTIONS', 'dpi:120'); } catch (e) {}
                 img.src = u.toString();
               } catch (e) {
                 const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend URL failed'; block.appendChild(err);
