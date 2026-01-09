@@ -552,6 +552,60 @@
         parseResponse(text);
         // show expanded results area after parsing
         expandResults();
+        // Additionally, request WMS GetFeatureInfo from quaternary layer for the same coords
+        try {
+          const lat = Number(latStr);
+          const lon = Number(lonStr);
+          if (!isNaN(lat) && !isNaN(lon) && typeof quaternaryLayer !== 'undefined' && quaternaryLayer && quaternaryLayer.getSource) {
+            const src = quaternaryLayer.getSource();
+            if (src && typeof src.getFeatureInfoUrl === 'function' && map) {
+              const coord = ol.proj.fromLonLat([lon, lat]);
+              const view = map.getView();
+              const url = src.getFeatureInfoUrl(coord, view.getResolution(), view.getProjection(), { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 1 });
+              if (url) {
+                try {
+                  const infoText = await fetchWithFallback(url);
+                  let infoJson = null;
+                  try { infoJson = JSON.parse(infoText); } catch (e) { infoJson = null; }
+                  if (infoJson && infoJson.features && infoJson.features.length > 0) {
+                    const props = infoJson.features[0].properties || {};
+                    // try to read fields case-insensitively
+                    const keys = Object.keys(props);
+                    const findKey = (name) => keys.find(k => k.toLowerCase() === name.toLowerCase());
+                    const sKey = findKey('SEDIMENTINDEX');
+                    const lKey = findKey('LITOLOGY');
+                    const sVal = sKey ? props[sKey] : (props.SEDIMENTINDEX || props.sedimentindex || '');
+                    const lVal = lKey ? props[lKey] : (props.LITOLOGY || props.lithology || props.litoLOGY || '');
+                    // insert a caption row at the top of the table results
+                    try {
+                      if (tableContainer) {
+                        const tableEl = tableContainer.querySelector('table');
+                        if (tableEl) {
+                          const hdr = tableEl.querySelector('thead');
+                          const infoRow = document.createElement('tr');
+                          const infoCell = document.createElement('td');
+                          infoCell.setAttribute('colspan', '4');
+                          infoCell.style.background = '#eef6ff';
+                          infoCell.style.fontWeight = '700';
+                          infoCell.style.padding = '8px';
+                          infoCell.textContent = `Kvartārs: ${sVal}    - ${lVal}`;
+                          infoRow.appendChild(infoCell);
+                          if (hdr && hdr.parentNode) {
+                            hdr.parentNode.insertBefore(infoRow, hdr.nextSibling);
+                          } else {
+                            tableEl.insertBefore(infoRow, tableEl.firstChild);
+                          }
+                        }
+                      }
+                    } catch (e) { /* ignore UI insertion errors */ }
+                  }
+                } catch (e) {
+                  // ignore feature info errors
+                }
+              }
+            }
+          }
+        } catch (e) { /* ignore */ }
       } catch (e) {
         clearInterval(waitInterval); waitInterval = null;
         try { if (mosysSpinner) mosysSpinner.style.display = 'none'; } catch (err) {}
