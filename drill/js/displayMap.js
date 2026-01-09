@@ -59,6 +59,16 @@
       }),
       visible: false
     });      
+    // Boreholes WMS (GE workspace)
+    const boreholeLayer = new ol.layer.Tile({
+      title: 'Ģeo/Hidro urbumi',
+      source: new ol.source.TileWMS({
+        url: 'https://geoserver.lvgmc.lv/geoserver/ge/ows',
+        params: {'LAYERS': 'GE.Borehole', 'TILED': true},
+        serverType: 'geoserver'
+      }),
+      visible: false
+    });
     const t10Layer = new ol.layer.Tile({
       title: 'Topo10',
       source: new ol.source.TileWMS({
@@ -70,13 +80,22 @@
     });
     const map = new ol.Map({
       target: 'map',
-      layers: [osmLayer, t10Layer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer],
+      layers: [osmLayer, t10Layer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer, boreholeLayer],
       view: new ol.View({
         center: center,
         zoom: 13
       })
     });
 
+    // attach WMS info metadata for legend requests (single consolidated block)
+    try {
+      orthoLayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'public:Orto_7cikls' });
+      cadastralLayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'publicwfs:kkparcel' });
+      quaternaryLayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'public:quaternary' });
+      soilLayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'publicwfs:soils' });
+      t10Layer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'public:Topo10DTM_contours' });
+      boreholeLayer.set('wmsInfo', { url: 'https://geoserver.lvgmc.lv/geoserver/ge/ows', layer: 'GE.Borehole' });
+    } catch (e) { /* ignore if setting metadata fails */ }
     // Add a marker at the center
     const marker = new ol.Feature({
       geometry: new ol.geom.Point(ol.proj.fromLonLat([currentCoord.lon, currentCoord.lat]))
@@ -85,7 +104,6 @@
     const vectorSource = new ol.source.Vector({
       features: [marker]
     });
-
     const markerStyle = new ol.style.Style({
       image: new ol.style.Circle({
         radius: 8,
@@ -165,6 +183,217 @@
         // If the LayerSwitcher lib isn't available, fail gracefully
         console.warn('LayerSwitcher control not added:', e);
     }
+    // Legend popup and buttons: inject small '?' buttons next to layer names in the LayerSwitcher.
+    // When pressed, request a WMS GetLegendGraphic for the associated layer and show it.
+    // outer references so other helpers can use the popup
+    let legendPopup = null;
+    let legendContent = null;
+    try {
+      // create popup container (hidden by default)
+      legendPopup = document.createElement('div');
+      legendPopup.id = 'legend-popup';
+      legendPopup.className = 'legend-popup hidden';
+      legendPopup.innerHTML = '<div class="legend-inner"><button class="legend-close" aria-label="Close">✕</button><div class="legend-content"></div></div>';
+      document.body.appendChild(legendPopup);
+
+      legendContent = legendPopup.querySelector('.legend-content');
+      const legendClose = legendPopup.querySelector('.legend-close');
+      let currentLegendImgUrl = null;
+      function hideLegend() {
+        legendPopup.classList.add('hidden');
+        if (legendContent) legendContent.innerHTML = '';
+        if (currentLegendImgUrl) { try { URL.revokeObjectURL(currentLegendImgUrl); } catch (e) {} currentLegendImgUrl = null; }
+      }
+      legendClose.addEventListener('click', hideLegend);
+      legendPopup.addEventListener('click', function (e) { if (e.target === legendPopup) hideLegend(); });
+
+      function showLegendForLayer(layer) {
+        try {
+          const info = layer && layer.get ? layer.get('wmsInfo') : null;
+          if (!info || !info.url || !info.layer) return;
+          // build GetLegendGraphic URL
+          try {
+            const u = new URL(info.url, window.location.href);
+            // ensure we point to WMS endpoint
+            u.searchParams.set('SERVICE', 'WMS');
+            u.searchParams.set('REQUEST', 'GetLegendGraphic');
+            u.searchParams.set('FORMAT', 'image/png');
+            u.searchParams.set('VERSION', '1.3.0');
+            u.searchParams.set('LAYER', info.layer);
+            // prefer transparent background
+            u.searchParams.set('TRANSPARENT', 'TRUE');
+            const legendUrl = u.toString();
+            // show a loading placeholder while image loads and wrap in a vertical block
+            if (legendContent) {
+              legendContent.innerHTML = '';
+              const block = document.createElement('div');
+              block.className = 'legend-item';
+              block.style.marginBottom = '12px';
+              const title = document.createElement('div');
+              title.style.fontWeight = '700';
+              title.style.marginBottom = '6px';
+              title.textContent = layer.get('title') || info.layer;
+              block.appendChild(title);
+              const placeholder = document.createElement('div');
+              placeholder.className = 'legend-loading';
+              placeholder.textContent = 'Loading…';
+              block.appendChild(placeholder);
+
+              const img = document.createElement('img');
+              img.alt = 'Legend for ' + (layer.get('title') || info.layer);
+              img.onload = function () {
+                try { block.removeChild(placeholder); } catch (e) {}
+                block.appendChild(img);
+              };
+              img.onerror = function () {
+                try { block.removeChild(placeholder); } catch (e) {}
+                const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; block.appendChild(err);
+              };
+              try { img.src = legendUrl; } catch (e) { placeholder.textContent = 'Legend URL error'; }
+              legendContent.appendChild(block);
+            }
+            legendPopup.classList.remove('hidden');
+          } catch (err) {
+            // ignore URL errors
+          }
+        } catch (e) { /* swallow */ }
+      }
+
+      // Try to find the LayerSwitcher element in a few ways and inject buttons next to layer labels.
+      function insertLegendButtons() {
+        try {
+          const mapEl = document.getElementById('map');
+          // attempt to find the layer switcher element
+          const selectors = ['.layer-switcher', '.layerswitcher', '.ol-layerswitcher', '.layer-switcher-wrapper', '.ol-control.layerswitcher'];
+          let switcherEl = null;
+          if (mapEl) {
+            for (const s of selectors) {
+              const found = mapEl.querySelector(s);
+              if (found) { switcherEl = found; break; }
+            }
+          }
+          if (!switcherEl && typeof layerSwitcher !== 'undefined' && layerSwitcher) {
+            if (layerSwitcher.element) switcherEl = layerSwitcher.element;
+            else if (layerSwitcher.getElement) switcherEl = layerSwitcher.getElement();
+          }
+          // final fallback: try global selector on document
+          if (!switcherEl) {
+            for (const s of selectors) {
+              const found = document.querySelector(s);
+              if (found) { switcherEl = found; break; }
+            }
+          }
+          if (!switcherEl) return;
+
+          const layersArr = (map.getLayers && map.getLayers().getArray) ? map.getLayers().getArray() : [];
+
+          // prefer iterating label elements inside the switcher
+          const labelEls = switcherEl.querySelectorAll('label');
+          labelEls.forEach((lbl) => {
+            try {
+              // skip if we've already added a legend button
+              if (lbl.querySelector && lbl.querySelector('.ls-legend-btn')) return;
+
+              // derive visible text by cloning and stripping interactive elements
+              const clone = lbl.cloneNode(true);
+              const removes = clone.querySelectorAll('input, button, svg');
+              removes.forEach(n => n.remove());
+              const labelText = (clone.textContent || '').replace(/\?+$/, '').trim();
+              if (!labelText) return;
+
+              // normalize helper
+              const normalize = s => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+              const normalizedLabel = normalize(labelText);
+
+              // find matching layer by title (case-insensitive normalized)
+              let foundLayer = layersArr.find(l => {
+                try {
+                  const t = l.get && l.get('title') ? normalize(l.get('title')) : '';
+                  return t === normalizedLabel;
+                } catch (e) { return false; }
+              });
+              // fallback: allow startsWith match if no exact match
+              if (!foundLayer) {
+                foundLayer = layersArr.find(l => {
+                  try { const t = l.get && l.get('title') ? normalize(l.get('title')) : ''; return t && normalizedLabel && (t.indexOf(normalizedLabel) !== -1 || normalizedLabel.indexOf(t) !== -1); } catch (e) { return false; }
+                });
+              }
+              if (!foundLayer) return;
+              const info = foundLayer.get ? foundLayer.get('wmsInfo') : null;
+              if (!info) return; // only add legend button for layers with wmsInfo
+
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'ls-legend-btn';
+              btn.setAttribute('aria-label', 'Show legend for ' + (foundLayer.get('title') || info.layer));
+              btn.title = 'Show legend for ' + (foundLayer.get('title') || info.layer);
+              btn.textContent = '?';
+              btn.addEventListener('click', function (ev) { ev.stopPropagation(); showLegendForLayer(foundLayer); });
+
+              try { lbl.appendChild(btn); } catch (e) { try { lbl.parentNode && lbl.parentNode.appendChild(btn); } catch (err) {} }
+            } catch (e) { /* ignore per-label errors */ }
+          });
+        } catch (e) { /* ignore overall errors */ }
+      }
+
+      // Show legends for all currently visible WMS layers
+      function showLegendsForVisibleLayers() {
+        try {
+          if (!legendContent || !legendPopup) return;
+          legendContent.innerHTML = '';
+          const layersArr = (map.getLayers && map.getLayers().getArray) ? map.getLayers().getArray() : [];
+          let found = false;
+          layersArr.forEach(l => {
+            try {
+              if (typeof l.get !== 'function') return;
+              if (!l.getVisible || !l.getVisible()) return;
+              const info = l.get('wmsInfo');
+              if (!info || !info.url || !info.layer) return;
+              found = true;
+              const block = document.createElement('div');
+              block.className = 'legend-item';
+              block.style.marginBottom = '12px';
+              const title = document.createElement('div');
+              title.style.fontWeight = '700';
+              title.style.marginBottom = '6px';
+              title.textContent = l.get('title') || info.layer;
+              block.appendChild(title);
+              const img = document.createElement('img');
+              img.alt = 'Legend for ' + (l.get('title') || info.layer);
+              img.onerror = function () { const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; block.appendChild(err); };
+              // build GetLegendGraphic URL
+              try {
+                const u = new URL(info.url, window.location.href);
+                u.searchParams.set('SERVICE', 'WMS');
+                u.searchParams.set('REQUEST', 'GetLegendGraphic');
+                u.searchParams.set('FORMAT', 'image/png');
+                u.searchParams.set('VERSION', '1.3.0');
+                u.searchParams.set('LAYER', info.layer);
+                u.searchParams.set('TRANSPARENT', 'TRUE');
+                img.src = u.toString();
+              } catch (e) {
+                const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend URL failed'; block.appendChild(err);
+              }
+              block.appendChild(img);
+              legendContent.appendChild(block);
+            } catch (e) {}
+          });
+          if (!found) {
+            legendContent.innerHTML = '<div class="legend-error">No visible WMS layers with legends found</div>';
+          }
+          legendPopup.classList.remove('hidden');
+        } catch (e) {}
+      }
+
+      // observe changes inside the layer switcher so dynamic updates get buttons too
+      try {
+        const rootObserverTarget = document.getElementById('map') || document.body;
+        const mo = new MutationObserver(function () { setTimeout(insertLegendButtons, 50); });
+        mo.observe(rootObserverTarget, { childList: true, subtree: true });
+        // initial pass
+        setTimeout(insertLegendButtons, 300);
+      } catch (e) {}
+    } catch (e) { console.warn('Legend helper not added:', e); }
     // GPS control + accuracy circle + label: add a small map-top-right button that centers on user's location
     try {
       // vector layer to show accuracy circle (meters in EPSG:3857)
@@ -294,6 +523,23 @@
       gpsAccuracyLabel.style.display = 'none';
       gpsEl.appendChild(gpsAccuracyLabel);
       map.addControl(new ol.control.Control({ element: gpsEl }));
+
+      // Add a Legend-All control: requests legends for all currently visible WMS layers
+      try {
+        const legendAllEl = document.createElement('div');
+        legendAllEl.className = 'ol-control ol-unselectable ol-legendall';
+        const legendAllBtn = document.createElement('button');
+        legendAllBtn.type = 'button';
+        legendAllBtn.title = 'Show legends for visible layers';
+        legendAllBtn.innerText = '🖼';
+        legendAllBtn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          try { legendAllBtn.blur(); } catch (e) {}
+          showLegendsForVisibleLayers();
+        });
+        legendAllEl.appendChild(legendAllBtn);
+        map.addControl(new ol.control.Control({ element: legendAllEl }));
+      } catch (e) { /* ignore adding legend-all control */ }
 
       // panel-level spinner for MOSYS requests (created later inside Drill button)
 

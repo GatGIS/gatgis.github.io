@@ -282,8 +282,27 @@ html, body, #app {
 
 /* Move OpenLayers rotate (north) control to top-left under the zoom controls
   so it doesn't overlap map-top-right GPS control. */
-.ol-zoom { top: 10px !important; left: 10px !important; right: auto !important; }
-.ol-rotate { top: 80px !important; left: 10px !important; right: auto !important; }
+.ol-zoom { top: 56px !important; left: 10px !important; right: auto !important; }
+.ol-rotate { top: 100px !important; left: 10px !important; right: auto !important; }
+
+/* Legend-All control positioned above the zoom controls (same column). Match zoom button size and style */
+.ol-legendall { position: absolute; top: 10px !important; left: 10px !important; z-index: 2000; }
+.ol-legendall button {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: linear-gradient(180deg,#fafafa,#ffffff);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  cursor: pointer;
+  color: #223;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.ol-legendall button:hover { transform: translateY(-2px); background: linear-gradient(180deg,#fff,#f7fbff); }
+.ol-legendall button:focus { outline: none; box-shadow: none; }
 
 /* small popup label near marker showing precision briefly */
 .gps-precision {
@@ -364,3 +383,47 @@ html, body, #app {
 }
 
 .pamatiezi-info { font-size: 14px; color: #663c00; }
+
+/* Legend popup shown when user clicks the small '?' next to a layer name */
+.legend-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5000;
+  background: rgba(255,255,255,0.98);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  border-radius: 10px;
+  max-width: 92vw;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 10px;
+}
+.legend-popup.hidden { display: none; }
+.legend-popup .legend-inner { display:flex; flex-direction:column; gap:8px; }
+.legend-popup .legend-content { display:flex; flex-direction:column; gap:12px; align-items:center; padding:12px; }
+/* Each legend item is a full-width block that centers the image */
+.legend-popup .legend-item { width: 100%; display:flex; flex-direction:column; align-items:center; }
+.legend-popup .legend-item .legend-title { width: 100%; text-align: left; font-weight: 700; margin-bottom: 6px; }
+.legend-popup .legend-item img { max-width: 96vw; width: auto; height: auto; max-height: 85vh; object-fit: contain; display:block; margin: 0 auto; }
+.legend-popup .legend-close { align-self:flex-end; background:transparent; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:6px 8px; cursor:pointer; }
+.legend-loading { color:#666; font-size:14px; padding:12px; }
+.legend-error { color:#a33; font-size:14px; padding:12px; }
+
+/* small legend button appended next to layer label inside the LayerSwitcher */
+.ls-legend-btn {
+  margin-left: 8px;
+  background: rgba(0,0,0,0.06);
+  border: none;
+  border-radius: 6px;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ls-legend-btn:hover { background: rgba(0,0,0,0.12); }
