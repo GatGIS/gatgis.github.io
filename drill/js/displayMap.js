@@ -592,6 +592,72 @@
                         tableContainer.insertBefore(infoDiv, tableContainer.firstChild);
                       }
                     } catch (e) { /* ignore UI insertion errors */ }
+                    // Also request Pamatiežu WMS GetFeatureInfo and append its fields under Kvartārs
+                    try {
+                      const wmsBase = 'https://geodata.lvgmc.lv/server/services/Fona_Kartes/PamatiezuKarte200tk_WM/MapServer/WmsServer';
+                      if (map && typeof ol !== 'undefined') {
+                        const size = map.getSize();
+                        if (size && size[0] > 0 && size[1] > 0) {
+                          // extent in map projection -> transform to CRS:84 (lon,lat)
+                          const view = map.getView();
+                          const extent = view.calculateExtent(size);
+                          const bbox84 = ol.proj.transformExtent(extent, view.getProjection(), 'EPSG:4326');
+                          const bboxParam = bbox84.join(',');
+                          const pixel = map.getPixelFromCoordinate(coord);
+                          const i = Math.floor(pixel[0]);
+                          const j = Math.floor(pixel[1]);
+                          const wmsUrl = `${wmsBase}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=${encodeURIComponent(bboxParam)}&CRS=CRS:84&WIDTH=${size[0]}&HEIGHT=${size[1]}&LAYERS=0&STYLES=&FORMAT=image/png&QUERY_LAYERS=0&INFO_FORMAT=application/json&I=${i}&J=${j}`;
+                          try {
+                            const wmsText = await fetchWithFallback(wmsUrl);
+                            let wmsJson = null;
+                            try { wmsJson = JSON.parse(wmsText); } catch (e) { wmsJson = null; }
+                            if (wmsJson && wmsJson.features && wmsJson.features.length > 0) {
+                              const props = wmsJson.features[0].properties || {};
+                              const keys = Object.keys(props);
+                              const findKey = (name) => keys.find(k => k.toLowerCase() === name.toLowerCase());
+                              const fields = ['eraterma','geol_ind','reg_stavs','sistema','stavs','svita'];
+                              const vals = {};
+                              fields.forEach(f => { const k = findKey(f); vals[f] = k ? props[k] : (props[f] || ''); });
+                              // create or replace pamatiezi block under quaternary-info
+                              try {
+                                if (tableContainer) {
+                                  // ensure quaternary-info exists
+                                  const parent = tableContainer;
+                                  // remove previous pamatiezi if present
+                                  try { const prev = parent.querySelector('#pamatiezi-info'); if (prev) prev.remove(); } catch (e) {}
+                                  const pDiv = document.createElement('div');
+                                  pDiv.id = 'pamatiezi-info';
+                                  pDiv.className = 'pamatiezi-info';
+                                  pDiv.style.background = '#fff7e6';
+                                  pDiv.style.padding = '8px';
+                                  pDiv.style.marginBottom = '8px';
+                                  pDiv.style.borderRadius = '6px';
+                                  pDiv.style.color = '#663c00';
+                                  // build content
+                                  const title = document.createElement('div');
+                                  title.style.fontWeight = '700';
+                                  title.textContent = 'Pamatieži:';
+                                  pDiv.appendChild(title);
+                                  const list = document.createElement('div');
+                                  list.style.marginTop = '6px';
+                                  fields.forEach(f => {
+                                    const row = document.createElement('div');
+                                    const label = f.replace('_',' ');
+                                    row.textContent = `${label}: ${vals[f]}`;
+                                    list.appendChild(row);
+                                  });
+                                  pDiv.appendChild(list);
+                                  // insert after quaternary-info if present, else at top
+                                  const qInfo = parent.querySelector('#quaternary-info');
+                                  if (qInfo && qInfo.parentNode) qInfo.parentNode.insertBefore(pDiv, qInfo.nextSibling);
+                                  else parent.insertBefore(pDiv, parent.firstChild);
+                                }
+                              } catch (e) { /* ignore UI errors */ }
+                            }
+                          } catch (e) { /* ignore WMS errors */ }
+                        }
+                      }
+                    } catch (e) { /* ignore overall */ }
                   }
                 } catch (e) {
                   // ignore feature info errors
