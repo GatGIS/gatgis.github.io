@@ -606,55 +606,66 @@
                           const pixel = map.getPixelFromCoordinate(coord);
                           const i = Math.floor(pixel[0]);
                           const j = Math.floor(pixel[1]);
-                          const wmsUrl = `${wmsBase}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=${encodeURIComponent(bboxParam)}&CRS=CRS:84&WIDTH=${size[0]}&HEIGHT=${size[1]}&LAYERS=0&STYLES=&FORMAT=image/png&QUERY_LAYERS=0&INFO_FORMAT=application/json&I=${i}&J=${j}`;
+                          // Build ArcGIS REST query URL (direct HTTPS, returns JSON)
                           try {
-                            const wmsText = await fetchWithFallback(wmsUrl);
-                            let wmsJson = null;
-                            try { wmsJson = JSON.parse(wmsText); } catch (e) { wmsJson = null; }
-                            if (wmsJson && wmsJson.features && wmsJson.features.length > 0) {
-                              const props = wmsJson.features[0].properties || {};
-                              const keys = Object.keys(props);
-                              const findKey = (name) => keys.find(k => k.toLowerCase() === name.toLowerCase());
-                              const fields = ['eraterma','geol_ind','reg_stavs','sistema','stavs','svita'];
-                              const vals = {};
-                              fields.forEach(f => { const k = findKey(f); vals[f] = k ? props[k] : (props[f] || ''); });
-                              // create or replace pamatiezi block under quaternary-info
-                              try {
-                                if (tableContainer) {
-                                  // ensure quaternary-info exists
-                                  const parent = tableContainer;
-                                  // remove previous pamatiezi if present
-                                  try { const prev = parent.querySelector('#pamatiezi-info'); if (prev) prev.remove(); } catch (e) {}
-                                  const pDiv = document.createElement('div');
-                                  pDiv.id = 'pamatiezi-info';
-                                  pDiv.className = 'pamatiezi-info';
-                                  pDiv.style.background = '#fff7e6';
-                                  pDiv.style.padding = '8px';
-                                  pDiv.style.marginBottom = '8px';
-                                  pDiv.style.borderRadius = '6px';
-                                  pDiv.style.color = '#663c00';
-                                  // build content
-                                  const title = document.createElement('div');
-                                  title.style.fontWeight = '700';
-                                  title.textContent = 'Pamatieži:';
-                                  pDiv.appendChild(title);
-                                  const list = document.createElement('div');
-                                  list.style.marginTop = '6px';
-                                  fields.forEach(f => {
-                                    const row = document.createElement('div');
-                                    const label = f.replace('_',' ');
-                                    row.textContent = `${label}: ${vals[f]}`;
-                                    list.appendChild(row);
-                                  });
-                                  pDiv.appendChild(list);
-                                  // insert after quaternary-info if present, else at top
-                                  const qInfo = parent.querySelector('#quaternary-info');
-                                  if (qInfo && qInfo.parentNode) qInfo.parentNode.insertBefore(pDiv, qInfo.nextSibling);
-                                  else parent.insertBefore(pDiv, parent.firstChild);
+                            const restBase = 'https://geodata.lvgmc.lv/server/rest/services/Public/PamatiezuKarte200tk/MapServer/4/query';
+                            const outFields = ['eratema','geol_ind','reg_stavs','sistema','stavs','svita'].join(',');
+                            const params = new URLSearchParams({
+                              geometry: `${lon},${lat}`,
+                              geometryType: 'esriGeometryPoint',
+                              inSR: '4326',
+                              spatialRel: 'esriSpatialRelIntersects',
+                              outFields: outFields,
+                              returnGeometry: 'false',
+                              f: 'json'
+                            });
+                            const restUrl = restBase + '?' + params.toString();
+                            try {
+                              const resp = await fetch(restUrl);
+                              if (resp && resp.ok) {
+                                const restJson = await resp.json();
+                                if (restJson && restJson.features && restJson.features.length > 0) {
+                                  const attrs = restJson.features[0].attributes || {};
+                                  const fields = ['eratema','geol_ind','reg_stavs','sistema','stavs','svita'];
+                                  const vals = {};
+                                  fields.forEach(f => { vals[f] = (attrs[f] !== undefined && attrs[f] !== null) ? attrs[f] : ''; });
+                                  // create or replace pamatiezi block under quaternary-info
+                                  try {
+                                    if (tableContainer) {
+                                      const parent = tableContainer;
+                                      try { const prev = parent.querySelector('#pamatiezi-info'); if (prev) prev.remove(); } catch (e) {}
+                                      const pDiv = document.createElement('div');
+                                      pDiv.id = 'pamatiezi-info';
+                                      pDiv.className = 'pamatiezi-info';
+                                      pDiv.style.background = '#fff7e6';
+                                      pDiv.style.padding = '8px';
+                                      pDiv.style.marginBottom = '8px';
+                                      pDiv.style.borderRadius = '6px';
+                                      pDiv.style.color = '#663c00';
+                                      const title = document.createElement('div');
+                                      title.style.fontWeight = '700';
+                                      title.textContent = 'Pamatieži:';
+                                      pDiv.appendChild(title);
+                                      const list = document.createElement('div');
+                                      list.style.marginTop = '6px';
+                                      fields.forEach(f => {
+                                        const row = document.createElement('div');
+                                        const label = f.replace('_',' ');
+                                        row.textContent = `${label}: ${vals[f]}`;
+                                        list.appendChild(row);
+                                      });
+                                      pDiv.appendChild(list);
+                                      const qInfo = parent.querySelector('#quaternary-info');
+                                      if (qInfo && qInfo.parentNode) qInfo.parentNode.insertBefore(pDiv, qInfo.nextSibling);
+                                      else parent.insertBefore(pDiv, parent.firstChild);
+                                    }
+                                  } catch (e) { /* ignore UI errors */ }
                                 }
-                              } catch (e) { /* ignore UI errors */ }
+                              }
+                            } catch (e) {
+                              // direct REST fetch failed or CORS blocked; silently ignore
                             }
-                          } catch (e) { /* ignore WMS errors */ }
+                          } catch (e) { /* ignore overall */ }
                         }
                       }
                     } catch (e) { /* ignore overall */ }
