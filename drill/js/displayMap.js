@@ -193,19 +193,71 @@
       legendPopup = document.createElement('div');
       legendPopup.id = 'legend-popup';
       legendPopup.className = 'legend-popup hidden';
-      legendPopup.innerHTML = '<div class="legend-inner"><button class="legend-close" aria-label="Close">✕</button><div class="legend-content"></div></div>';
+      legendPopup.innerHTML = '<div class="legend-inner"><div class="legend-content"></div></div>';
       document.body.appendChild(legendPopup);
 
       legendContent = legendPopup.querySelector('.legend-content');
-      const legendClose = legendPopup.querySelector('.legend-close');
       let currentLegendImgUrl = null;
+
+      // create a global close button outside of the popup so it is not affected by popup scrolling
+      const legendCloseGlobal = document.createElement('button');
+      legendCloseGlobal.className = 'legend-close-global hidden';
+      legendCloseGlobal.setAttribute('aria-label', 'Close legend');
+      legendCloseGlobal.innerText = '✕';
+      document.body.appendChild(legendCloseGlobal);
+
       function hideLegend() {
-        legendPopup.classList.add('hidden');
+        try { legendPopup.classList.add('hidden'); } catch (e) {}
+        try { legendCloseGlobal.classList.add('hidden'); } catch (e) {}
         if (legendContent) legendContent.innerHTML = '';
         if (currentLegendImgUrl) { try { URL.revokeObjectURL(currentLegendImgUrl); } catch (e) {} currentLegendImgUrl = null; }
       }
-      legendClose.addEventListener('click', hideLegend);
+      legendCloseGlobal.addEventListener('click', hideLegend);
       legendPopup.addEventListener('click', function (e) { if (e.target === legendPopup) hideLegend(); });
+
+      function positionLegendClose() {
+        try {
+          if (!legendPopup || !legendCloseGlobal) return;
+          const rect = legendPopup.getBoundingClientRect();
+          const btnW = 40; // approximate button size
+          const top = Math.max(8, rect.top + 8);
+          const left = Math.min(window.innerWidth - btnW - 8, rect.right - btnW - 8);
+          legendCloseGlobal.style.position = 'fixed';
+          legendCloseGlobal.style.top = top + 'px';
+          legendCloseGlobal.style.left = left + 'px';
+        } catch (e) {}
+      }
+      window.addEventListener('resize', positionLegendClose);
+      window.addEventListener('scroll', positionLegendClose, true);
+
+      // Touch-drag fallback for horizontal scrolling inside legend-embed on mobile
+      try {
+        let _touchState = { down: false, startX: 0, scrollLeft: 0, el: null };
+        legendContent.addEventListener('touchstart', function (ev) {
+          try {
+            const t = ev.touches && ev.touches[0];
+            if (!t) return;
+            const target = ev.target && ev.target.closest ? ev.target.closest('.legend-embed') : null;
+            if (!target) return;
+            _touchState.down = true;
+            _touchState.startX = t.pageX;
+            _touchState.el = target;
+            _touchState.scrollLeft = target.scrollLeft || 0;
+          } catch (e) {}
+        }, { passive: true });
+        legendContent.addEventListener('touchmove', function (ev) {
+          try {
+            if (!_touchState.down || !_touchState.el) return;
+            const t = ev.touches && ev.touches[0];
+            if (!t) return;
+            const dx = _touchState.startX - t.pageX;
+            _touchState.el.scrollLeft = _touchState.scrollLeft + dx;
+            // prevent the popup from interpreting this as vertical scroll while dragging horizontally
+            ev.preventDefault && ev.preventDefault();
+          } catch (e) {}
+        }, { passive: false });
+        legendContent.addEventListener('touchend', function () { _touchState.down = false; _touchState.el = null; });
+      } catch (e) {}
 
       function showLegendForLayer(layer) {
         try {
@@ -247,16 +299,20 @@
               img.onload = function () {
                 try { embed.removeChild(placeholder); } catch (e) {}
                 embed.appendChild(img);
+                try { legendPopup.classList.remove('hidden'); } catch (e) {}
+                try { legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (e) {}
               };
               img.onerror = function () {
                 try { embed.removeChild(placeholder); } catch (e) {}
                 const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; embed.appendChild(err);
+                try { legendPopup.classList.remove('hidden'); } catch (e) {}
+                try { legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (e) {}
               };
               try { img.src = legendUrl; } catch (e) { placeholder.textContent = 'Legend URL error'; }
               block.appendChild(embed);
               legendContent.appendChild(block);
             }
-            legendPopup.classList.remove('hidden');
+            // popup visibility will be toggled by image load/error handlers above
           } catch (err) {
             // ignore URL errors
           }
@@ -347,6 +403,7 @@
           legendContent.innerHTML = '';
           const layersArr = (map.getLayers && map.getLayers().getArray) ? map.getLayers().getArray() : [];
           let found = false;
+          const loadPromises = [];
           layersArr.forEach(l => {
             try {
               if (typeof l.get !== 'function') return;
@@ -364,7 +421,11 @@
               block.appendChild(title);
               const img = document.createElement('img');
               img.alt = 'Legend for ' + (l.get('title') || info.layer);
-              img.onerror = function () { const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; block.appendChild(err); };
+              // Promise to track load/error so we can position the close button after layout stabilizes
+              loadPromises.push(new Promise(function (resolve) {
+                img.onload = function () { resolve({ ok: true, img: img }); };
+                img.onerror = function () { const err = document.createElement('div'); err.className = 'legend-error'; err.textContent = 'Legend not available'; block.appendChild(err); resolve({ ok: false }); };
+              }));
               // build GetLegendGraphic URL
               try {
                 const u = new URL(info.url, window.location.href);
@@ -385,8 +446,16 @@
           });
           if (!found) {
             legendContent.innerHTML = '<div class="legend-error">No visible WMS layers with legends found</div>';
+            try { legendPopup.classList.remove('hidden'); legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (e) {}
+            return;
           }
-          legendPopup.classList.remove('hidden');
+          // Wait for all images (or their error handlers) to settle before showing popup and positioning close button
+          try {
+            Promise.all(loadPromises.map(p => p.catch && p.catch(() => null) || p)).then(function () {
+              try { legendPopup.classList.remove('hidden'); } catch (e) {}
+              try { legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (e) {}
+            }).catch(function () { try { legendPopup.classList.remove('hidden'); legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (e) {} });
+          } catch (e) { try { legendPopup.classList.remove('hidden'); legendCloseGlobal.classList.remove('hidden'); positionLegendClose(); } catch (err) {} }
         } catch (e) {}
       }
 
