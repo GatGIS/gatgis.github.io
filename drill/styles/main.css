@@ -304,6 +304,13 @@ html, body, #app {
 .ol-legendall button:hover { transform: translateY(-2px); background: linear-gradient(180deg,#fff,#f7fbff); }
 .ol-legendall button:focus { outline: none; box-shadow: none; }
 
+/* Mobile: stack map controls to avoid overlap (zoom -> legend -> rotate) */
+@media (max-width: 600px) {
+  .ol-zoom { top: 10px !important; left: 10px !important; }
+  .ol-legendall { top: 64px !important; left: 10px !important; }
+  .ol-rotate { top: 118px !important; left: 10px !important; }
+}
+
 /* small popup label near marker showing precision briefly */
 .gps-precision {
   background: rgba(255,255,255,0.95);
