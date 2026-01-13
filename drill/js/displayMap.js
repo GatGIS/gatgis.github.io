@@ -78,9 +78,18 @@
       }),
       visible: false
     });
+    const ZMNILayer = new ol.layer.Tile({
+      title: 'ZMNI',
+      source: new ol.source.TileWMS({
+        url: 'https://lvmgeoserver.lvm.lv/geoserver/zmni/ows',
+        params: {'LAYERS': 'ZMNI WMS datu kopa', 'TILED': true},
+        serverType: 'geoserver'
+      }),
+      visible: false
+    });
     const map = new ol.Map({
       target: 'map',
-      layers: [osmLayer, t10Layer, orthoLayer, quaternaryLayer, soilLayer, cadastralLayer, boreholeLayer],
+      layers: [osmLayer, t10Layer, orthoLayer, quaternaryLayer, soilLayer, ZMNILayer, cadastralLayer, boreholeLayer],
       view: new ol.View({
         center: center,
         zoom: 13
@@ -95,6 +104,7 @@
       soilLayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'publicwfs:soils' });
       t10Layer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/ows', layer: 'public:Topo10DTM_contours' });
       boreholeLayer.set('wmsInfo', { url: 'https://geoserver.lvgmc.lv/geoserver/ge/ows', layer: 'GE.Borehole' });
+      ZMNILayer.set('wmsInfo', { url: 'https://lvmgeoserver.lvm.lv/geoserver/zmni/ows', layer: 'ZMNI WMS datu kopa' });
     } catch (e) { /* ignore if setting metadata fails */ }
     // Add a marker at the center
     const marker = new ol.Feature({
