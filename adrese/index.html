@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Latvia Map – Multiple Reverse Geocoders</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    #container {
+      display: flex;
+      height: 100%;
+    }
+    #map {
+      flex: 2;
+    }
+    #info-panel {
+      flex: 1;
+      padding: 10px;
+      box-sizing: border-box;
+      border-left: 1px solid #ccc;
+      font-size: 14px;
+    }
+    label {
+      display: block;
+      margin: 8px 0 4px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px;
+    }
+    textarea {
+      height: 80px;
+      resize: vertical;
+    }
+    fieldset {
+      margin-bottom: 10px;
+    }
+    .inline-label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  </style>
+  <!-- OpenLayers -->
+  <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+  <!-- proj4 for LKS-92 -->
+  <script src="https://cdn.jsdelivr.net/npm/proj4@2.9.0/dist/proj4.js"></script>
+</head>
+<body>
+<div id="container">
+  <div id="map"></div>
+
+  <div id="info-panel">
+    <h2>Clicked point info</h2>
+
+    <fieldset>
+      <legend>Reverse geocoder</legend>
+      <label class="inline-label">
+        <input type="radio" name="geocoder" value="nominatim" checked>
+        Nominatim (OSM)
+      </label>
+      <label class="inline-label">
+        <input type="radio" name="geocoder" value="janaseta">
+        Jāņa sēta (kartes.lv)
+      </label>
+      <label class="inline-label">
+        <input type="radio" name="geocoder" value="photon">
+        Photon (Komoot)
+      </label>
+    </fieldset>
+
+    <form>
+      <label for="lon">Longitude (EPSG:4326)</label>
+      <input type="text" id="lon" readonly>
+
+      <label for="lat">Latitude (EPSG:4326)</label>
+      <input type="text" id="lat" readonly>
+
+      <label for="x3059">LKS-92 X (EPSG:3059)</label>
+      <input type="text" id="x3059" readonly>
+
+      <label for="y3059">LKS-92 Y (EPSG:3059)</label>
+      <input type="text" id="y3059" readonly>
+
+      <label for="addr">Closest address</label>
+      <textarea id="addr" readonly></textarea>
+
+      <label for="distance">Distance to address (km)</label>
+      <input type="text" id="distance" readonly>
+
+      <label for="bearing">Direction to address (deg / compass)</label>
+      <input type="text" id="bearing" readonly>
+    </form>
+
+    <p style="font-size: 12px; color: #666; margin-top: 8px;">
+      Nominatim &amp; Photon use OpenStreetMap data (WGS84).<br>
+      Jāņa sēta uses LKS‑92 coordinates (x/y).<br>
+      Serve via <code>http://localhost</code>, not <code>file://</code>, to avoid CORS issues.
+    </p>
+  </div>
+</div>
+
+<script>
+  // ===== Register LKS-92 TM (EPSG:3059) =====
+  proj4.defs('EPSG:3059',
+    '+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 ' +
+    '+x_0=500000 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
+  );
+  ol.proj.proj4.register(proj4);
+
+  const proj3059 = ol.proj.get('EPSG:3059');
+  const proj4326 = ol.proj.get('EPSG:4326');
+  const proj3857 = ol.proj.get('EPSG:3857');
+
+  // ===== Map setup =====
+  const map = new ol.Map({
+    target: 'map',
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM()
+      })
+    ],
+    view: new ol.View({
+      center: ol.proj.fromLonLat([24.6032, 56.8796]), // Latvia
+      zoom: 7
+    })
+  });
+
+  // DOM
+  const lonInput = document.getElementById('lon');
+  const latInput = document.getElementById('lat');
+  const x3059Input = document.getElementById('x3059');
+  const y3059Input = document.getElementById('y3059');
+  const addrInput = document.getElementById('addr');
+  const distInput = document.getElementById('distance');
+  const bearingInput = document.getElementById('bearing');
+
+  function getSelectedGeocoder() {
+    const radios = document.querySelectorAll('input[name="geocoder"]');
+    for (const r of radios) {
+      if (r.checked) return r.value;
+    }
+    return 'nominatim';
+  }
+
+  // ===== Vector layer for markers + line =====
+  const vectorSource = new ol.source.Vector();
+  const vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+    style: function (feature) {
+      const type = feature.get('type');
+
+      if (type === 'clickPoint') {
+        return new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({ color: 'rgba(220, 0, 0, 0.9)' }),
+            stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 })
+          })
+        });
+      } else if (type === 'addressPoint') {
+        return new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({ color: 'rgba(0, 0, 0, 0.9)' }),
+            stroke: new ol.style.Stroke({ color: '#ffffff', width: 1 })
+          })
+        });
+      } else if (type === 'line') {
+        return new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'rgba(0, 0, 255, 0.8)',
+            width: 2
+          })
+        });
+      }
+      return null;
+    }
+  });
+  map.addLayer(vectorLayer);
+
+  const clickFeature = new ol.Feature({ type: 'clickPoint' });
+  const addressFeature = new ol.Feature({ type: 'addressPoint' });
+  const lineFeature = new ol.Feature({ type: 'line' });
+
+  vectorSource.addFeature(clickFeature);
+  vectorSource.addFeature(addressFeature);
+  vectorSource.addFeature(lineFeature);
+
+  function setClickPoint(coord3857) {
+    clickFeature.setGeometry(new ol.geom.Point(coord3857));
+  }
+
+  function setAddressPoint(coord3857) {
+    addressFeature.setGeometry(new ol.geom.Point(coord3857));
+  }
+
+  function setLineBetween(coord1_3857, coord2_3857) {
+    lineFeature.setGeometry(new ol.geom.LineString([coord1_3857, coord2_3857]));
+  }
+
+  // ===== Reverse geocoders =====
+
+  // Nominatim (WGS84)
+  async function reverseNominatim(lon, lat) {
+    const url =
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2` +
+      `&lon=${encodeURIComponent(lon)}` +
+      `&lat=${encodeURIComponent(lat)}` +
+      `&zoom=18&addressdetails=1`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'ExampleApp/1.0 (contact: your-email@example.com)'
+        }
+      });
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+      if (!data) return null;
+      return {
+        display_name: data.display_name || '',
+        lon: data.lon ? parseFloat(data.lon) : lon,
+        lat: data.lat ? parseFloat(data.lat) : lat,
+        raw: data
+      };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  // Jāņa sēta (LKS-92 x/y)
+  async function reverseJanaSeta(x3059, y3059) {
+    // NOTE: replace the path/key with your real one if needed.
+    const url =
+      `https://api.kartes.lv/v3/KVDM_KQRlN/reverse_geocoding?x=${encodeURIComponent(x3059)}` +
+      `&y=${encodeURIComponent(y3059)}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+      if (!data) return null;
+
+      return {
+        display_name: data.adrese || '',
+        lon: data.lon ? parseFloat(data.lon) : undefined,
+        lat: data.lat ? parseFloat(data.lat) : undefined,
+        raw: data
+      };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  // Photon (Komoot, WGS84)
+  async function reversePhoton(lon, lat) {
+    const url =
+      `https://photon.komoot.io/reverse?lat=${encodeURIComponent(lat)}` +
+      `&lon=${encodeURIComponent(lon)}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+      if (!data || !data.features || !data.features.length) return null;
+
+      const f = data.features[0];
+      const coords = f.geometry && f.geometry.coordinates;
+      const props = f.properties || {};
+
+      const outLon = coords ? coords[0] : lon;
+      const outLat = coords ? coords[1] : lat;
+
+      // Build a display name from Photon properties
+      const parts = [];
+      if (props.name) parts.push(props.name);
+      if (props.street) parts.push(props.street);
+      if (props.housenumber) parts.push(props.housenumber);
+      if (props.city) parts.push(props.city);
+      if (props.country) parts.push(props.country);
+      const display = parts.length ? parts.join(', ') : (props.osm_value || 'Unknown place');
+
+      return {
+        display_name: display,
+        lon: outLon,
+        lat: outLat,
+        raw: data
+      };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  // Dispatcher
+  async function reverseGeocode(lon4326, lat4326, x3059, y3059) {
+    const which = getSelectedGeocoder();
+
+    if (which === 'janaseta') {
+      return await reverseJanaSeta(x3059, y3059);
+    } else if (which === 'photon') {
+      return await reversePhoton(lon4326, lat4326);
+    } else {
+      return await reverseNominatim(lon4326, lat4326);
+    }
+  }
+
+  // ===== Distance and bearing helpers =====
+  function haversineDistanceKm(lon1, lat1, lon2, lat2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function bearingDeg(lon1, lat1, lon2, lat2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const toDeg = rad => rad * 180 / Math.PI;
+
+    const φ1 = toRad(lat1);
+    const φ2 = toRad(lat2);
+    const λ1 = toRad(lon1);
+    const λ2 = toRad(lon2);
+    const dLon = λ2 - λ1;
+
+    const y = Math.sin(dLon) * Math.cos(φ2);
+    const x = Math.cos(φ1) * Math.sin(φ2) -
+              Math.sin(φ1) * Math.cos(φ2) * Math.cos(dLon);
+    let brng = toDeg(Math.atan2(y, x));
+    brng = (brng + 360) % 360;
+    return brng;
+  }
+
+  function bearingToCompass(brng) {
+    const directions = [
+      'N', 'NNE', 'NE', 'ENE',
+      'E', 'ESE', 'SE', 'SSE',
+      'S', 'SSW', 'SW', 'WSW',
+      'W', 'WNW', 'NW', 'NNW'
+    ];
+    const index = Math.round(brng / 22.5) % 16;
+    return directions[index];
+  }
+
+  // ===== Track last click so we can re-run on geocoder change =====
+  let lastClick = null; // { lon, lat, x3059, y3059, coord3857_click }
+
+  async function processReverseForCurrentGeocoder() {
+    if (!lastClick) return;
+
+    const { lon, lat, x3059, y3059, coord3857_click } = lastClick;
+
+    addrInput.value = 'Searching for address...';
+    distInput.value = '';
+    bearingInput.value = '';
+
+    const result = await reverseGeocode(lon, lat, x3059, y3059);
+
+    if (!result) {
+      addrInput.value = 'Error while requesting address.';
+      lineFeature.setGeometry(null);
+      addressFeature.setGeometry(null);
+      return;
+    }
+
+    addrInput.value = result.display_name || 'No address found for this location.';
+
+    let addrLon = result.lon;
+    let addrLat = result.lat;
+
+    if (addrLon == null || addrLat == null) {
+      lineFeature.setGeometry(null);
+      addressFeature.setGeometry(null);
+      distInput.value = 'N/A';
+      bearingInput.value = 'N/A';
+      return;
+    }
+
+    const distKm = haversineDistanceKm(lon, lat, addrLon, addrLat);
+    distInput.value = distKm.toFixed(3);
+
+    const brng = bearingDeg(lon, lat, addrLon, addrLat);
+    const compass = bearingToCompass(brng);
+    bearingInput.value = `${brng.toFixed(1)}° (${compass})`;
+
+    const coord3857_addr = ol.proj.transform(
+      [addrLon, addrLat],
+      proj4326,
+      proj3857
+    );
+    setAddressPoint(coord3857_addr);
+    setLineBetween(coord3857_click, coord3857_addr);
+  }
+
+  // ===== Map click handler =====
+  map.on('singleclick', async function (evt) {
+    const coord3857_click = evt.coordinate;
+
+    const [lonClick, latClick] = ol.proj.transform(
+      coord3857_click,
+      proj3857,
+      proj4326
+    );
+
+    lonInput.value = lonClick.toFixed(6);
+    latInput.value = latClick.toFixed(6);
+
+    const [x3059, y3059] = ol.proj.transform(
+      [lonClick, latClick],
+      proj4326,
+      proj3059
+    );
+    x3059Input.value = x3059.toFixed(3);
+    y3059Input.value = y3059.toFixed(3);
+
+    setClickPoint(coord3857_click);
+
+    lastClick = {
+      lon: lonClick,
+      lat: latClick,
+      x3059,
+      y3059,
+      coord3857_click
+    };
+
+    await processReverseForCurrentGeocoder();
+  });
+
+  // Re-run reverse geocoding on geocoder change
+  document.querySelectorAll('input[name="geocoder"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      processReverseForCurrentGeocoder();
+    });
+  });
+</script>
+</body>
+</html>
