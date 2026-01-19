@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Latvia Map – Multiple Reverse Geocoders</title>
+  <title>Latvia Map – Multiple Reverse Geocoders (dynamic Jāņa sēta key)</title>
   <style>
     html, body {
       margin: 0;
@@ -43,6 +43,12 @@
     .inline-label {
       display: inline-block;
       margin-right: 10px;
+    }
+    #status {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      white-space: pre-line;
     }
   </style>
   <!-- OpenLayers -->
@@ -97,15 +103,39 @@
       <input type="text" id="bearing" readonly>
     </form>
 
-    <p style="font-size: 12px; color: #666; margin-top: 8px;">
-      Nominatim &amp; Photon use OpenStreetMap data (WGS84).<br>
-      Jāņa sēta uses LKS‑92 coordinates (x/y).<br>
-      Serve via <code>http://localhost</code>, not <code>file://</code>, to avoid CORS issues.
-    </p>
+    <div id="status">
+      Loading Jāņa sēta API key...
+    </div>
   </div>
 </div>
 
 <script>
+  // ===== Global: dynamic Jāņa sēta key =====
+  let janasetaApiKey = null;
+  const statusEl = document.getElementById('status');
+
+async function loadJanaSetaKey() {
+  try {
+    const keyUrl = 'https://developers.kartes.lv/kijs_key.php';
+    const proxied = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(keyUrl);
+
+    const resp = await fetch(proxied);
+    if (!resp.ok) throw new Error('Key request failed: ' + resp.status);
+    const text = await resp.text();
+    janasetaApiKey = text.trim();
+    if (!janasetaApiKey) throw new Error('Empty key received');
+    statusEl.textContent = 'Jāņa sēta key loaded: ' + janasetaApiKey;
+  } catch (e) {
+    console.error('Error loading Jāņa sēta key:', e);
+    janasetaApiKey = null;
+    statusEl.textContent =
+      'Failed to load Jāņa sēta key via proxy.\n' +
+      'Nominatim and Photon will still work.';
+  }
+}
+
+  loadJanaSetaKey();
+
   // ===== Register LKS-92 TM (EPSG:3059) =====
   proj4.defs('EPSG:3059',
     '+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 ' +
@@ -235,11 +265,16 @@
     }
   }
 
-  // Jāņa sēta (LKS-92 x/y)
+  // Jāņa sēta (LKS-92 x/y, dynamic key)
   async function reverseJanaSeta(x3059, y3059) {
-    // NOTE: replace the path/key with your real one if needed.
+    if (!janasetaApiKey) {
+      addrInput.value = 'Jāņa sēta key not available.';
+      return null;
+    }
+
     const url =
-      `https://api.kartes.lv/v3/KVDM_gQhdt/reverse_geocoding?x=${encodeURIComponent(x3059)}` +
+      `https://api.kartes.lv/v3/${encodeURIComponent(janasetaApiKey)}/reverse_geocoding` +
+      `?x=${encodeURIComponent(x3059)}` +
       `&y=${encodeURIComponent(y3059)}`;
 
     try {
@@ -279,7 +314,6 @@
       const outLon = coords ? coords[0] : lon;
       const outLat = coords ? coords[1] : lat;
 
-      // Build a display name from Photon properties
       const parts = [];
       if (props.name) parts.push(props.name);
       if (props.street) parts.push(props.street);
