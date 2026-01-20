@@ -60,10 +60,8 @@
 <body>
 <div id="container">
   <div id="map"></div>
-
   <div id="info-panel">
     <h2>Clicked point info</h2>
-
     <fieldset>
       <legend>Reverse geocoder</legend>
       <label class="inline-label">
@@ -78,31 +76,28 @@
         <input type="radio" name="geocoder" value="photon">
         Photon (Komoot)
       </label>
+      <!-- NEW: AMK (VISS) -->
+      <label class="inline-label">
+        <input type="radio" name="geocoder" value="amk">
+        AMK (VISS)
+      </label>
     </fieldset>
-
     <form>
       <label for="lon">Longitude (EPSG:4326)</label>
       <input type="text" id="lon" readonly>
-
       <label for="lat">Latitude (EPSG:4326)</label>
       <input type="text" id="lat" readonly>
-
       <label for="x3059">LKS-92 X (EPSG:3059)</label>
       <input type="text" id="x3059" readonly>
-
       <label for="y3059">LKS-92 Y (EPSG:3059)</label>
       <input type="text" id="y3059" readonly>
-
       <label for="addr">Closest address</label>
       <textarea id="addr" readonly></textarea>
-
       <label for="distance">Distance to address (km)</label>
       <input type="text" id="distance" readonly>
-
       <label for="bearing">Direction to address (deg / compass)</label>
       <input type="text" id="bearing" readonly>
     </form>
-
     <div id="status">
       Loading Jāņa sēta API key...
     </div>
@@ -114,26 +109,24 @@
   let janasetaApiKey = null;
   const statusEl = document.getElementById('status');
 
-async function loadJanaSetaKey() {
-  try {
-    const keyUrl = 'https://developers.kartes.lv/kijs_key.php';
-    const proxied = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(keyUrl);
-
-    const resp = await fetch(proxied);
-    if (!resp.ok) throw new Error('Key request failed: ' + resp.status);
-    const text = await resp.text();
-    janasetaApiKey = text.trim();
-    if (!janasetaApiKey) throw new Error('Empty key received');
-    statusEl.textContent = 'Jāņa sēta key loaded: ' + janasetaApiKey;
-  } catch (e) {
-    console.error('Error loading Jāņa sēta key:', e);
-    janasetaApiKey = null;
-    statusEl.textContent =
-      'Failed to load Jāņa sēta key via proxy.\n' +
-      'Nominatim and Photon will still work.';
+  async function loadJanaSetaKey() {
+    try {
+      const keyUrl = 'https://developers.kartes.lv/kijs_key.php';
+      const proxied = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(keyUrl);
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error('Key request failed: ' + resp.status);
+      const text = await resp.text();
+      janasetaApiKey = text.trim();
+      if (!janasetaApiKey) throw new Error('Empty key received');
+      statusEl.textContent = 'Jāņa sēta key loaded: ' + janasetaApiKey;
+    } catch (e) {
+      console.error('Error loading Jāņa sēta key:', e);
+      janasetaApiKey = null;
+      statusEl.textContent =
+        'Failed to load Jāņa sēta key via proxy.\n' +
+        'Nominatim and Photon will still work.';
+    }
   }
-}
-
   loadJanaSetaKey();
 
   // ===== Register LKS-92 TM (EPSG:3059) =====
@@ -142,7 +135,6 @@ async function loadJanaSetaKey() {
     '+x_0=500000 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
   );
   ol.proj.proj4.register(proj4);
-
   const proj3059 = ol.proj.get('EPSG:3059');
   const proj4326 = ol.proj.get('EPSG:4326');
   const proj3857 = ol.proj.get('EPSG:3857');
@@ -184,7 +176,6 @@ async function loadJanaSetaKey() {
     source: vectorSource,
     style: function (feature) {
       const type = feature.get('type');
-
       if (type === 'clickPoint') {
         return new ol.style.Style({
           image: new ol.style.Circle({
@@ -217,7 +208,6 @@ async function loadJanaSetaKey() {
   const clickFeature = new ol.Feature({ type: 'clickPoint' });
   const addressFeature = new ol.Feature({ type: 'addressPoint' });
   const lineFeature = new ol.Feature({ type: 'line' });
-
   vectorSource.addFeature(clickFeature);
   vectorSource.addFeature(addressFeature);
   vectorSource.addFeature(lineFeature);
@@ -225,11 +215,9 @@ async function loadJanaSetaKey() {
   function setClickPoint(coord3857) {
     clickFeature.setGeometry(new ol.geom.Point(coord3857));
   }
-
   function setAddressPoint(coord3857) {
     addressFeature.setGeometry(new ol.geom.Point(coord3857));
   }
-
   function setLineBetween(coord1_3857, coord2_3857) {
     lineFeature.setGeometry(new ol.geom.LineString([coord1_3857, coord2_3857]));
   }
@@ -243,7 +231,6 @@ async function loadJanaSetaKey() {
       `&lon=${encodeURIComponent(lon)}` +
       `&lat=${encodeURIComponent(lat)}` +
       `&zoom=18&addressdetails=1`;
-
     try {
       const response = await fetch(url, {
         headers: {
@@ -271,18 +258,15 @@ async function loadJanaSetaKey() {
       addrInput.value = 'Jāņa sēta key not available.';
       return null;
     }
-
     const url =
       `https://api.kartes.lv/v3/${encodeURIComponent(janasetaApiKey)}/reverse_geocoding` +
       `?x=${encodeURIComponent(x3059)}` +
       `&y=${encodeURIComponent(y3059)}`;
-
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not OK');
       const data = await response.json();
       if (!data) return null;
-
       return {
         display_name: data.adrese || '',
         lon: data.lon ? parseFloat(data.lon) : undefined,
@@ -300,20 +284,16 @@ async function loadJanaSetaKey() {
     const url =
       `https://photon.komoot.io/reverse?lat=${encodeURIComponent(lat)}` +
       `&lon=${encodeURIComponent(lon)}`;
-
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not OK');
       const data = await response.json();
       if (!data || !data.features || !data.features.length) return null;
-
       const f = data.features[0];
       const coords = f.geometry && f.geometry.coordinates;
       const props = f.properties || {};
-
       const outLon = coords ? coords[0] : lon;
       const outLat = coords ? coords[1] : lat;
-
       const parts = [];
       if (props.name) parts.push(props.name);
       if (props.street) parts.push(props.street);
@@ -321,7 +301,6 @@ async function loadJanaSetaKey() {
       if (props.city) parts.push(props.city);
       if (props.country) parts.push(props.country);
       const display = parts.length ? parts.join(', ') : (props.osm_value || 'Unknown place');
-
       return {
         display_name: display,
         lon: outLon,
@@ -334,14 +313,64 @@ async function loadJanaSetaKey() {
     }
   }
 
+// AMK (VISS, LKS-92 with short northing: Y_short = Y_full - 6 000 000)
+async function reverseAMK(x3059, y3059) {
+  // AMK expects lks_lat = Y_short, lks_long = X
+  const yShort = y3059 - 6000000;
+
+  const url =
+    `https://amk.viss.gov.lv/rest/address-struct` +
+    `?lks_lat=${encodeURIComponent(yShort)}` +
+    `&lks_long=${encodeURIComponent(x3059)}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not OK');
+    const data = await response.json();
+
+    // Response is an array, e.g. [ { ... } ]
+    if (!Array.isArray(data) || data.length === 0) return null;
+
+    const item = data[0];
+
+    const displayName = item.address || '';
+
+    // Returned lksLat is SHORT: Y_short = Y_full - 6 000 000
+    // Convert back to full LKS-92 northing:
+    let addrLon, addrLat;
+    if (typeof item.lksLong === 'number' && typeof item.lksLat === 'number') {
+      const yFull = item.lksLat + 6000000;   // <-- add 6,000,000 here
+
+      const coord4326 = ol.proj.transform(
+        [item.lksLong, yFull],   // [X, Y_full] in EPSG:3059
+        proj3059,
+        proj4326
+      );
+      addrLon = coord4326[0];
+      addrLat = coord4326[1];
+    }
+
+    return {
+      display_name: displayName,
+      lon: addrLon,
+      lat: addrLat,
+      raw: item
+    };
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
   // Dispatcher
   async function reverseGeocode(lon4326, lat4326, x3059, y3059) {
     const which = getSelectedGeocoder();
-
     if (which === 'janaseta') {
       return await reverseJanaSeta(x3059, y3059);
     } else if (which === 'photon') {
       return await reversePhoton(lon4326, lat4326);
+    } else if (which === 'amk') {
+      return await reverseAMK(x3059, y3059);
     } else {
       return await reverseNominatim(lon4326, lat4326);
     }
@@ -364,13 +393,11 @@ async function loadJanaSetaKey() {
   function bearingDeg(lon1, lat1, lon2, lat2) {
     const toRad = deg => deg * Math.PI / 180;
     const toDeg = rad => rad * 180 / Math.PI;
-
     const φ1 = toRad(lat1);
     const φ2 = toRad(lat2);
     const λ1 = toRad(lon1);
     const λ2 = toRad(lon2);
     const dLon = λ2 - λ1;
-
     const y = Math.sin(dLon) * Math.cos(φ2);
     const x = Math.cos(φ1) * Math.sin(φ2) -
               Math.sin(φ1) * Math.cos(φ2) * Math.cos(dLon);
@@ -395,7 +422,6 @@ async function loadJanaSetaKey() {
 
   async function processReverseForCurrentGeocoder() {
     if (!lastClick) return;
-
     const { lon, lat, x3059, y3059, coord3857_click } = lastClick;
 
     addrInput.value = 'Searching for address...';
@@ -403,7 +429,6 @@ async function loadJanaSetaKey() {
     bearingInput.value = '';
 
     const result = await reverseGeocode(lon, lat, x3059, y3059);
-
     if (!result) {
       addrInput.value = 'Error while requesting address.';
       lineFeature.setGeometry(null);
@@ -415,7 +440,6 @@ async function loadJanaSetaKey() {
 
     let addrLon = result.lon;
     let addrLat = result.lat;
-
     if (addrLon == null || addrLat == null) {
       lineFeature.setGeometry(null);
       addressFeature.setGeometry(null);
@@ -449,7 +473,6 @@ async function loadJanaSetaKey() {
       proj3857,
       proj4326
     );
-
     lonInput.value = lonClick.toFixed(6);
     latInput.value = latClick.toFixed(6);
 
