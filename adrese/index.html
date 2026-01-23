@@ -76,7 +76,7 @@
         <input type="radio" name="geocoder" value="photon">
         Photon (Komoot)
       </label>
-      <!-- NEW: AMK (VISS) -->
+      <!-- AMK (VISS) -->
       <label class="inline-label">
         <input type="radio" name="geocoder" value="amk">
         AMK (VISS)
@@ -87,28 +87,34 @@
       <input type="text" id="lon" readonly>
       <label for="lat">Latitude (EPSG:4326)</label>
       <input type="text" id="lat" readonly>
+
       <label for="x3059">LKS-92 X (EPSG:3059)</label>
       <input type="text" id="x3059" readonly>
       <label for="y3059">LKS-92 Y (EPSG:3059)</label>
       <input type="text" id="y3059" readonly>
+
       <label for="addr">Closest address</label>
       <textarea id="addr" readonly></textarea>
+
       <label for="distance">Distance to address (km)</label>
       <input type="text" id="distance" readonly>
+
       <label for="bearing">Direction to address (deg / compass)</label>
       <input type="text" id="bearing" readonly>
+
+      <!-- NEW: clicked object info from Nominatim -->
+      <label for="feature">Clicked object (OSM)</label>
+      <input type="text" id="feature" readonly>
     </form>
     <div id="status">
       Loading Jāņa sēta API key...
     </div>
   </div>
 </div>
-
 <script>
   // ===== Global: dynamic Jāņa sēta key =====
   let janasetaApiKey = null;
   const statusEl = document.getElementById('status');
-
   async function loadJanaSetaKey() {
     try {
       const keyUrl = 'https://developers.kartes.lv/kijs_key.php';
@@ -161,6 +167,7 @@
   const addrInput = document.getElementById('addr');
   const distInput = document.getElementById('distance');
   const bearingInput = document.getElementById('bearing');
+  const featureInput = document.getElementById('feature');
 
   function getSelectedGeocoder() {
     const radios = document.querySelectorAll('input[name="geocoder"]');
@@ -204,7 +211,6 @@
     }
   });
   map.addLayer(vectorLayer);
-
   const clickFeature = new ol.Feature({ type: 'clickPoint' });
   const addressFeature = new ol.Feature({ type: 'addressPoint' });
   const lineFeature = new ol.Feature({ type: 'line' });
@@ -223,7 +229,6 @@
   }
 
   // ===== Reverse geocoders =====
-
   // Nominatim (WGS84)
   async function reverseNominatim(lon, lat) {
     const url =
@@ -313,54 +318,42 @@
     }
   }
 
-// AMK (VISS, LKS-92 with short northing: Y_short = Y_full - 6 000 000)
-async function reverseAMK(x3059, y3059) {
-  // AMK expects lks_lat = Y_short, lks_long = X
-  const yShort = y3059 - 6000000;
-
-  const url =
-    `https://amk.viss.gov.lv/rest/address-struct` +
-    `?lks_lat=${encodeURIComponent(yShort)}` +
-    `&lks_long=${encodeURIComponent(x3059)}`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Network response was not OK');
-    const data = await response.json();
-
-    // Response is an array, e.g. [ { ... } ]
-    if (!Array.isArray(data) || data.length === 0) return null;
-
-    const item = data[0];
-
-    const displayName = item.address || '';
-
-    // Returned lksLat is SHORT: Y_short = Y_full - 6 000 000
-    // Convert back to full LKS-92 northing:
-    let addrLon, addrLat;
-    if (typeof item.lksLong === 'number' && typeof item.lksLat === 'number') {
-      const yFull = item.lksLat + 6000000;   // <-- add 6,000,000 here
-
-      const coord4326 = ol.proj.transform(
-        [item.lksLong, yFull],   // [X, Y_full] in EPSG:3059
-        proj3059,
-        proj4326
-      );
-      addrLon = coord4326[0];
-      addrLat = coord4326[1];
+  // AMK (VISS, LKS-92 with short northing: Y_short = Y_full - 6 000 000)
+  async function reverseAMK(x3059, y3059) {
+    const yShort = y3059 - 6000000;
+    const url =
+      `https://amk.viss.gov.lv/rest/address-struct` +
+      `?lks_lat=${encodeURIComponent(yShort)}` +
+      `&lks_long=${encodeURIComponent(x3059)}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const item = data[0];
+      const displayName = item.address || '';
+      let addrLon, addrLat;
+      if (typeof item.lksLong === 'number' && typeof item.lksLat === 'number') {
+        const yFull = item.lksLat + 6000000;
+        const coord4326 = ol.proj.transform(
+          [item.lksLong, yFull],
+          proj3059,
+          proj4326
+        );
+        addrLon = coord4326[0];
+        addrLat = coord4326[1];
+      }
+      return {
+        display_name: displayName,
+        lon: addrLon,
+        lat: addrLat,
+        raw: item
+      };
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-
-    return {
-      display_name: displayName,
-      lon: addrLon,
-      lat: addrLat,
-      raw: item
-    };
-  } catch (e) {
-    console.error(e);
-    return null;
   }
-}
 
   // Dispatcher
   async function reverseGeocode(lon4326, lat4326, x3059, y3059) {
@@ -376,6 +369,61 @@ async function reverseAMK(x3059, y3059) {
     }
   }
 
+  // ===== Nominatim feature classifier (for clicked object) =====
+  async function reverseNominatimFeature(lon, lat) {
+    const url =
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2` +
+      `&lon=${encodeURIComponent(lon)}` +
+      `&lat=${encodeURIComponent(lat)}` +
+      `&zoom=18&addressdetails=0&extratags=1`;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'ExampleApp/1.0 (contact: your-email@example.com)'
+        }
+      });
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+      if (!data) return null;
+      return {
+        name: data.name || '',
+        category: data.category || '',
+        type: data.type || '',
+        raw: data
+      };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  function classifyNominatimFeature(feat) {
+  const cat = feat.category;
+  const typ = feat.type;
+
+  if (cat === 'highway') return { label: 'Street / road',  isOther: false };
+  if (cat === 'waterway' && typ === 'river')   return { label: 'River',          isOther: false };
+  if (cat === 'waterway' && typ === 'stream')  return { label: 'Stream',         isOther: false };
+  if (cat === 'waterway')                      return { label: 'Waterway',       isOther: false };
+  if (cat === 'natural' && typ === 'water')    return { label: 'Water body',     isOther: false };
+  if (cat === 'natural' && typ === 'wood')     return { label: 'Forest',         isOther: false };
+  if (cat === 'natural')                       return { label: 'Natural feature',isOther: false };
+  if (cat === 'building')                      return { label: 'Building',       isOther: false };
+  if (cat === 'place')                         return { label: 'Place / settlement', isOther: false };
+  if (cat === 'landuse' && typ === 'forest')   return { label: 'Forest area',    isOther: false };
+  if (cat === 'landuse' && typ === 'residential') return { label: 'Residential area', isOther: false };
+  if (cat === 'landuse')                       return { label: 'Land use area',  isOther: false };
+
+  // Fallback: show raw category/type when it's "Other"
+  const rawDesc = [
+    cat ? `category=${cat}` : null,
+    typ ? `type=${typ}` : null
+  ].filter(Boolean).join(', ');
+
+  const label = rawDesc ? `Other (${rawDesc})` : 'Other';
+  return { label, isOther: true };
+}
+
   // ===== Distance and bearing helpers =====
   function haversineDistanceKm(lon1, lat1, lon2, lat2) {
     const toRad = deg => deg * Math.PI / 180;
@@ -389,7 +437,6 @@ async function reverseAMK(x3059, y3059) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
-
   function bearingDeg(lon1, lat1, lon2, lat2) {
     const toRad = deg => deg * Math.PI / 180;
     const toDeg = rad => rad * 180 / Math.PI;
@@ -405,7 +452,6 @@ async function reverseAMK(x3059, y3059) {
     brng = (brng + 360) % 360;
     return brng;
   }
-
   function bearingToCompass(brng) {
     const directions = [
       'N', 'NNE', 'NE', 'ENE',
@@ -423,7 +469,6 @@ async function reverseAMK(x3059, y3059) {
   async function processReverseForCurrentGeocoder() {
     if (!lastClick) return;
     const { lon, lat, x3059, y3059, coord3857_click } = lastClick;
-
     addrInput.value = 'Searching for address...';
     distInput.value = '';
     bearingInput.value = '';
@@ -437,7 +482,6 @@ async function reverseAMK(x3059, y3059) {
     }
 
     addrInput.value = result.display_name || 'No address found for this location.';
-
     let addrLon = result.lon;
     let addrLat = result.lat;
     if (addrLon == null || addrLat == null) {
@@ -450,7 +494,6 @@ async function reverseAMK(x3059, y3059) {
 
     const distKm = haversineDistanceKm(lon, lat, addrLon, addrLat);
     distInput.value = distKm.toFixed(3);
-
     const brng = bearingDeg(lon, lat, addrLon, addrLat);
     const compass = bearingToCompass(brng);
     bearingInput.value = `${brng.toFixed(1)}° (${compass})`;
@@ -494,10 +537,22 @@ async function reverseAMK(x3059, y3059) {
       coord3857_click
     };
 
+    // Main address from selected geocoder (AMK, Jāņa sēta, etc.)
     await processReverseForCurrentGeocoder();
+
+    // Object classification from Nominatim (independent of selected geocoder)
+    featureInput.value = 'Detecting object...';
+    const feat = await reverseNominatimFeature(lonClick, latClick);
+    if (feat) {
+      const { label, isOther } = classifyNominatimFeature(feat);
+      const name = feat.name ? ` – ${feat.name}` : '';
+      featureInput.value = `${label}${name}`;
+    } else {
+      featureInput.value = 'Unknown';
+    }
   });
 
-  // Re-run reverse geocoding on geocoder change
+  // Re-run reverse geocoding on geocoder change (address only)
   document.querySelectorAll('input[name="geocoder"]').forEach(radio => {
     radio.addEventListener('change', () => {
       processReverseForCurrentGeocoder();
