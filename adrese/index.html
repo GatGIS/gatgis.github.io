@@ -105,6 +105,9 @@
       <!-- NEW: clicked object info from Nominatim -->
       <label for="feature">Clicked object (OSM)</label>
       <input type="text" id="feature" readonly>
+      <!-- NEW: VUGD polygon info -->
+      <label for="vugdInfo">VUGD responsibility area</label>
+      <textarea id="vugdInfo" readonly></textarea>
     </form>
     <div id="status">
       Loading Jāņa sēta API key...
@@ -217,6 +220,23 @@
   vectorSource.addFeature(clickFeature);
   vectorSource.addFeature(addressFeature);
   vectorSource.addFeature(lineFeature);
+    // ===== VUGD polygon layer =====
+  const vugdSource = new ol.source.Vector();
+  const vugdLayer = new ol.layer.Vector({
+    source: vugdSource,
+    style: new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'rgba(255, 128, 0, 0.9)',
+        width: 2
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(255, 128, 0, 0.2)'
+      })
+    })
+  });
+  map.addLayer(vugdLayer);
+
+  const vugdInfoInput = document.getElementById('vugdInfo');
 
   function setClickPoint(coord3857) {
     clickFeature.setGeometry(new ol.geom.Point(coord3857));
@@ -424,6 +444,59 @@
   return { label, isOther: true };
 }
 
+  // ===== VUGD polygon info (find_polygon) =====
+  async function loadVugdPolygon(lat, lon) {
+    // Service expects lat/lon in WGS84
+    const url =
+      'https://vkcp-ppe-igis.vugd.gov.lv/geoservices/' +
+      `?method=find_polygon&lat=${encodeURIComponent(lat)}` +
+      `&lon=${encodeURIComponent(lon)}` +
+      '&layer=vp_iecirknu_atbildibas_rajoni';
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('VUGD request failed: ' + resp.status);
+      const data = await resp.json();
+
+      // Clear previous polygon
+      vugdSource.clear();
+
+      if (!data || !Array.isArray(data.features) || data.features.length === 0) {
+        vugdInfoInput.value = 'No VUGD polygon found at this location.';
+        return;
+      }
+
+      const feat = data.features[0]; // take first feature
+      const props = feat.properties || {};
+      const geom = feat.geometry;
+
+      // Build info text
+      const lines = [];
+      if (props.NOSAUKUMS_) lines.push(`Nosaukums: ${props.NOSAUKUMS_}`);
+      else if (props.NOSAUKUMS) lines.push(`Nosaukums: ${props.NOSAUKUMS}`);
+      if (props.TIPS)      lines.push(`Tips: ${props.TIPS}`);
+      if (props.REGIONS)   lines.push(`Reģions: ${props.REGIONS}`);
+      if (props.ATVKKODS20)lines.push(`Kods: ${props.ATVKKODS20}`);
+      if (props.APRAKSTS)  lines.push(`Apraksts: ${props.APRAKSTS}`);
+
+      vugdInfoInput.value = lines.join('\n') || 'VUGD polygon found (no details).';
+
+      // Draw polygon (coordinates are [lon, lat] in WGS84)
+      if (geom && geom.type === 'Polygon' && Array.isArray(geom.coordinates)) {
+        const poly3857 = new ol.geom.Polygon(
+          geom.coordinates.map(ring =>
+            ring.map(coord => ol.proj.transform(coord, proj4326, proj3857))
+          )
+        );
+        const vugdFeature = new ol.Feature(poly3857);
+        vugdSource.addFeature(vugdFeature);
+      }
+    } catch (e) {
+      console.error(e);
+      vugdSource.clear();
+      vugdInfoInput.value = 'Error loading VUGD polygon.';
+    }
+  }
   // ===== Distance and bearing helpers =====
   function haversineDistanceKm(lon1, lat1, lon2, lat2) {
     const toRad = deg => deg * Math.PI / 180;
@@ -550,6 +623,9 @@
     } else {
       featureInput.value = 'Unknown';
     }
+        // VUGD polygon info and drawing
+    vugdInfoInput.value = 'Loading VUGD polygon...';
+    await loadVugdPolygon(latClick, lonClick);
   });
 
   // Re-run reverse geocoding on geocoder change (address only)
