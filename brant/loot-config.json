@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Weapon",
+    "prefix": "Krusts",
+    "type": "Weapon",
+    "icon": "🗡️"
+  },
+  {
+    "category": "Armor",
+    "prefix": "Vairogs",
+    "type": "Armor",
+    "icon": "🛡️"
+  },
+  {
+    "category": "Cup",
+    "prefix": "Kauss",
+    "type": "Cup",
+    "icon": "🍺"
+  },
+  {
+    "category": "Helmet",
+    "prefix": "Cilts",
+    "type": "Armor",
+    "icon": "🎩"
+  }
+]

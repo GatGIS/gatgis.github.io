@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brant Bachelor Raid</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head>
+<body>
+    <main class="page">
+        <section id="screen-welcome" class="screen active">
+            <div class="panel">
+                <h1>Brant: Bachelor Raid</h1>
+                <p>Choose your role and prepare for the real-life treasure hunt and end-of-day boss fight.</p>
+                <button id="btn-start-raider">I am Raider</button>
+                <button id="btn-start-boss">I am Boss</button>
+                <p class="note">Raiders collect loot by answering location questions. The Boss scans profiles and then fights the party.</p>
+            </div>
+        </section>
+
+        <section id="screen-setup" class="screen">
+            <div class="panel">
+                <h2 id="setup-title">Create your Player</h2>
+                <form id="setup-form">
+                    <label for="player-name">Name</label>
+                    <input id="player-name" type="text" maxlength="15" required>
+                    <label for="player-role">Role</label>
+                    <input id="player-role" type="text" disabled>
+                    <label>Class</label>
+                    <div class="class-selector">
+                        <label><input type="radio" name="player-class" value="dps" checked> ⚔️ DPS <span>HP 650, ATK 105, DEF 45, SPD 1.10, CRIT 13%, CDMG 150, Rage 25</span></label>
+                        <label><input type="radio" name="player-class" value="tank"> 🛡️ Tank <span>HP 780, ATK 80, DEF 60, SPD 0.95, CRIT 6%, CDMG 130, Thorns 25</span></label>
+                        <label><input type="radio" name="player-class" value="healer"> ❤️ Healer <span>HP 620, ATK 75, DEF 45, SPD 1.00, CRIT 8%, CDMG 140, Heal 50</span></label>
+                    </div>
+                    <div id="avatar-selection" class="avatar-panel">
+                        <p>Choose a funny avatar</p>
+                        <div id="avatar-preview" class="avatar-preview-card"></div>
+                        <div class="avatar-actions">
+                            <button id="btn-random-avatar" type="button">Regenerate Avatar</button>
+                        </div>
+                    </div>
+                    <div id="boss-only" class="form-hint hidden">
+                        <p>Boss phone: use this screen to scan raider QR codes and begin the final fight.</p>
+                    </div>
+                    <button type="submit">Continue</button>
+                </form>
+                <button id="btn-back-welcome" class="secondary">Back</button>
+            </div>
+        </section>
+
+        <section id="screen-player" class="screen">
+            <div class="panel">
+                <div class="top-bar">
+                    <div>
+                        <h2 id="player-summary-name"></h2>
+                        <p id="player-summary-role"></p>
+                        <p id="player-summary-class" class="small-note"></p>
+                    </div>
+                    <button id="btn-reset-profile" class="secondary small">Reset</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div>HP: <strong id="stat-hp"></strong></div>
+                    <div>ATK: <strong id="stat-atk"></strong></div>
+                    <div>DEF: <strong id="stat-def"></strong></div>
+                    <div>SPD: <strong id="stat-spd"></strong></div>
+                    <div>CRIT %: <strong id="stat-crit"></strong></div>
+                    <div>CRIT DMG: <strong id="stat-cdmg"></strong></div>
+                    <div>RAGE: <strong id="stat-rage"></strong></div>
+                    <div>THORNS: <strong id="stat-thorns"></strong></div>
+                    <div>REGEN: <strong id="stat-regen"></strong></div>
+                    <div>HEAL: <strong id="stat-heal"></strong></div>
+                </div>
+                <div class="player-hero">
+                    <div class="player-avatar-card">
+                        <img id="player-avatar-img" src="" alt="Player Avatar">
+                    </div>
+                    <div id="player-inventory" class="inventory-list"></div>
+                </div>
+
+                <div id="raider-controls" class="control-panel">
+                    <button id="btn-refresh-location">Refresh Location</button>
+                    <button id="btn-view-qr">Show My QR Code</button>
+                    <button id="btn-go-locations">Go To Locations</button>
+                </div>
+
+                <div id="boss-controls" class="control-panel hidden">
+                    <button id="btn-scan-qr">Scan Raiders</button>
+                    <button id="btn-view-scanned">View Scanned Party</button>
+                    <button id="btn-go-locations-boss">Go To Locations</button>
+                    <button id="btn-start-fight">Start Boss Fight</button>
+                </div>
+
+                <div id="profile-message" class="message"></div>
+            </div>
+        </section>
+
+        <section id="screen-locations" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2>Real-life Locations</h2>
+                    <button id="btn-back-player" class="secondary small">Back</button>
+                </div>
+                <p>Go near a marker, answer the question, and earn loot.</p>
+                <div id="location-status" class="message"></div>
+                <div id="location-map" class="location-map"></div>
+                <div class="list" id="location-list"></div>
+                <div class="location-footer">
+                    <button id="btn-toggle-debug" class="secondary small">Enter Test Mode</button>
+                    <button id="btn-clear-storage" class="secondary small">Developer Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-question" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2 id="question-title">Question</h2>
+                    <button id="btn-back-locations" class="secondary small">Back</button>
+                </div>
+                <div class="question-card">
+                    <p id="question-text"></p>
+                    <div id="question-options" class="options"></div>
+                    <button id="btn-submit-answer">Submit Answer</button>
+                </div>
+                <div id="question-feedback" class="message"></div>
+            </div>
+        </section>
+
+        <section id="screen-loot" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2>Choose your loot</h2>
+                    <button id="btn-back-loot" class="secondary small">Back</button>
+                </div>
+                <p id="loot-message" class="message"></p>
+                <p id="rarity-note" class="small-note">Loot rarity affects how strong the item rolls. Better rarity gives bigger stats and more powerful effects.</p>
+                <div id="loot-choices" class="list"></div>
+            </div>
+        </section>
+
+        <section id="screen-qr" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2>Your Raider QR</h2>
+                    <button id="btn-back-player2" class="secondary small">Back</button>
+                </div>
+                <p>Show this QR code to the boss when the hunt is done.</p>
+                <div id="qr-card"></div>
+                <textarea id="qr-text" readonly></textarea>
+                <div class="message">If the camera cannot read the QR code, copy the full text and paste it on the boss phone.</div>
+            </div>
+        </section>
+
+        <section id="screen-scan" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2>Scan Raider QR</h2>
+                    <button id="btn-back-player3" class="secondary small">Back</button>
+                </div>
+                <p>Use the boss phone camera to scan each raider's QR code.</p>
+                <div id="scan-status" class="message"></div>
+                <video id="qr-video" autoplay playsinline class="hidden"></video>
+                <canvas id="qr-canvas" class="hidden"></canvas>
+                <div class="scan-card">
+                    <p>Manual paste:</p>
+                    <textarea id="scan-input" placeholder="Paste QR text here"></textarea>
+                    <button id="btn-parse-qr">Parse Code</button>
+                </div>
+                <div id="scanned-list" class="list"></div>
+            </div>
+        </section>
+
+        <section id="screen-fight" class="screen">
+            <div class="panel wide">
+                <div class="top-bar">
+                    <h2>Boss Fight</h2>
+                    <button id="btn-back-player4" class="secondary small">Back</button>
+                </div>
+                <div class="fight-card">
+                    <p id="fight-summary"></p>
+                    <div id="fight-log" class="message"></div>
+                    <button id="btn-run-fight" class="secondary">Run Combat</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

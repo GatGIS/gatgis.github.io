@@ -1,0 +1,57 @@
+[
+  {
+    "id": "loc1",
+    "name": "Old City Checkpoint",
+    "lat": 56.9496,
+    "lng": 24.1052,
+    "question": "What is the traditional Latvian drink served at celebrations?",
+    "answers": ["Kefir", "Kvass", "Aldis", "Birch sap"],
+    "correct": 1,
+    "difficulty": 1,
+    "visited": false
+  },
+  {
+    "id": "loc2",
+    "name": "Riverside Marker",
+    "lat": 56.9509,
+    "lng": 24.1125,
+    "question": "What does the word \"Briviba\" mean in English?",
+    "answers": ["Brown", "Freedom", "Brew", "Bridge"],
+    "correct": 1,
+    "difficulty": 2,
+    "visited": false
+  },
+  {
+    "id": "loc3",
+    "name": "Market Gate",
+    "lat": 56.9489,
+    "lng": 24.1068,
+    "question": "How many players should be in the raiding party?",
+    "answers": ["2", "4", "6", "8"],
+    "correct": 2,
+    "difficulty": 1,
+    "visited": false
+  },
+  {
+    "id": "loc4",
+    "name": "Pub Corner",
+    "lat": 56.9492,
+    "lng": 24.1085,
+    "question": "A good loot roll should increase which stat the most?",
+    "answers": ["HP", "ATK", "DEF", "SPD"],
+    "correct": 1,
+    "difficulty": 3,
+    "visited": false
+  },
+  {
+    "id": "loc5",
+    "name": "Statue Plaza",
+    "lat": 56.95,
+    "lng": 24.103,
+    "question": "What is the boss role at the end of the day?",
+    "answers": ["Shopkeeper", "Scanner", "Boss", "Raider"],
+    "correct": 2,
+    "difficulty": 2,
+    "visited": false
+  }
+]
