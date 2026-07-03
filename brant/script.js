@@ -931,14 +931,14 @@ const buildQrPage = () => {
         elements.qrText.value = '';
         return;
     }
-    const correctLevel = (window.QRCode && QRCode.CorrectLevel && QRCode.CorrectLevel.H) || 3;
+    const correctLevel = (window.QRCode && QRCode.CorrectLevel && (QRCode.CorrectLevel.M || QRCode.CorrectLevel.L || QRCode.CorrectLevel.H)) || 0;
     try {
         new QRCode(elements.qrCard, {
             text: token,
             width: 240,
             height: 240,
-            colorDark: '#ffffff',
-            colorLight: '#1a101c',
+            colorDark: '#000000',
+            colorLight: '#ffffff',
             correctLevel
         });
     } catch (error) {
@@ -969,33 +969,69 @@ const getPlayerToken = () => {
         return '';
     }
     const token = {
-        name: state.player.name,
-        role: state.player.role,
-        playerClass: state.player.playerClass,
-        hpMax: state.player.hpMax,
-        atk: state.player.atk,
-        def: state.player.def,
-        spd: state.player.spd,
-        critRate: state.player.critRate,
-        critDmg: state.player.critDmg,
-        rage: state.player.rage || 0,
-        thorns: state.player.thorns || 0,
-        regen: state.player.regen || 0,
-        healingOutput: state.player.healingOutput || 0,
-        lootQuality: state.player.lootQuality,
-        avatarSeed: state.player.avatarSeed,
-        avatarStyle: state.player.avatarStyle
+        n: state.player.name,
+        r: state.player.role,
+        c: state.player.playerClass,
+        H: state.player.hpMax,
+        A: state.player.atk,
+        D: state.player.def,
+        S: state.player.spd,
+        C: state.player.critRate,
+        Q: state.player.critDmg,
+        G: state.player.rage || 0,
+        T: state.player.thorns || 0,
+        E: state.player.regen || 0,
+        L: state.player.healingOutput || 0,
+        V: state.player.avatarSeed,
+        Y: state.player.avatarStyle
     };
-    return encodePlayerToken(JSON.stringify(token));
+    return JSON.stringify(token);
+};
+
+const normalizePlayerPayload = (raw) => {
+    if (!raw || typeof raw !== 'object') {
+        return null;
+    }
+    const payload = {
+        name: raw.name || raw.n || '',
+        role: raw.role || raw.r || 'raider',
+        playerClass: raw.playerClass || raw.c || 'dps',
+        hpMax: raw.hpMax || raw.H || 0,
+        atk: raw.atk || raw.A || 0,
+        def: raw.def || raw.D || 0,
+        spd: raw.spd || raw.S || 0,
+        critRate: raw.critRate || raw.C || 0,
+        critDmg: raw.critDmg || raw.Q || 0,
+        rage: raw.rage || raw.G || 0,
+        thorns: raw.thorns || raw.T || 0,
+        regen: raw.regen || raw.E || 0,
+        healingOutput: raw.healingOutput || raw.L || 0,
+        lootQuality: raw.lootQuality || raw.P || 0,
+        avatarSeed: raw.avatarSeed || raw.V || null,
+        avatarStyle: raw.avatarStyle || raw.Y || null,
+        inventory: Array.isArray(raw.inventory) ? raw.inventory : []
+    };
+    return payload;
 };
 
 const parsePlayerToken = (token) => {
-    try {
-        const decoded = decodePlayerToken(token.trim());
-        return JSON.parse(decoded);
-    } catch (error) {
+    if (!token || typeof token !== 'string') {
         return null;
     }
+    const trimmed = token.trim();
+    let parsed = null;
+    try {
+        parsed = JSON.parse(trimmed);
+    } catch (_error) {
+        try {
+            const decoded = decodePlayerToken(trimmed);
+            parsed = JSON.parse(decoded);
+        } catch (error) {
+            console.warn('Unable to parse player token:', error);
+            return null;
+        }
+    }
+    return normalizePlayerPayload(parsed);
 };
 
 const addScannedPlayer = (payload) => {
