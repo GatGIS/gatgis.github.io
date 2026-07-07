@@ -1338,8 +1338,22 @@ const runFight = () => {
 const activateBossScan = () => {
     showScreen('scan');
     renderScannedList();
+    
+    // Ensure the camera wrapper is completely visible
+    const stageContainer = document.querySelector('.scan-stage');
+    if (stageContainer) {
+        stageContainer.classList.remove('hidden');
+    }
+    
+    // Clear any leftover "Scan Next Raider" buttons from a previous scan
+    const oldBtn = document.getElementById('btn-scan-next');
+    if (oldBtn) oldBtn.remove();
+    
     elements.scanStatus.textContent = 'Ready to scan or paste a raider QR code.';
-    startQrScanner();
+    elements.scanStatus.style.color = "";
+    
+    // Turn on the video loop
+    startQrScanner(); 
 };
 
 const initialize = async () => {
@@ -1449,6 +1463,7 @@ const initialize = async () => {
 
     elements.btnSubmitAnswer.addEventListener('click', handleAnswerSubmit);
     elements.btnScanQr.addEventListener('click', activateBossScan);
+
     elements.btnParseQr.addEventListener('click', () => {
         const payload = parsePlayerToken(elements.scanInput.value);
         addScannedPlayer(payload);
