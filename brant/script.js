@@ -1175,14 +1175,13 @@ const scanTick = () => {
     canvas.width = elements.qrVideo.videoWidth;
     canvas.height = elements.qrVideo.videoHeight;
     
-    // Draw the current frame to canvas
+    // Draw the current camera frame to the canvas
     context.drawImage(elements.qrVideo, 0, 0, canvas.width, canvas.height);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const code = jsQR(imageData.data, imageData.width, imageData.height);
     
     if (code && code.data) {
-        // DO NOT stop the video camera stream entirely.
-        // Instead, draw a bounding box around the successful code for visual feedback
+        // 1. Draw a bounding box around the successful QR code for immediate visual feedback
         const drawLine = (begin, end, color) => {
             context.beginPath();
             context.moveTo(begin.x, begin.y);
@@ -1198,18 +1197,32 @@ const scanTick = () => {
 
         const payload = parsePlayerToken(code.data);
         if (payload) {
-            addScannedPlayer(payload);
-            elements.scanStatus.textContent = `Scanned ${payload.n || 'Player'} successfully!`;
-            elements.scanStatus.style.color = "#4ade80";
+            // Check if this specific player token has already been added to the game state
+            const isDuplicate = state.scannedPlayers && state.scannedPlayers.some(p => p.token === code.data || p.V === payload.V);
+            
+            if (isDuplicate) {
+                // Update text to notify that they are already in the party
+                elements.scanStatus.textContent = `⚠️ ${payload.n || 'Player'} has ALREADY been scanned into the party!`;
+                elements.scanStatus.style.color = "#fbbf24"; // Warning Orange/Yellow
+            } else {
+                // Not a duplicate - register the player safely
+                addScannedPlayer(payload);
+                
+                // Force-update the visual roster array right away so it renders below the camera
+                if (typeof renderScannedList === 'function') {
+                    renderScannedList();
+                }
+                
+                elements.scanStatus.textContent = `✅ Successfully added ${payload.n || 'Player'} to the Raid Party!`;
+                elements.scanStatus.style.color = "#4ade80"; // Success Green
+            }
         } else {
-            elements.scanStatus.textContent = 'QR was read but could not be parsed. Try the manual paste box.';
-            elements.scanStatus.style.color = "#ef4444";
+            elements.scanStatus.textContent = '❌ QR code read but data format is invalid.';
+            elements.scanStatus.style.color = "#ef4444"; // Error Red
         }
 
-        // 1. Create the floating overlay button inside the camera frame
+        // 2. Generate the floating prompt overlay button
         const stageContainer = document.querySelector('.scan-stage');
-        
-        // Remove old button if it's somehow lingering
         const oldBtn = document.getElementById('btn-scan-next');
         if (oldBtn) oldBtn.remove();
 
@@ -1218,24 +1231,23 @@ const scanTick = () => {
         nextBtn.textContent = '➕ Scan Next Raider';
         nextBtn.className = 'scan-next-overlay-btn';
         
-        // 2. Button Action: Clear itself and safely kick off the animation loop again
+        // Button callback behavior
         nextBtn.addEventListener('click', () => {
             nextBtn.remove();
             elements.scanStatus.textContent = "Scanning for Raiders...";
             elements.scanStatus.style.color = "";
             
-            // Clear the frozen bounding box frame by resuming the loop sequence
+            // Re-fire the loop request sequence
             requestAnimationFrame(scanTick);
         });
 
         stageContainer.appendChild(nextBtn);
         
-        // Return without executing the next animation tick, pausing the camera screen 
-        // until they click the button.
+        // Stop execution here to pause the loop camera frame until they click the action button
         return;
     }
     
-    // Continue running the scan loops as long as the stream is active and no code is detected
+    // Continue loop cycle execution if nothing is captured
     if (state.videoStream) {
         window.setTimeout(() => requestAnimationFrame(scanTick), 250);
     }
