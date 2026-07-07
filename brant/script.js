@@ -1462,7 +1462,23 @@ const initialize = async () => {
     if (!state.player) {
         generateRandomAvatar();
     }
-    elements.btnViewScanned.addEventListener('click', activateBossScan);
+    //elements.btnViewScanned.addEventListener('click', activateBossScan);
+    elements.btnViewScanned.addEventListener('click', () => {
+    // Turn off the camera if it was lingering open
+    stopVideo(); 
+    
+    showScreen('scan');
+    
+    // Hide the entire live camera block so only the party roster is visible
+    const stageContainer = document.querySelector('.scan-stage');
+    if (stageContainer) {
+        stageContainer.classList.add('hidden');
+    }
+    
+    // Update the layout context text
+    elements.scanStatus.textContent = "Reviewing Scanned Raid Party";
+    elements.scanStatus.style.color = "#7dd3fc"; // Change text to your theme's info blue
+});
     elements.btnStartFight.addEventListener('click', () => {
         if (state.scannedPlayers.length === 0) {
             elements.profileMessage.textContent = 'Scan raiders before starting the fight.';
