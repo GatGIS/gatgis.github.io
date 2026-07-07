@@ -932,35 +932,36 @@ const buildQrPage = async () => {
         return;
     }
     elements.qrText.value = token;
+
     try {
-        const qrLib = window.QRCode || window.qrcode;
+        // Use the official browser global variable directly
+        const qrLib = window.QRCode; 
         if (!qrLib || typeof qrLib.toDataURL !== 'function') {
-            throw new Error('QR generator unavailable');
+            throw new Error('QR generator library is not loaded on the window object');
         }
+
+        // Programmatic inversion fix: 
+        // Ensure "dark" is your QR module color and "light" is the background color
         const dataUrl = await qrLib.toDataURL(token, {
             errorCorrectionLevel: 'M',
-            margin: 1,
+            margin: 4, // 4 modules is standard for optimal scanner framing
+            width: 256,
             color: {
-                dark: '#000000',
-                light: '#ffffff'
+                dark: '#000000',  // The QR modules MUST be dark
+                light: '#ffffff'  // The background MUST be light
             }
         });
+
+        // Generate the visual element onto your page
         const img = document.createElement('img');
         img.src = dataUrl;
-        img.alt = 'Raider QR code';
-        img.style.width = '100%';
-        img.style.maxWidth = '240px';
-        img.style.height = 'auto';
-        img.style.display = 'block';
-        img.style.margin = '0 auto';
+        img.alt = "Raider Profile QR Code";
+        img.style.maxWidth = "100%";
         elements.qrCard.appendChild(img);
+
     } catch (error) {
         console.error('QR generation failed:', error);
-        const fallback = document.createElement('div');
-        fallback.textContent = 'QR code could not be rendered.';
-        fallback.style.color = '#fff';
-        fallback.style.padding = '1rem';
-        elements.qrCard.appendChild(fallback);
+        elements.qrCard.textContent = 'Failed to generate QR code visual.';
     }
 };
 
@@ -1173,19 +1174,68 @@ const scanTick = () => {
     const context = canvas.getContext('2d');
     canvas.width = elements.qrVideo.videoWidth;
     canvas.height = elements.qrVideo.videoHeight;
+    
+    // Draw the current frame to canvas
     context.drawImage(elements.qrVideo, 0, 0, canvas.width, canvas.height);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const code = jsQR(imageData.data, imageData.width, imageData.height);
+    
     if (code && code.data) {
-        stopVideo();
+        // DO NOT stop the video camera stream entirely.
+        // Instead, draw a bounding box around the successful code for visual feedback
+        const drawLine = (begin, end, color) => {
+            context.beginPath();
+            context.moveTo(begin.x, begin.y);
+            context.lineTo(end.x, end.y);
+            context.lineWidth = 4;
+            context.strokeStyle = color;
+            context.stroke();
+        };
+        drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#4ade80");
+        drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#4ade80");
+        drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#4ade80");
+        drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#4ade80");
+
         const payload = parsePlayerToken(code.data);
         if (payload) {
             addScannedPlayer(payload);
+            elements.scanStatus.textContent = `Scanned ${payload.n || 'Player'} successfully!`;
+            elements.scanStatus.style.color = "#4ade80";
         } else {
             elements.scanStatus.textContent = 'QR was read but could not be parsed. Try the manual paste box.';
+            elements.scanStatus.style.color = "#ef4444";
         }
+
+        // 1. Create the floating overlay button inside the camera frame
+        const stageContainer = document.querySelector('.scan-stage');
+        
+        // Remove old button if it's somehow lingering
+        const oldBtn = document.getElementById('btn-scan-next');
+        if (oldBtn) oldBtn.remove();
+
+        const nextBtn = document.createElement('button');
+        nextBtn.id = 'btn-scan-next';
+        nextBtn.textContent = '➕ Scan Next Raider';
+        nextBtn.className = 'scan-next-overlay-btn';
+        
+        // 2. Button Action: Clear itself and safely kick off the animation loop again
+        nextBtn.addEventListener('click', () => {
+            nextBtn.remove();
+            elements.scanStatus.textContent = "Scanning for Raiders...";
+            elements.scanStatus.style.color = "";
+            
+            // Clear the frozen bounding box frame by resuming the loop sequence
+            requestAnimationFrame(scanTick);
+        });
+
+        stageContainer.appendChild(nextBtn);
+        
+        // Return without executing the next animation tick, pausing the camera screen 
+        // until they click the button.
         return;
     }
+    
+    // Continue running the scan loops as long as the stream is active and no code is detected
     if (state.videoStream) {
         window.setTimeout(() => requestAnimationFrame(scanTick), 250);
     }
