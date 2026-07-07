@@ -920,7 +920,7 @@ const handleAnswerSubmit = () => {
     openLootChoice(location, correct);
 };
 
-const buildQrPage = () => {
+const buildQrPage = async () => {
     if (!state.player || state.player.role !== 'raider') {
         return;
     }
@@ -931,21 +931,37 @@ const buildQrPage = () => {
         elements.qrText.value = '';
         return;
     }
-    const correctLevel = (window.QRCode && QRCode.CorrectLevel && (QRCode.CorrectLevel.M || QRCode.CorrectLevel.L || QRCode.CorrectLevel.H)) || 0;
+    elements.qrText.value = token;
     try {
-        new QRCode(elements.qrCard, {
-            text: token,
-            width: 240,
-            height: 240,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel
+        const qrLib = window.QRCode || window.qrcode;
+        if (!qrLib || typeof qrLib.toDataURL !== 'function') {
+            throw new Error('QR generator unavailable');
+        }
+        const dataUrl = await qrLib.toDataURL(token, {
+            errorCorrectionLevel: 'M',
+            margin: 1,
+            color: {
+                dark: '#000000',
+                light: '#ffffff'
+            }
         });
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = 'Raider QR code';
+        img.style.width = '100%';
+        img.style.maxWidth = '240px';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.margin = '0 auto';
+        elements.qrCard.appendChild(img);
     } catch (error) {
         console.error('QR generation failed:', error);
-        elements.qrCard.textContent = 'Unable to render QR code.';
+        const fallback = document.createElement('div');
+        fallback.textContent = 'QR code could not be rendered.';
+        fallback.style.color = '#fff';
+        fallback.style.padding = '1rem';
+        elements.qrCard.appendChild(fallback);
     }
-    elements.qrText.value = token;
 };
 
 const encodePlayerToken = (value) => {
@@ -1163,11 +1179,15 @@ const scanTick = () => {
     if (code && code.data) {
         stopVideo();
         const payload = parsePlayerToken(code.data);
-        addScannedPlayer(payload);
+        if (payload) {
+            addScannedPlayer(payload);
+        } else {
+            elements.scanStatus.textContent = 'QR was read but could not be parsed. Try the manual paste box.';
+        }
         return;
     }
     if (state.videoStream) {
-        requestAnimationFrame(scanTick);
+        window.setTimeout(() => requestAnimationFrame(scanTick), 250);
     }
 };
 
@@ -1340,8 +1360,8 @@ const initialize = async () => {
         showScreen('locations');
     });
 
-    elements.btnViewQr.addEventListener('click', () => {
-        buildQrPage();
+    elements.btnViewQr.addEventListener('click', async () => {
+        await buildQrPage();
         showScreen('qr');
     });
 
