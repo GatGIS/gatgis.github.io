@@ -164,8 +164,12 @@
                 </div>
                 <p>Use the boss phone camera to scan each raider's QR code.</p>
                 <div id="scan-status" class="message"></div>
-                <video id="qr-video" autoplay playsinline class="hidden"></video>
-                <canvas id="qr-canvas" class="hidden"></canvas>
+                <div class="scan-stage">
+                    <video id="qr-video" autoplay playsinline class="hidden"></video>
+                    <canvas id="qr-canvas" class="hidden"></canvas>
+                    <div class="scan-frame"></div>
+                    <div class="scan-guide">Hold the phone steady and keep the QR code inside the frame.</div>
+                </div>
                 <div class="scan-card">
                     <p>Manual paste:</p>
                     <textarea id="scan-input" placeholder="Paste QR text here"></textarea>

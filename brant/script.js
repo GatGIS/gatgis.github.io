@@ -1119,7 +1119,11 @@ const stopVideo = () => {
         state.videoStream.getTracks().forEach(track => track.stop());
         state.videoStream = null;
     }
-    elements.qrVideo.classList.add('hidden');
+    if (elements.qrVideo) {
+        elements.qrVideo.pause();
+        elements.qrVideo.srcObject = null;
+        elements.qrVideo.classList.add('hidden');
+    }
 };
 
 const startQrScanner = async () => {
@@ -1128,11 +1132,16 @@ const startQrScanner = async () => {
         return;
     }
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: 'environment' }
+            }
+        });
         state.videoStream = stream;
         elements.qrVideo.srcObject = stream;
         elements.qrVideo.classList.remove('hidden');
         elements.scanStatus.textContent = 'Point camera at the raider QR code.';
+        await elements.qrVideo.play().catch(() => {});
         requestAnimationFrame(scanTick);
     } catch (error) {
         elements.scanStatus.textContent = 'Unable to access camera. Use manual paste instead.';
@@ -1140,7 +1149,7 @@ const startQrScanner = async () => {
 };
 
 const scanTick = () => {
-    if (!elements.qrVideo.videoWidth || !state.videoStream) {
+    if (!elements.qrVideo || !elements.qrVideo.videoWidth || !state.videoStream) {
         requestAnimationFrame(scanTick);
         return;
     }
