@@ -80,12 +80,18 @@ const elements = {
     btnBackPlayer3: document.querySelector('#btn-back-player3'),
 
     fightSummary: document.querySelector('#fight-summary'),
+    fightTurnIndicator: document.querySelector('#fight-turn-indicator'),
+    fightArena: document.querySelector('#fight-arena'),
+    fightBoss: document.querySelector('#fight-boss'),
+    fightParty: document.querySelector('#fight-party'),
+    fightAbilityBar: document.querySelector('#fight-ability-bar'),
     fightLog: document.querySelector('#fight-log'),
     btnRunFight: document.querySelector('#btn-run-fight'),
     btnBackPlayer4: document.querySelector('#btn-back-player4')
 };
 
 let locations = [];
+const FightModule = typeof window !== 'undefined' && window.BrantFight ? window.BrantFight : null;
 const defaultLocations = [
     {
         id: 'loc1',
@@ -300,6 +306,7 @@ const state = {
     scannedPlayers: [],
     fightRunning: false,
     fightLog: [],
+    fightSession: null,
     videoStream: null,
     avatarSeed: null,
     avatarStyle: null,
@@ -1269,13 +1276,16 @@ const createBossProfile = () => {
     average.spd /= count;
     const boss = {
         name: `${state.player.name} (Boss)`,
-        hpMax: Math.max(1200, Math.round(average.hp * 1.3 + party.length * 55)),
-        atk: Math.max(110, Math.round(average.atk * 1.2 + party.length * 6)),
-        def: Math.max(70, Math.round(average.def * 1.3 + party.length * 5)),
+        hpMax: Math.max(1200, Math.round(average.hp * 1.25 + party.length * 45)),
+        atk: Math.max(120, Math.round(average.atk * 1.2 + party.length * 10)),
+        def: Math.max(80, Math.round(average.def * 1.2 + party.length * 6)),
         spd: Math.max(0.85, Math.min(2.2, average.spd * 0.9 + 0.3)),
         critRate: 8,
         critDmg: 150,
-        currentHp: 0
+        currentHp: 0,
+        avatarUrl: state.player?.avatarUrl || state.avatarUrl || null,
+        avatarSeed: state.player?.avatarSeed || state.avatarSeed || null,
+        avatarStyle: state.player?.avatarStyle || state.avatarStyle || null
     };
     boss.currentHp = boss.hpMax;
     return boss;
@@ -1294,57 +1304,303 @@ const calculateDamage = (attacker, defender) => {
     return Math.max(1, damage);
 };
 
-const runFight = () => {
-    if (state.scannedPlayers.length === 0) {
-        elements.fightSummary.textContent = 'Scan at least one raider before fighting.';
+const applyFightAnimation = (session, targetName, amount) => {
+    if (!session || !targetName || !amount) {
         return;
     }
-    const boss = createBossProfile();
-    const party = state.scannedPlayers.map(raider => ({ ...raider, currentHp: raider.hpMax, inventory: Array.isArray(raider.inventory) ? [...raider.inventory] : [] }));
-    const log = [];
-    let round = 1;
-    while (boss.currentHp > 0 && party.some(member => member.currentHp > 0) && round <= 20) {
-        log.push(`--- Round ${round} ---`);
-        useHealingItemsInFight(party, log);
-        for (const member of party) {
-            if (member.currentHp <= 0) {
-                continue;
-            }
-            if (member.regen) {
-                const healAmount = Math.min(member.regen, member.hpMax - member.currentHp);
-                if (healAmount > 0) {
-                    member.currentHp += healAmount;
-                    log.push(`${member.name} regenerates ${healAmount} HP at the start of their turn.`);
-                }
-            }
-            const damage = calculateDamage(member, boss);
-            const finalDamage = Math.round(damage);
-            boss.currentHp -= finalDamage;
-            boss.currentHp = Math.max(0, boss.currentHp);
-            log.push(`${member.name} hits Boss for ${finalDamage}. Boss HP ${boss.currentHp}/${boss.hpMax}`);
-            if (boss.currentHp <= 0) {
-                break;
-            }
-            const counter = calculateDamage(boss, member);
-            member.currentHp -= counter;
-            member.currentHp = Math.max(0, member.currentHp);
-            log.push(`Boss hits ${member.name} for ${counter}. ${member.name} HP ${member.currentHp}/${member.hpMax}`);
-            if (member.currentHp <= 0) {
-                log.push(`${member.name} has fallen.`);
-            }
-        }
-        round += 1;
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate([30, 15, 30]);
     }
-    const survivors = party.filter(member => member.currentHp > 0);
-    if (boss.currentHp <= 0 && survivors.length > 0) {
-        log.push(`Boss defeated! ${survivors.length} raider(s) survive.`);
-        elements.fightSummary.textContent = `Victory! ${survivors.length} raider(s) survived.`;
+};
+
+const getFightUnitAvatar = (unit) => {
+    if (unit?.avatarUrl) {
+        return unit.avatarUrl;
+    }
+    if (unit?.avatarSeed && unit?.avatarStyle) {
+        return getAvatarUrl(unit.avatarStyle, unit.avatarSeed);
+    }
+    return '';
+};
+
+const getBossPreview = (session) => {
+    if (!session) {
+        return null;
+    }
+    if (FightModule && typeof FightModule.getBossPreview === 'function') {
+        return FightModule.getBossPreview(session);
+    }
+    const aliveRaiders = session.party.filter(member => member.currentHp > 0);
+    if (aliveRaiders.length === 0) {
+        return null;
+    }
+    const preferredAbility = session.bossSelectedAbility || 'basic';
+    const abilityToUse = preferredAbility === 'targeted' && session.bossAbilityCooldown <= 0
+        ? 'targeted'
+        : preferredAbility === 'aoe' && session.bossAoeCooldown <= 0
+            ? 'aoe'
+            : preferredAbility === 'vamp' && session.bossVampCooldown <= 0
+                ? 'vamp'
+                : session.bossAbilityCooldown <= 0
+                    ? 'targeted'
+                    : session.bossAoeCooldown <= 0
+                        ? 'aoe'
+                        : session.bossVampCooldown <= 0
+                            ? 'vamp'
+                            : 'basic';
+
+    const target = abilityToUse === 'targeted'
+        ? (() => {
+            const cursor = Number.isInteger(session.bossTargetCursor) ? session.bossTargetCursor : 0;
+            const selected = aliveRaiders[cursor % aliveRaiders.length] || aliveRaiders[0];
+            session.bossTargetCursor = (cursor + 1) % aliveRaiders.length;
+            session.bossAbilityTargetName = selected.name;
+            return selected;
+        })()
+        : (() => {
+            const tanks = aliveRaiders.filter(member => member.playerClass === 'tank');
+            return tanks.length > 0 && Math.random() < 0.75
+                ? tanks.reduce((lowest, candidate) => {
+                    if (!lowest) {
+                        return candidate;
+                    }
+                    return candidate.currentHp < lowest.currentHp ? candidate : lowest;
+                }, null)
+                : aliveRaiders.reduce((lowest, candidate) => {
+                    if (!lowest) {
+                        return candidate;
+                    }
+                    return candidate.currentHp < lowest.currentHp ? candidate : lowest;
+                }, null);
+        })();
+
+    if (!target) {
+        return null;
+    }
+
+    const predictedDamage = Math.max(1, Math.round(session.boss.atk * (session.boss.atk / (session.boss.atk + target.def))));
+    const partySize = Math.max(1, aliveRaiders.length);
+
+    if (abilityToUse === 'targeted') {
+        return {
+            type: 'targeted',
+            target: target.name,
+            amount: Math.max(1, Math.round(predictedDamage * 1.2)),
+            abilityName: 'Targeted Attack'
+        };
+    }
+    if (abilityToUse === 'aoe') {
+        return {
+            type: 'aoe',
+            target: 'All Raiders',
+            amount: Math.max(1, Math.round(predictedDamage / partySize)),
+            abilityName: 'AoE Attack'
+        };
+    }
+    if (abilityToUse === 'vamp') {
+        return {
+            type: 'vamp',
+            target: target.name,
+            amount: Math.max(1, Math.round(predictedDamage * 0.3)),
+            abilityName: 'Vamp Attack'
+        };
+    }
+    return {
+        type: 'basic',
+        target: target.name,
+        amount: predictedDamage,
+        abilityName: 'Basic Attack'
+    };
+};
+
+const renderFightView = () => {
+    const session = state.fightSession;
+    if (!session) {
+        elements.fightSummary.textContent = 'No fight started yet.';
+        elements.fightTurnIndicator.textContent = 'Start the encounter to begin the first turn.';
+        elements.fightBoss.innerHTML = '<div class="fight-boss-card"><p>Boss will appear here once the fight begins.</p></div>';
+        elements.fightParty.innerHTML = '';
+        elements.fightAbilityBar.innerHTML = '';
+        elements.fightLog.innerHTML = '<div class="fight-log-entry">The battlefield is waiting for the first turn.</div>';
+        elements.btnRunFight.textContent = 'Start Fight';
+        return;
+    }
+
+    elements.fightSummary.textContent = FightModule ? FightModule.getFightSummary(session) : 'Fight ready.';
+    const activeName = session.currentActor?.name || 'Waiting';
+    elements.fightTurnIndicator.textContent = session.status === 'ready'
+        ? `Turn ${session.turnNumber || 0} • ${activeName} is ready`
+        : `Fight ended • ${session.winner === 'party' ? 'Party wins' : session.winner === 'boss' ? 'Boss wins' : 'Draw'}`;
+
+    document.body.classList.toggle('fight-boss-phase', session.status === 'ready' && session.phase === 'boss');
+
+    const bossHpPercent = (session.boss.currentHp / session.boss.hpMax) * 100;
+    const bossAvatarUrl = getFightUnitAvatar(session.boss);
+    const bossDamageFlash = session.lastAction?.target === session.boss.name ? 'damage-flash' : '';
+    const bossHighlight = session.highlightUntil > Date.now() && session.lastAction?.actor === session.boss.name ? 'fight-card-pulse fight-vibrate' : '';
+    const preview = session.lastPreview || getBossPreview(session);
+    if (preview) {
+        session.lastPreview = preview;
+    }
+    const previewTarget = preview;
+    const bossArrow = previewTarget && session.phase === 'boss' ? `<span class="fight-target-arrow">↦ ${previewTarget.target}</span>` : '';
+    const bossStats = `HP ${Math.max(0, session.boss.currentHp)} • ATK ${session.boss.atk} • DEF ${session.boss.def}`;
+    elements.fightBoss.innerHTML = `
+        <div class="fight-boss-card ${session.currentActor?.name === session.boss.name ? 'active' : ''} ${bossDamageFlash} ${bossHighlight}">
+            ${bossArrow}
+            <div class="fight-unit-row">
+                <div class="fight-avatar">
+                    ${bossAvatarUrl ? `<img src="${bossAvatarUrl}" alt="${session.boss.name}">` : '<div class="fight-avatar-placeholder"></div>'}
+                </div>
+                <div class="fight-unit-body">
+                    <div class="fight-unit-header">
+                        <h3>${session.boss.name}</h3>
+                        <span class="fight-role">Boss</span>
+                    </div>
+                    <div class="fight-stats">${bossStats}</div>
+                </div>
+            </div>
+            <div class="fight-hp-bar">
+                <div class="fight-hp-fill ${bossHpPercent <= 35 ? 'warning' : ''} ${bossDamageFlash}" style="width: ${Math.max(0, bossHpPercent)}%"></div>
+                ${session.lastAction?.target === session.boss.name ? `<span class="fight-damage-badge">-${session.lastAction.amount}</span>` : ''}
+            </div>
+            <div class="fight-hp-label">${Math.max(0, session.boss.currentHp)} / ${session.boss.hpMax} HP</div>
+        </div>
+    `;
+
+    elements.fightParty.innerHTML = session.party.map(member => {
+        const hpPercent = (member.currentHp / member.hpMax) * 100;
+        const isActive = session.currentActor?.name === member.name;
+        const memberDamageFlash = session.lastAction?.target === member.name ? 'damage-flash' : '';
+        const memberHighlight = session.highlightUntil > Date.now() && session.lastAction?.target === member.name ? 'fight-card-pulse fight-vibrate' : '';
+        const avatarUrl = getFightUnitAvatar(member);
+        const targetArrow = previewTarget && session.phase === 'boss' && member.name === previewTarget.target ? '<span class="fight-target-arrow">↦</span>' : '';
+        const extraStats = [
+            member.thorns > 0 ? `THR ${member.thorns}` : null,
+            member.regen > 0 ? `REGEN ${member.regen}` : null,
+            member.healingOutput > 0 ? `HEAL ${member.healingOutput}` : null
+        ].filter(Boolean);
+        const statLabel = extraStats.length > 0 ? ` • ${extraStats.join(' • ')}` : '';
+        const damageBadge = session.lastAction && ['attack', 'boss', 'heal-attack', 'thorns'].includes(session.lastAction.type)
+            && session.lastAction.target === member.name
+            ? `<span class="fight-damage-badge">-${session.lastAction.amount}</span>`
+            : '';
+        const healBadge = (session.lastAction?.type === 'regen' || session.lastAction?.type === 'heal')
+            && session.lastAction.target === member.name
+            ? `<span class="fight-heal-badge">+${session.lastAction.amount}</span>`
+            : '';
+        return `
+            <div class="fight-member-card ${isActive ? 'active' : ''} ${memberDamageFlash} ${memberHighlight}">
+                ${targetArrow}
+                <div class="fight-unit-row">
+                    <div class="fight-avatar">
+                        ${avatarUrl ? `<img src="${avatarUrl}" alt="${member.name}">` : '<div class="fight-avatar-placeholder"></div>'}
+                    </div>
+                    <div class="fight-unit-body">
+                        <div class="fight-unit-header">
+                            <h3>${member.name}</h3>
+                            <span class="fight-role">${member.playerClass || 'Raider'}</span>
+                        </div>
+                        <div class="fight-stats">HP ${Math.max(0, member.currentHp)} • ATK ${member.atk} • DEF ${member.def}${statLabel}</div>
+                    </div>
+                </div>
+                <div class="fight-hp-bar">
+                    <div class="fight-hp-fill ${hpPercent <= 35 ? 'warning' : ''} ${memberDamageFlash}" style="width: ${Math.max(0, hpPercent)}%"></div>
+                    ${damageBadge}
+                    ${healBadge}
+                </div>
+                <div class="fight-hp-label">${Math.max(0, member.currentHp)} / ${member.hpMax} HP</div>
+            </div>
+        `;
+    }).join('');
+
+    elements.fightAbilityBar.innerHTML = session.phase === 'boss' ? `
+        <div class="fight-ability-preview">
+            <strong>${preview ? preview.abilityName : 'Boss Ability'}</strong>
+            ${preview ? ` → ${preview.target} for ${preview.amount} damage` : ''}
+        </div>
+        <div class="fight-ability-controls">
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'basic' ? 'active' : ''}" data-ability="basic">Basic</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'targeted' ? 'active' : ''}" data-ability="targeted" ${session.bossAbilityCooldown <= 0 ? '' : 'disabled'}>Targeted</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'aoe' ? 'active' : ''}" data-ability="aoe" ${session.bossAoeCooldown <= 0 ? '' : 'disabled'}>AoE</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'vamp' ? 'active' : ''}" data-ability="vamp" ${session.bossVampCooldown <= 0 ? '' : 'disabled'}>Vamp</button>
+        </div>
+        <span class="fight-ability-text">${preview?.type === 'targeted' ? `Targeted ready in ${session.bossAbilityCooldown}/${session.config.bossAbilityInterval} turns` : preview?.type === 'aoe' ? `AoE ready in ${session.bossAoeCooldown}/${session.config.bossAoeInterval} turns` : preview?.type === 'vamp' ? `Vamp ready in ${session.bossVampCooldown}/${session.config.bossVampInterval} turns` : 'Basic attack'}</span>
+    ` : '';
+
+    const recentLogs = (session.log || []).slice(-8);
+    elements.fightLog.innerHTML = recentLogs.length > 0
+        ? recentLogs.map(line => `<div class="fight-log-entry">${line}</div>`).join('')
+        : '<div class="fight-log-entry">No turns have been taken yet.</div>';
+
+    if (session.status !== 'ready') {
+        elements.btnRunFight.textContent = 'Restart Fight';
+    } else if (session.phase === 'setup') {
+        elements.btnRunFight.textContent = 'Start Fight';
     } else {
-        log.push('Boss wins! The raiders have been defeated.');
-        elements.fightSummary.textContent = 'Defeat! Boss remains standing.';
+        elements.btnRunFight.textContent = 'Next Turn';
     }
-    elements.fightLog.textContent = log.join('\n');
-    elements.fightLog.scrollTop = elements.fightLog.scrollHeight;
+};
+
+const handleBossAbilitySelection = (event) => {
+    const button = event.target.closest('[data-ability]');
+    if (!button || !state.fightSession || state.fightSession.phase !== 'boss') {
+        return;
+    }
+    const ability = button.getAttribute('data-ability');
+    if (!ability) {
+        return;
+    }
+    state.fightSession.bossSelectedAbility = ability;
+    if (ability === 'targeted' && state.fightSession.bossAbilityCooldown > 0) {
+        return;
+    }
+    if (ability === 'aoe' && state.fightSession.bossAoeCooldown > 0) {
+        return;
+    }
+    if (ability === 'vamp' && state.fightSession.bossVampCooldown > 0) {
+        return;
+    }
+    state.fightSession.lastPreview = getBossPreview(state.fightSession);
+    renderFightView();
+};
+
+const runFight = () => {
+    if (!FightModule) {
+        elements.fightSummary.textContent = 'Combat module unavailable.';
+        return;
+    }
+
+    if (!state.fightSession) {
+        if (state.scannedPlayers.length === 0) {
+            elements.fightSummary.textContent = 'Scan at least one raider before fighting.';
+            return;
+        }
+        const boss = createBossProfile();
+        const party = state.scannedPlayers.map(raider => ({ ...raider, currentHp: raider.hpMax, inventory: Array.isArray(raider.inventory) ? [...raider.inventory] : [] }));
+        state.fightSession = FightModule.createFightSession({ boss, party });
+    }
+
+    if (state.fightSession.status !== 'ready') {
+        const boss = createBossProfile();
+        const party = state.scannedPlayers.map(raider => ({ ...raider, currentHp: raider.hpMax, inventory: Array.isArray(raider.inventory) ? [...raider.inventory] : [] }));
+        state.fightSession = FightModule.createFightSession({ boss, party });
+    }
+
+    if (state.fightSession.phase === 'setup') {
+        state.fightSession.phase = 'boss';
+        state.fightSession.currentActor = { name: state.fightSession.boss.name, kind: 'boss', unit: state.fightSession.boss };
+        state.fightSession.lastAction = { type: 'setup', actor: state.fightSession.boss.name, target: null, amount: 0, detail: 'Ready' };
+        state.fightSession.lastPreview = getBossPreview(state.fightSession);
+        renderFightView();
+        return;
+    }
+
+    FightModule.advanceTurn(state.fightSession);
+    if (state.fightSession.lastAction && state.fightSession.lastAction.amount > 0) {
+        applyFightAnimation(state.fightSession, state.fightSession.lastAction.target, state.fightSession.lastAction.amount);
+    }
+    renderFightView();
 };
 
 const activateBossScan = () => {
@@ -1506,14 +1762,18 @@ const initialize = async () => {
     elements.scanStatus.textContent = "Reviewing Scanned Raid Party";
     elements.scanStatus.style.color = "#7dd3fc"; // Change text to your theme's info blue
 });
+    elements.fightAbilityBar.addEventListener('click', handleBossAbilitySelection);
+
     elements.btnStartFight.addEventListener('click', () => {
         if (state.scannedPlayers.length === 0) {
             elements.profileMessage.textContent = 'Scan raiders before starting the fight.';
             return;
         }
+        const boss = createBossProfile();
+        const party = state.scannedPlayers.map(raider => ({ ...raider, currentHp: raider.hpMax, inventory: Array.isArray(raider.inventory) ? [...raider.inventory] : [] }));
+        state.fightSession = FightModule ? FightModule.createFightSession({ boss, party }) : null;
         showScreen('fight');
-        elements.fightSummary.textContent = `Ready to fight ${state.scannedPlayers.length} raider(s).`;
-        elements.fightLog.textContent = '';
+        renderFightView();
     });
     elements.btnRunFight.addEventListener('click', runFight);
 

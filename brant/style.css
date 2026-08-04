@@ -9,6 +9,21 @@ body {
     font-family: Inter, Arial, sans-serif;
     background: radial-gradient(circle at top, #2a1a40 0%, #0b0814 55%, #050304 100%);
     color: #f5f2f8;
+    transition: background 0.35s ease, color 0.35s ease;
+}
+
+body.fight-boss-phase {
+    background: radial-gradient(circle at top, #4c0c13 0%, #22060b 55%, #090203 100%);
+    color: #fff4f4;
+}
+
+body.fight-boss-phase .panel {
+    border-color: rgba(255, 143, 143, 0.24);
+    box-shadow: 0 24px 80px rgba(120, 0, 0, 0.35);
+}
+
+body.fight-boss-phase button {
+    border-color: #ff7d7d;
 }
 
 .page {
@@ -297,6 +312,275 @@ label {
     background: rgba(255,255,255,0.06);
     display: flex;
     justify-content: center;
+}
+
+.fight-arena {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.fight-boss-card,
+.fight-member-card {
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+}
+
+.fight-member-card.active,
+.fight-boss-card.active {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.4), 0 10px 24px rgba(251, 191, 36, 0.16);
+}
+
+.fight-unit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+.fight-role {
+    font-size: 0.8rem;
+    color: #c9b7ff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.fight-hp-bar {
+    height: 0.7rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    overflow: visible;
+    margin-bottom: 0.4rem;
+    position: relative;
+}
+
+.fight-hp-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    transition: width 0.3s ease, transform 0.2s ease;
+    overflow: hidden;
+}
+
+.fight-hp-fill.warning {
+    background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+.fight-hp-fill.damage-flash {
+    animation: hpFlash 0.45s ease;
+}
+
+.fight-hp-label {
+    font-size: 0.95rem;
+    color: #e7ddff;
+}
+
+.fight-unit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.fight-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 0.95rem;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+}
+
+.fight-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fight-unit-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.65rem;
+}
+
+.fight-stats {
+    font-size: 0.8rem;
+    color: #cfc7e8;
+    line-height: 1.35;
+}
+
+.fight-damage-badge {
+    position: absolute;
+    right: 0.25rem;
+    top: -0.15rem;
+    z-index: 3;
+    background: rgba(248, 113, 113, 0.96);
+    color: white;
+    border-radius: 999px;
+    padding: 0.18rem 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    animation: badgePop 0.5s ease;
+}
+
+.fight-heal-badge {
+    position: absolute;
+    right: 0.25rem;
+    top: -0.95rem;
+    z-index: 3;
+    background: rgba(34, 197, 94, 0.96);
+    color: white;
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    animation: badgePop 0.5s ease;
+}
+
+.fight-card-pulse {
+    animation: cardPulse 0.45s ease;
+}
+
+.fight-vibrate {
+    animation: shake 0.3s ease;
+}
+
+.fight-target-arrow {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    font-size: 1.1rem;
+    color: #fbbf24;
+    animation: targetPulse 0.8s ease infinite;
+}
+
+.fight-ability-bar {
+    margin: 1rem 0 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.fight-ability-controls {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.fight-ability-choice {
+    border-radius: 999px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.16);
+}
+
+.fight-ability-choice.active {
+    background: rgba(251, 191, 36, 0.24);
+    border-color: #fbbf24;
+}
+
+.fight-ability-choice:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.fight-ability-btn {
+    border-radius: 999px;
+    padding: 0.6rem 0.95rem;
+    min-width: auto;
+    background: rgba(251, 191, 36, 0.16);
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+.fight-ability-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.12);
+}
+
+.fight-ability-btn.ready {
+    border-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.24);
+}
+
+.fight-ability-text {
+    font-size: 0.95rem;
+    color: #d6caef;
+}
+
+.fight-log {
+    display: grid;
+    gap: 0.5rem;
+    min-height: 10rem;
+    max-height: 12rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.9rem 1rem;
+}
+
+@keyframes hpFlash {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(1.04); }
+    100% { transform: scaleX(1); }
+}
+
+@keyframes badgePop {
+    0% { transform: translateY(4px) scale(0.8); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes cardPulse {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes targetPulse {
+    0% { transform: translateX(0) scale(1); opacity: 0.8; }
+    50% { transform: translateX(5px) scale(1.1); opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 0.8; }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+.fight-turn-indicator {
+    padding: 0.8rem 1rem;
+    border-radius: 0.9rem;
+    background: rgba(157, 145, 255, 0.12);
+    border: 1px solid rgba(157, 145, 255, 0.22);
+    margin-top: 0.75rem;
+}
+
+.fight-log {
+    display: grid;
+    gap: 0.5rem;
+    min-height: 8rem;
+}
+
+.fight-log-entry {
+    border-left: 2px solid rgba(157, 145, 255, 0.45);
+    padding-left: 0.7rem;
+    line-height: 1.4;
 }
 
 .scan-stage {

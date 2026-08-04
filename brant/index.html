@@ -187,12 +187,19 @@
                 </div>
                 <div class="fight-card">
                     <p id="fight-summary"></p>
-                    <div id="fight-log" class="message"></div>
-                    <button id="btn-run-fight" class="secondary">Run Combat</button>
+                    <div id="fight-turn-indicator" class="fight-turn-indicator">No fight started yet.</div>
+                    <div id="fight-arena" class="fight-arena">
+                        <div id="fight-boss" class="fight-boss-card"></div>
+                        <div id="fight-party" class="fight-party"></div>
+                    </div>
+                    <div id="fight-ability-bar" class="fight-ability-bar"></div>
+                    <div id="fight-log" class="message fight-log"></div>
+                    <button id="btn-run-fight" class="secondary">Start Fight</button>
                 </div>
             </div>
         </section>
     </main>
+    <script src="fight.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
