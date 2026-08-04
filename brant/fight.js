@@ -7,9 +7,9 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     const defaultConfig = {
         bossAbilityNames: ['Ground Slam', 'Arcane Pulse', 'Shadow Burst'],
-        bossAbilityInterval: 5,
+        bossAbilityInterval: 2,
         bossAoeInterval: 3,
-        bossVampInterval: 4
+        bossVampInterval: 2
     };
 
     const createFightSession = ({ boss, party, config = {} }) => {
@@ -51,6 +51,7 @@
             bossSelectedAbility: 'basic',
             bossAbilityTargetName: null,
             bossTargetCursor: 0,
+            bossPreviewTargetName: null,
             highlightUntil: 0
         };
         return session;
@@ -121,28 +122,39 @@
         if (aliveParty.length === 0) {
             return null;
         }
+        if (session.bossPreviewTargetName) {
+            const cachedTarget = aliveParty.find(member => member.name === session.bossPreviewTargetName);
+            if (cachedTarget && cachedTarget.currentHp > 0) {
+                return cachedTarget;
+            }
+        }
         if (abilityType === 'targeted') {
             const cursor = Number.isInteger(session.bossTargetCursor) ? session.bossTargetCursor : 0;
             const target = aliveParty[cursor % aliveParty.length] || aliveParty[0];
             session.bossTargetCursor = (cursor + 1) % aliveParty.length;
+            session.bossPreviewTargetName = target.name;
             session.bossAbilityTargetName = target.name;
             return target;
         }
         const tanks = aliveParty.filter(member => member.playerClass === 'tank');
         if (tanks.length > 0 && Math.random() < 0.75) {
-            return tanks.reduce((lowest, candidate) => {
+            const target = tanks.reduce((lowest, candidate) => {
                 if (!lowest) {
                     return candidate;
                 }
                 return candidate.currentHp < lowest.currentHp ? candidate : lowest;
             }, null);
+            session.bossPreviewTargetName = target.name;
+            return target;
         }
-        return aliveParty.reduce((lowest, candidate) => {
+        const target = aliveParty.reduce((lowest, candidate) => {
             if (!lowest) {
                 return candidate;
             }
             return candidate.currentHp < lowest.currentHp ? candidate : lowest;
         }, null);
+        session.bossPreviewTargetName = target.name;
+        return target;
     };
 
     const applyThornsRetaliation = (session, attacker, defender) => {
@@ -246,11 +258,15 @@
                 bossAbilityReady: true
             };
         } else if (abilityToUse === 'aoe') {
+            const aoeValues = aliveRaiders.map(raider => calculatePredictedDamage(session.boss, raider));
+            const minDamage = Math.max(1, Math.min(...aoeValues));
+            const maxDamage = Math.max(...aoeValues);
             preview = {
                 type: 'aoe',
                 actor: session.boss.name,
                 target: 'All Raiders',
                 amount: Math.max(1, Math.round(baseDamage / partySize)),
+                amountRange: { min: minDamage, max: maxDamage },
                 abilityName: 'AoE Attack',
                 bossAbilityReady: false
             };
@@ -259,7 +275,7 @@
                 type: 'vamp',
                 actor: session.boss.name,
                 target: target.name,
-                amount: Math.max(1, Math.round(baseDamage * 0.3)),
+                amount: Math.max(1, Math.round(baseDamage * 0.85)),
                 abilityName: 'Vamp Attack',
                 bossAbilityReady: false
             };
@@ -314,12 +330,11 @@
             session.bossVampCooldown = Math.max(0, session.bossVampCooldown - 1);
             return;
         } else if (abilityToUse === 'vamp') {
-            const baseDamage = calculatePredictedDamage(session.boss, target);
             const result = calculateDamageResult(session.boss, target);
-            damage = result.damage;
+            damage = Math.max(1, Math.round(result.damage * 0.85));
             crit = result.crit;
             detail = 'Vamp Attack';
-            healAmount = Math.max(1, Math.round(damage * 0.5));
+            healAmount = Math.max(1, Math.round(damage * 0.3));
             const previousHp = target.currentHp;
             target.currentHp = Math.max(0, target.currentHp - damage);
             const critSuffix = crit ? ' (critical)' : '';

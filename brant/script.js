@@ -1514,18 +1514,31 @@ const renderFightView = () => {
         `;
     }).join('');
 
+    const getAbilityButtonLabel = (abilityKey, cooldown) => {
+        if (abilityKey === 'basic') {
+            return 'Basic';
+        }
+        const labels = {
+            targeted: 'Targeted',
+            aoe: 'AoE',
+            vamp: 'Vamp'
+        };
+        const base = labels[abilityKey] || abilityKey;
+        return cooldown > 0 ? `${base} (${cooldown})` : base;
+    };
+
     elements.fightAbilityBar.innerHTML = session.phase === 'boss' ? `
         <div class="fight-ability-preview">
             <strong>${preview ? preview.abilityName : 'Boss Ability'}</strong>
-            ${preview ? ` → ${preview.target} for ${preview.amount} damage` : ''}
+            ${preview ? ` → ${preview.target} for ${preview.type === 'aoe' && preview.amountRange ? `${preview.amountRange.min}-${preview.amountRange.max}` : preview.amount} damage` : ''}
         </div>
         <div class="fight-ability-controls">
             <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'basic' ? 'active' : ''}" data-ability="basic">Basic</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'targeted' ? 'active' : ''}" data-ability="targeted" ${session.bossAbilityCooldown <= 0 ? '' : 'disabled'}>Targeted</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'aoe' ? 'active' : ''}" data-ability="aoe" ${session.bossAoeCooldown <= 0 ? '' : 'disabled'}>AoE</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'vamp' ? 'active' : ''}" data-ability="vamp" ${session.bossVampCooldown <= 0 ? '' : 'disabled'}>Vamp</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'targeted' ? 'active' : ''}" data-ability="targeted" ${session.bossAbilityCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('targeted', session.bossAbilityCooldown)}</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'aoe' ? 'active' : ''}" data-ability="aoe" ${session.bossAoeCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('aoe', session.bossAoeCooldown)}</button>
+            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'vamp' ? 'active' : ''}" data-ability="vamp" ${session.bossVampCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('vamp', session.bossVampCooldown)}</button>
         </div>
-        <span class="fight-ability-text">${preview?.type === 'targeted' ? `Targeted ready in ${session.bossAbilityCooldown}/${session.config.bossAbilityInterval} turns` : preview?.type === 'aoe' ? `AoE ready in ${session.bossAoeCooldown}/${session.config.bossAoeInterval} turns` : preview?.type === 'vamp' ? `Vamp ready in ${session.bossVampCooldown}/${session.config.bossVampInterval} turns` : 'Basic attack'}</span>
+        <span class="fight-ability-text">${preview ? preview.abilityName : 'Basic attack'}</span>
     ` : '';
 
     const recentLogs = (session.log || []).slice(-8);
