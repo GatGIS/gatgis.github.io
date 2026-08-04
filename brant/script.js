@@ -1292,7 +1292,7 @@ const createBossProfile = () => {
 };
 
 const calculateDamage = (attacker, defender) => {
-    const base = attacker.atk * (attacker.atk / (attacker.atk + defender.def));
+    const base = attacker.atk * (attacker.atk / (attacker.atk + defender.def * 1.25)) * 0.72;
     const variation = 0.9 + Math.random() * 0.2;
     let damage = Math.round(base * variation);
     if (attacker.rage) {
@@ -1352,10 +1352,20 @@ const getBossPreview = (session) => {
     const target = abilityToUse === 'targeted'
         ? (() => {
             const cursor = Number.isInteger(session.bossTargetCursor) ? session.bossTargetCursor : 0;
-            const selected = aliveRaiders[cursor % aliveRaiders.length] || aliveRaiders[0];
-            session.bossTargetCursor = (cursor + 1) % aliveRaiders.length;
-            session.bossAbilityTargetName = selected.name;
-            return selected;
+            const partyLength = Math.max(1, Array.isArray(session.party) ? session.party.length : 0);
+            const startIndex = cursor % partyLength;
+            let selected = null;
+            for (let offset = 0; offset < partyLength; offset += 1) {
+                const candidateIndex = (startIndex + offset) % partyLength;
+                const candidate = session.party[candidateIndex];
+                if (candidate && candidate.currentHp > 0) {
+                    selected = candidate;
+                    session.bossTargetCursor = (candidateIndex + 1) % partyLength;
+                    session.bossAbilityTargetName = selected.name;
+                    break;
+                }
+            }
+            return selected || aliveRaiders[0] || null;
         })()
         : (() => {
             const tanks = aliveRaiders.filter(member => member.playerClass === 'tank');
@@ -1378,37 +1388,55 @@ const getBossPreview = (session) => {
         return null;
     }
 
-    const predictedDamage = Math.max(1, Math.round(session.boss.atk * (session.boss.atk / (session.boss.atk + target.def))));
+    const baseDamage = Math.max(1, Math.round(session.boss.atk * (session.boss.atk / (session.boss.atk + target.def * 1.25)) * 0.72));
+    const minDamage = Math.max(1, Math.round(baseDamage * 0.9));
+    const maxDamage = Math.max(1, Math.round(baseDamage * 1.1));
     const partySize = Math.max(1, aliveRaiders.length);
 
     if (abilityToUse === 'targeted') {
+        const targetedBounds = {
+            min: Math.max(1, Math.round(minDamage * 1.2)),
+            max: Math.max(1, Math.round(maxDamage * 1.2))
+        };
         return {
             type: 'targeted',
             target: target.name,
-            amount: Math.max(1, Math.round(predictedDamage * 1.2)),
+            amount: Math.round((targetedBounds.min + targetedBounds.max) / 2),
+            amountRange: targetedBounds,
             abilityName: 'Targeted Attack'
         };
     }
     if (abilityToUse === 'aoe') {
+        const aoeBounds = {
+            min: Math.max(1, Math.round(minDamage / partySize)),
+            max: Math.max(1, Math.round(maxDamage / partySize))
+        };
         return {
             type: 'aoe',
             target: 'All Raiders',
-            amount: Math.max(1, Math.round(predictedDamage / partySize)),
+            amount: Math.round((aoeBounds.min + aoeBounds.max) / 2),
+            amountRange: aoeBounds,
             abilityName: 'AoE Attack'
         };
     }
     if (abilityToUse === 'vamp') {
+        const vampBounds = {
+            min: Math.max(1, Math.round(minDamage * 0.85)),
+            max: Math.max(1, Math.round(maxDamage * 0.85))
+        };
         return {
             type: 'vamp',
             target: target.name,
-            amount: Math.max(1, Math.round(predictedDamage * 0.3)),
+            amount: Math.round((vampBounds.min + vampBounds.max) / 2),
+            amountRange: vampBounds,
             abilityName: 'Vamp Attack'
         };
     }
     return {
         type: 'basic',
         target: target.name,
-        amount: predictedDamage,
+        amount: Math.round((minDamage + maxDamage) / 2),
+        amountRange: { min: minDamage, max: maxDamage },
         abilityName: 'Basic Attack'
     };
 };
@@ -1438,16 +1466,37 @@ const renderFightView = () => {
     const bossAvatarUrl = getFightUnitAvatar(session.boss);
     const bossDamageFlash = session.lastAction?.target === session.boss.name ? 'damage-flash' : '';
     const bossHighlight = session.highlightUntil > Date.now() && session.lastAction?.actor === session.boss.name ? 'fight-card-pulse fight-vibrate' : '';
-    const preview = session.lastPreview || getBossPreview(session);
+    const previewTurn = (session.turnNumber || 0) + 1;
+    const preferredAbility = session.bossSelectedAbility || 'basic';
+    const currentPreviewAbility = preferredAbility === 'targeted' && session.bossAbilityCooldown <= 0
+        ? 'targeted'
+        : preferredAbility === 'aoe' && session.bossAoeCooldown <= 0
+            ? 'aoe'
+            : preferredAbility === 'vamp' && session.bossVampCooldown <= 0
+                ? 'vamp'
+                : session.bossAbilityCooldown <= 0
+                    ? 'targeted'
+                    : session.bossAoeCooldown <= 0
+                        ? 'aoe'
+                        : session.bossVampCooldown <= 0
+                            ? 'vamp'
+                            : 'basic';
+    const currentPreviewKey = `${previewTurn}:${session.boss.name}:${currentPreviewAbility}:${preferredAbility}`;
+    const shouldReusePreview = currentPreviewAbility !== 'targeted'
+        && session.lastPreview
+        && session.lastPreview.turn === previewTurn
+        && session.lastPreview.actor === session.boss.name
+        && session.lastPreview.previewKey === currentPreviewKey;
+    const preview = shouldReusePreview
+        ? session.lastPreview
+        : getBossPreview(session);
     if (preview) {
         session.lastPreview = preview;
     }
     const previewTarget = preview;
-    const bossArrow = previewTarget && session.phase === 'boss' ? `<span class="fight-target-arrow">↦ ${previewTarget.target}</span>` : '';
     const bossStats = `HP ${Math.max(0, session.boss.currentHp)} • ATK ${session.boss.atk} • DEF ${session.boss.def}`;
     elements.fightBoss.innerHTML = `
         <div class="fight-boss-card ${session.currentActor?.name === session.boss.name ? 'active' : ''} ${bossDamageFlash} ${bossHighlight}">
-            ${bossArrow}
             <div class="fight-unit-row">
                 <div class="fight-avatar">
                     ${bossAvatarUrl ? `<img src="${bossAvatarUrl}" alt="${session.boss.name}">` : '<div class="fight-avatar-placeholder"></div>'}
@@ -1474,7 +1523,8 @@ const renderFightView = () => {
         const memberDamageFlash = session.lastAction?.target === member.name ? 'damage-flash' : '';
         const memberHighlight = session.highlightUntil > Date.now() && session.lastAction?.target === member.name ? 'fight-card-pulse fight-vibrate' : '';
         const avatarUrl = getFightUnitAvatar(member);
-        const targetArrow = previewTarget && session.phase === 'boss' && member.name === previewTarget.target ? '<span class="fight-target-arrow">↦</span>' : '';
+        const targetArrow = previewTarget && session.phase === 'boss' && member.name === previewTarget.target ? '<span class="fight-target-arrow" aria-label="Targeted"></span>' : '';
+        const isTargeted = previewTarget && session.phase === 'boss' && member.name === previewTarget.target;
         const extraStats = [
             member.thorns > 0 ? `THR ${member.thorns}` : null,
             member.regen > 0 ? `REGEN ${member.regen}` : null,
@@ -1490,7 +1540,7 @@ const renderFightView = () => {
             ? `<span class="fight-heal-badge">+${session.lastAction.amount}</span>`
             : '';
         return `
-            <div class="fight-member-card ${isActive ? 'active' : ''} ${memberDamageFlash} ${memberHighlight}">
+            <div class="fight-member-card ${isActive ? 'active' : ''} ${memberDamageFlash} ${memberHighlight} ${isTargeted ? 'targeted' : ''}">
                 ${targetArrow}
                 <div class="fight-unit-row">
                     <div class="fight-avatar">
@@ -1527,16 +1577,21 @@ const renderFightView = () => {
         return cooldown > 0 ? `${base} (${cooldown})` : base;
     };
 
+    const activeAbility = FightModule && typeof FightModule.getBossPreview === 'function'
+        ? (preview?.type === 'targeted' ? 'targeted' : preview?.type === 'aoe' ? 'aoe' : preview?.type === 'vamp' ? 'vamp' : 'basic')
+        : (session.bossSelectedAbility === 'basic' ? 'basic' : 'basic');
+    const previewDamageText = preview?.amountRange ? `${preview.amountRange.min}-${preview.amountRange.max}` : preview?.amount;
+
     elements.fightAbilityBar.innerHTML = session.phase === 'boss' ? `
         <div class="fight-ability-preview">
             <strong>${preview ? preview.abilityName : 'Boss Ability'}</strong>
-            ${preview ? ` → ${preview.target} for ${preview.type === 'aoe' && preview.amountRange ? `${preview.amountRange.min}-${preview.amountRange.max}` : preview.amount} damage` : ''}
+            ${preview ? ` → ${preview.target} for ${previewDamageText} damage` : ''}
         </div>
         <div class="fight-ability-controls">
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'basic' ? 'active' : ''}" data-ability="basic">Basic</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'targeted' ? 'active' : ''}" data-ability="targeted" ${session.bossAbilityCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('targeted', session.bossAbilityCooldown)}</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'aoe' ? 'active' : ''}" data-ability="aoe" ${session.bossAoeCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('aoe', session.bossAoeCooldown)}</button>
-            <button type="button" class="fight-ability-choice ${session.bossSelectedAbility === 'vamp' ? 'active' : ''}" data-ability="vamp" ${session.bossVampCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('vamp', session.bossVampCooldown)}</button>
+            <button type="button" class="fight-ability-choice ${activeAbility === 'basic' ? 'active' : ''}" data-ability="basic">Basic</button>
+            <button type="button" class="fight-ability-choice ${activeAbility === 'targeted' ? 'active' : ''}" data-ability="targeted" ${session.bossAbilityCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('targeted', session.bossAbilityCooldown)}</button>
+            <button type="button" class="fight-ability-choice ${activeAbility === 'aoe' ? 'active' : ''}" data-ability="aoe" ${session.bossAoeCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('aoe', session.bossAoeCooldown)}</button>
+            <button type="button" class="fight-ability-choice ${activeAbility === 'vamp' ? 'active' : ''}" data-ability="vamp" ${session.bossVampCooldown <= 0 ? '' : 'disabled'}>${getAbilityButtonLabel('vamp', session.bossVampCooldown)}</button>
         </div>
         <span class="fight-ability-text">${preview ? preview.abilityName : 'Basic attack'}</span>
     ` : '';
@@ -1545,6 +1600,7 @@ const renderFightView = () => {
     elements.fightLog.innerHTML = recentLogs.length > 0
         ? recentLogs.map(line => `<div class="fight-log-entry">${line}</div>`).join('')
         : '<div class="fight-log-entry">No turns have been taken yet.</div>';
+    elements.fightLog.scrollTop = elements.fightLog.scrollHeight;
 
     if (session.status !== 'ready') {
         elements.btnRunFight.textContent = 'Restart Fight';
@@ -1574,7 +1630,6 @@ const handleBossAbilitySelection = (event) => {
     if (ability === 'vamp' && state.fightSession.bossVampCooldown > 0) {
         return;
     }
-    state.fightSession.lastPreview = getBossPreview(state.fightSession);
     renderFightView();
 };
 

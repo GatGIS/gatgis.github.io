@@ -328,12 +328,24 @@ label {
     background: rgba(255,255,255,0.05);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .fight-member-card.active,
 .fight-boss-card.active {
     border-color: #fbbf24;
     box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.4), 0 10px 24px rgba(251, 191, 36, 0.16);
+    transform: translateY(-1px);
+}
+
+.fight-member-card.targeted {
+    border-color: #f87171;
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.42), 0 0 24px rgba(248, 113, 113, 0.2);
+}
+
+.fight-member-card.targeted .fight-avatar {
+    border-color: #fca5a5;
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.28);
 }
 
 .fight-unit-header {
@@ -457,10 +469,18 @@ label {
 .fight-target-arrow {
     position: absolute;
     top: 0.45rem;
-    right: 0.45rem;
-    font-size: 1.1rem;
-    color: #fbbf24;
+    left: 3.2rem;
+    font-size: 2rem;
+    line-height: 1;
+    color: #f87171;
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.75);
     animation: targetPulse 0.8s ease infinite;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.fight-target-arrow::before {
+    content: '✚';
 }
 
 .fight-ability-bar {
