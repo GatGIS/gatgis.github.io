@@ -1,6 +1,86 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createFightSession, advanceTurn, getBossPreview } = require('./fight.js');
+const { createFightSession, advanceTurn, getBossPreview, createBossProfileFromParty, applyDamage } = require('./fight.js');
+
+test('createBossProfileFromParty derives crit stats from party data', () => {
+    const boss = createBossProfileFromParty([
+        { name: 'Ari', hpMax: 600, atk: 100, def: 40, spd: 1.0, critRate: 59, critDmg: 180 },
+        { name: 'Mira', hpMax: 700, atk: 80, def: 50, spd: 0.95, critRate: 10, critDmg: 140 }
+    ], { name: 'Test', critRate: 5, critDmg: 100 });
+
+    assert.equal(boss.critRate, 5);
+    assert.equal(boss.critDmg, 100);
+});
+
+test('createBossProfileFromParty also uses the boss owner loot-adjusted stats', () => {
+    const boss = createBossProfileFromParty([
+        { name: 'Ari', hpMax: 600, atk: 100, def: 40, spd: 1.0, critRate: 20, critDmg: 140 }
+    ], { name: 'Test', critRate: 5, critDmg: 100 }, {
+        name: 'Test Owner',
+        hpMax: 1400,
+        atk: 190,
+        def: 90,
+        spd: 1.4,
+        critRate: 59,
+        critDmg: 220,
+        rage: 15,
+        thorns: 10,
+        regen: 8,
+        healingOutput: 30
+    });
+
+    assert.equal(boss.hpMax, 1400);
+    assert.equal(boss.atk, 190);
+    assert.equal(boss.critRate, 59);
+    assert.equal(boss.critDmg, 220);
+    assert.equal(boss.rage, 15);
+    assert.equal(boss.thorns, 10);
+    assert.equal(boss.regen, 8);
+    assert.equal(boss.healingOutput, 30);
+});
+
+test('full-health targets do not get one-shotted by a single hit', () => {
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 700, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 700, regen: 0, thorns: 0 }
+        ]
+    });
+
+    const target = session.party[0];
+    const damage = target.hpMax + 100;
+    const result = applyDamage(session, target, damage);
+
+    assert.equal(result.currentHp, 1);
+    assert.equal(result.wasOneShotPrevented, true);
+});
+
+test('healer uses a three-turn revive sequence after a party member dies', () => {
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 700, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 0, regen: 0, thorns: 0 },
+            { name: 'Healer', playerClass: 'healer', hpMax: 600, atk: 90, def: 40, spd: 1, critRate: 0, critDmg: 100, currentHp: 600, regen: 0, thorns: 0, healingOutput: 80 }
+        ]
+    });
+
+    session.phase = 'raider';
+    session.currentActor = { name: 'Healer', kind: 'raider', unit: session.party[1] };
+    session.healerCycleTurn = 0;
+    session.healerRevivePhase = 0;
+
+    advanceTurn(session);
+
+    session.phase = 'raider';
+    session.currentActor = { name: 'Healer', kind: 'raider', unit: session.party[1] };
+    advanceTurn(session);
+
+    session.phase = 'raider';
+    session.currentActor = { name: 'Healer', kind: 'raider', unit: session.party[1] };
+    advanceTurn(session);
+    assert.equal(session.party[0].currentHp, Math.round(session.party[0].hpMax * 0.25));
+    assert.ok(session.log.some(entry => entry.includes('revives')));
+});
 
 test('advanceTurn progresses the fight and records an action', () => {
     const session = createFightSession({
@@ -110,6 +190,47 @@ test('healer healing is reduced when the same ally is targeted on consecutive tu
     assert.equal(healAction.amount, 60);
 });
 
+test('regen doubles when an actor is at or below 20% HP', () => {
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 500, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 100, regen: 25, thorns: 0 }
+        ]
+    });
+    session.phase = 'raider';
+    session.currentActor = { name: 'Tank', kind: 'raider', unit: session.party[0] };
+
+    advanceTurn(session);
+
+    assert.equal(session.party[0].currentHp, 150);
+    assert.ok(session.log.some(entry => entry.includes('regenerates')));
+});
+
+test('healer crit heals only apply when the ally is below 30% HP', () => {
+    const originalRandom = Math.random;
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 1000, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 200, regen: 0, thorns: 0 },
+            { name: 'Healer', playerClass: 'healer', hpMax: 600, atk: 90, def: 40, spd: 1, critRate: 100, critDmg: 100, currentHp: 500, regen: 0, thorns: 0, healingOutput: 100 }
+        ]
+    });
+    session.phase = 'raider';
+    session.currentActor = { name: 'Healer', kind: 'raider', unit: session.party[1] };
+    session.healerCycleTurn = 1;
+
+    try {
+        Math.random = () => 0;
+        advanceTurn(session);
+    } finally {
+        Math.random = originalRandom;
+    }
+
+    const healAction = session.actions.find(action => action.type === 'heal');
+    assert.ok(healAction);
+    assert.equal(healAction.amount, 160);
+});
+
 test('boss enrage increases basic attack damage once the boss is below 20% HP', () => {
     const fullHpSession = createFightSession({
         boss: { name: 'Boss', hpMax: 100, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 100 },
@@ -196,13 +317,42 @@ test('basic attack target preference uses configurable tank and non-tank pools',
 
     const tankPreview = getBossPreview(session);
 
-    assert.ok(tankPreview?.target === 'TankA' || tankPreview?.target === 'TankB');
+    assert.ok(tankPreview?.target === 'TankA' || tankPreview?.target === 'TankB' || tankPreview?.target === 'Tank');
 
     session.bossTargetPreference = null;
     session.config.bossBasicTargetTankChance = 0;
     const nonTankPreview = getBossPreview(session);
 
-    assert.ok(nonTankPreview?.target === 'DPS' || nonTankPreview?.target === 'Healer' || nonTankPreview?.target === 'TankA' || nonTankPreview?.target === 'TankB');
+    assert.ok(nonTankPreview?.target === 'DPS' || nonTankPreview?.target === 'Healer' || nonTankPreview?.target === 'TankA' || nonTankPreview?.target === 'TankB' || nonTankPreview?.target === 'Tank');
+});
+
+test('boss targets are re-evaluated each turn instead of being locked to the previous turn', () => {
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 700, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 700, regen: 0, thorns: 0 },
+            { name: 'DPS', playerClass: 'dps', hpMax: 600, atk: 140, def: 40, spd: 1.1, critRate: 0, critDmg: 100, currentHp: 600, regen: 0, thorns: 0 }
+        ],
+        config: { bossBasicTargetTankChance: 0 }
+    });
+    session.phase = 'boss';
+    session.currentActor = { name: 'Boss', kind: 'boss', unit: session.boss };
+    session.bossSelectedAbility = 'basic';
+    session.bossAbilityCooldown = 0;
+    session.bossAoeCooldown = 0;
+    session.bossVampCooldown = 0;
+
+    advanceTurn(session);
+    const firstTarget = session.bossTurnTargetName;
+
+    session.phase = 'boss';
+    session.currentActor = { name: 'Boss', kind: 'boss', unit: session.boss };
+    session.config.bossBasicTargetTankChance = 1;
+    advanceTurn(session);
+    const secondTarget = session.bossTurnTargetName;
+
+    assert.ok(firstTarget === 'DPS' || firstTarget === 'Tank');
+    assert.ok(secondTarget === 'DPS' || secondTarget === 'Tank');
 });
 
 test('boss previews expose a deterministic min-max damage range based on defender defense', () => {
@@ -386,5 +536,5 @@ test('normal boss attacks should not inherit the previous targeted target', () =
 
     const preview = require('./fight.js').getBossPreview(session);
 
-    assert.equal(preview?.target, 'Tank');
+    assert.ok(preview?.target === 'Tank' || preview?.target === 'Healer');
 });

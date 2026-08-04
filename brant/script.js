@@ -1262,24 +1262,12 @@ const scanTick = () => {
 
 const createBossProfile = () => {
     const party = state.scannedPlayers;
-    const average = party.reduce((acc, player) => {
-        acc.hp += player.hpMax;
-        acc.atk += player.atk;
-        acc.def += player.def;
-        acc.spd += player.spd;
-        return acc;
-    }, { hp: 0, atk: 0, def: 0, spd: 0 });
-    const count = Math.max(1, party.length);
-    average.hp /= count;
-    average.atk /= count;
-    average.def /= count;
-    average.spd /= count;
-    const boss = {
+    const fallbackBoss = {
         name: `${state.player.name} (Boss)`,
-        hpMax: Math.max(1200, Math.round(average.hp * 1.25 + party.length * 45)),
-        atk: Math.max(120, Math.round(average.atk * 1.2 + party.length * 10)),
-        def: Math.max(80, Math.round(average.def * 1.2 + party.length * 6)),
-        spd: Math.max(0.85, Math.min(2.2, average.spd * 0.9 + 0.3)),
+        hpMax: 1200,
+        atk: 120,
+        def: 80,
+        spd: 1,
         critRate: 8,
         critDmg: 150,
         currentHp: 0,
@@ -1287,6 +1275,18 @@ const createBossProfile = () => {
         avatarSeed: state.player?.avatarSeed || state.avatarSeed || null,
         avatarStyle: state.player?.avatarStyle || state.avatarStyle || null
     };
+
+    const boss = FightModule && typeof FightModule.createBossProfileFromParty === 'function'
+        ? FightModule.createBossProfileFromParty(party, fallbackBoss, state.player)
+        : {
+            ...fallbackBoss,
+            currentHp: fallbackBoss.hpMax
+        };
+
+    boss.name = `${state.player.name} (Boss)`;
+    boss.avatarUrl = state.player?.avatarUrl || state.avatarUrl || null;
+    boss.avatarSeed = state.player?.avatarSeed || state.avatarSeed || null;
+    boss.avatarStyle = state.player?.avatarStyle || state.avatarStyle || null;
     boss.currentHp = boss.hpMax;
     return boss;
 };
