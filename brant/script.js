@@ -1482,8 +1482,7 @@ const renderFightView = () => {
                             ? 'vamp'
                             : 'basic';
     const currentPreviewKey = `${previewTurn}:${session.boss.name}:${currentPreviewAbility}:${preferredAbility}`;
-    const shouldReusePreview = currentPreviewAbility !== 'targeted'
-        && session.lastPreview
+    const shouldReusePreview = session.lastPreview
         && session.lastPreview.turn === previewTurn
         && session.lastPreview.actor === session.boss.name
         && session.lastPreview.previewKey === currentPreviewKey;
@@ -1493,7 +1492,7 @@ const renderFightView = () => {
     if (preview) {
         session.lastPreview = preview;
     }
-    const previewTarget = preview;
+    const previewTargetName = preview?.resolvedTargetName || preview?.target || null;
     const bossStats = `HP ${Math.max(0, session.boss.currentHp)} • ATK ${session.boss.atk} • DEF ${session.boss.def}`;
     elements.fightBoss.innerHTML = `
         <div class="fight-boss-card ${session.currentActor?.name === session.boss.name ? 'active' : ''} ${bossDamageFlash} ${bossHighlight}">
@@ -1523,8 +1522,8 @@ const renderFightView = () => {
         const memberDamageFlash = session.lastAction?.target === member.name ? 'damage-flash' : '';
         const memberHighlight = session.highlightUntil > Date.now() && session.lastAction?.target === member.name ? 'fight-card-pulse fight-vibrate' : '';
         const avatarUrl = getFightUnitAvatar(member);
-        const targetArrow = previewTarget && session.phase === 'boss' && member.name === previewTarget.target ? '<span class="fight-target-arrow" aria-label="Targeted"></span>' : '';
-        const isTargeted = previewTarget && session.phase === 'boss' && member.name === previewTarget.target;
+        const targetArrow = previewTargetName && session.phase === 'boss' && member.name === previewTargetName ? '<span class="fight-target-arrow" aria-label="Targeted"></span>' : '';
+        const isTargeted = previewTargetName && session.phase === 'boss' && member.name === previewTargetName;
         const extraStats = [
             member.thorns > 0 ? `THR ${member.thorns}` : null,
             member.regen > 0 ? `REGEN ${member.regen}` : null,
@@ -1620,6 +1619,7 @@ const handleBossAbilitySelection = (event) => {
     if (!ability) {
         return;
     }
+    const wasTargetedSelected = state.fightSession.bossSelectedAbility === 'targeted';
     state.fightSession.bossSelectedAbility = ability;
     if (ability === 'targeted' && state.fightSession.bossAbilityCooldown > 0) {
         return;
@@ -1630,6 +1630,11 @@ const handleBossAbilitySelection = (event) => {
     if (ability === 'vamp' && state.fightSession.bossVampCooldown > 0) {
         return;
     }
+
+    if (ability === 'targeted' && wasTargetedSelected) {
+        state.fightSession.lastPreview = null;
+    }
+
     renderFightView();
 };
 

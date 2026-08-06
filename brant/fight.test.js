@@ -401,7 +401,7 @@ test('changing the selected boss ability rebuilds the preview instead of reusing
     assert.equal(secondPreview?.type, 'targeted');
 });
 
-test('repeated targeted selections advance the target instead of reusing the same preview', () => {
+test('repeated targeted selections reuse the same target preview until the turn resolves', () => {
     const session = createFightSession({
         boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
         party: [
@@ -422,10 +422,10 @@ test('repeated targeted selections advance the target instead of reusing the sam
 
     assert.equal(firstPreview?.type, 'targeted');
     assert.equal(secondPreview?.type, 'targeted');
-    assert.notEqual(secondPreview?.target, firstPreview?.target);
+    assert.equal(secondPreview?.target, firstPreview?.target);
 });
 
-test('targeted previews advance the target on repeated lookups while the boss turn is still pending', () => {
+test('targeted previews stay stable on repeated lookups while the boss turn is still pending', () => {
     const session = createFightSession({
         boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
         party: [
@@ -447,7 +447,7 @@ test('targeted previews advance the target on repeated lookups while the boss tu
 
     assert.equal(firstPreview?.type, 'targeted');
     assert.equal(secondPreview?.type, 'targeted');
-    assert.notEqual(secondPreview?.target, firstPreview?.target);
+    assert.equal(secondPreview?.target, firstPreview?.target);
 });
 
 test('targeted previews skip dead raiders and continue in party order after a death', () => {
@@ -502,6 +502,34 @@ test('targeted previews use the same target as the actual attack and cycle throu
     const nextPreview = getBossPreview(session);
     assert.ok(nextPreview?.target);
     assert.ok(nextPreview?.resolvedTargetName || nextPreview?.target);
+});
+
+test('basic preview target matches the actual boss attack target for the same turn', () => {
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 900, atk: 120, def: 60, spd: 1, critRate: 0, critDmg: 100, currentHp: 900 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 750, atk: 85, def: 95, spd: 1, critRate: 0, critDmg: 100, currentHp: 750, regen: 0, thorns: 0 },
+            { name: 'DPS', playerClass: 'dps', hpMax: 620, atk: 145, def: 45, spd: 1.1, critRate: 0, critDmg: 100, currentHp: 620, regen: 0, thorns: 0 }
+        ],
+        config: {
+            bossBasicTargetTankChance: 1,
+            bossBasicTargetNonTankChance: 0
+        }
+    });
+    session.phase = 'boss';
+    session.currentActor = { name: 'Boss', kind: 'boss', unit: session.boss };
+    session.bossSelectedAbility = 'basic';
+    session.bossAbilityCooldown = 0;
+    session.bossAoeCooldown = 0;
+    session.bossVampCooldown = 0;
+
+    const preview = getBossPreview(session);
+    const previewTarget = preview?.resolvedTargetName || preview?.target;
+
+    advanceTurn(session);
+
+    assert.equal(session.lastAction?.type, 'boss');
+    assert.equal(session.lastAction?.target, previewTarget);
 });
 
 test('the healer can fall back to self-healing when it is the most injured ally', () => {

@@ -395,8 +395,7 @@
         const shouldReusePreview = session.lastPreview
             && session.lastPreview.turn === previewTurn
             && session.lastPreview.actor === session.boss.name
-            && session.lastPreview.previewKey === previewKey
-            && abilityToUse !== 'targeted';
+            && session.lastPreview.previewKey === previewKey;
         if (shouldReusePreview) {
             return session.lastPreview;
         }
@@ -474,6 +473,14 @@
             };
         }
         session.lastPreview = preview;
+        return preview;
+    };
+
+    const buildPreviewForCurrentTurn = (session) => {
+        const originalTurn = session.turnNumber || 0;
+        session.turnNumber = Math.max(0, originalTurn - 1);
+        const preview = buildPreview(session);
+        session.turnNumber = originalTurn;
         return preview;
     };
 
@@ -719,9 +726,9 @@
                 session.bossTurnTargetName = null;
                 session.bossAbilityTargetName = null;
             }
-            const previewForTurn = session.lastPreview?.turn === session.turnNumber && session.lastPreview?.type === 'targeted'
+            const previewForTurn = session.lastPreview?.turn === session.turnNumber
                 ? session.lastPreview
-                : buildPreview(session);
+                : buildPreviewForCurrentTurn(session);
             session.lastPreview = previewForTurn;
             applyBossAbility(session, previewForTurn);
             session.phase = 'raider';
