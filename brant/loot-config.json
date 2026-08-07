@@ -1,26 +1,34 @@
 [
   {
     "category": "Weapon",
-    "prefix": "Krusts",
+    "displayName": "Zobens",
+    "prefix": "Krusta",
+    "prefixes": ["Krustneša", "Asais", "Rudits", "Niknais", "Dzelzs"],
     "type": "Weapon",
     "icon": "🗡️"
   },
   {
     "category": "Armor",
+    "displayName": "Vairogs",
     "prefix": "Vairogs",
+    "prefixes": ["Smagais", "Sarga", "Stiprais", "Cietais"],
     "type": "Armor",
     "icon": "🛡️"
   },
   {
     "category": "Cup",
+    "displayName": "Kauss",
     "prefix": "Kauss",
+    "prefixes": ["Pilnais", "Dzirkstošs", "Vecais", "Rituālu"],
     "type": "Cup",
     "icon": "🍺"
   },
   {
     "category": "Helmet",
+    "displayName": "Ķivere",
     "prefix": "Cilts",
-    "type": "Armor",
+    "prefixes": ["Bērnu", "Sarga", "Ebreja", "Turbāna", "Plastmasas"],
+    "type": "Helmet",
     "icon": "🎩"
   }
 ]

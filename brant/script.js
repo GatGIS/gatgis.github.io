@@ -151,10 +151,10 @@ const defaultLocations = [
 ];
 
 const lootNames = [
-    {category: 'Weapon', prefix: 'Krusts'},
-    {category: 'Armor', prefix: 'Vairogs'},
-    {category: 'Cup', prefix: 'Kauss'},
-    {category: 'Helmet', prefix: 'Cepure'}
+    {category: 'Weapon', displayName: 'Weapon', prefix: 'Krusts', prefixes: ['Krusts', 'Asais', 'Dzelzs', 'Niknais']},
+    {category: 'Armor', displayName: 'Armor', prefix: 'Vairogs', prefixes: ['Vairogs', 'Smagais', 'Sargs', 'Neatlaidigais']},
+    {category: 'Cup', displayName: 'Cup', prefix: 'Kauss', prefixes: ['Kauss', 'Dzirkstoss', 'Pilnais', 'Vecais']},
+    {category: 'Helmet', displayName: 'Helmet', prefix: 'Cepure', prefixes: ['Cepure', 'Sarga', 'Biezais', 'Drosmiga']}
 ];
 
 const STORAGE_KEY = 'brant-save';
@@ -219,10 +219,40 @@ const getLootIcon = (category) => {
     return '✨';
 };
 
+const getLootPrefix = (itemType) => {
+    const configuredPrefixes = Array.isArray(itemType?.prefixes)
+        ? itemType.prefixes.filter(prefix => typeof prefix === 'string' && prefix.trim().length > 0)
+        : [];
+    if (configuredPrefixes.length > 0) {
+        return configuredPrefixes[randomBetween(0, configuredPrefixes.length - 1)].trim();
+    }
+    if (typeof itemType?.prefix === 'string' && itemType.prefix.trim().length > 0) {
+        return itemType.prefix.trim();
+    }
+    return '';
+};
+
+const getLootDisplayName = (itemType, fallbackName = '') => {
+    if (typeof itemType?.displayName === 'string' && itemType.displayName.trim().length > 0) {
+        return itemType.displayName.trim();
+    }
+    if (typeof itemType?.category === 'string' && itemType.category.trim().length > 0) {
+        return itemType.category.trim();
+    }
+    return fallbackName;
+};
+
 const getLootCategories = () => {
     const availableLoot = lootConfig.length > 0
         ? lootConfig
-        : lootNames.map(entry => ({ category: entry.category, prefix: entry.prefix, type: entry.category, icon: '' }));
+        : lootNames.map(entry => ({
+            category: entry.category,
+            displayName: entry.displayName,
+            prefix: entry.prefix,
+            prefixes: entry.prefixes,
+            type: entry.category,
+            icon: ''
+        }));
     const categories = [...new Set(availableLoot.map(item => item.category))];
     if (state.player?.playerClass === 'healer' && !categories.includes('Consumable')) {
         categories.push('Consumable');
@@ -621,14 +651,21 @@ const renderInventory = () => {
 const createLoot = (difficulty, forcedCategory = null) => {
     const availableLoot = lootConfig.length > 0
         ? lootConfig
-        : lootNames.map(entry => ({ category: entry.category, prefix: entry.prefix, type: entry.category, icon: '' }));
+        : lootNames.map(entry => ({
+            category: entry.category,
+            displayName: entry.displayName,
+            prefix: entry.prefix,
+            prefixes: entry.prefixes,
+            type: entry.category,
+            icon: ''
+        }));
     const itemPools = availableLoot.filter(entry => {
         return forcedCategory ? entry.category === forcedCategory : true;
     });
     const itemType = itemPools.length > 0
         ? itemPools[randomBetween(0, itemPools.length - 1)]
         : (forcedCategory === 'Consumable'
-            ? { category: 'Consumable', prefix: 'Heal', type: 'Consumable', icon: '🧪' }
+            ? { category: 'Consumable', displayName: 'Potion', prefix: 'Heal', type: 'Consumable', icon: '🧪' }
             : availableLoot[randomBetween(0, availableLoot.length - 1)]);
     const quality = randomBetween(difficulty + 1, difficulty + 4);
     const rarity = getLootRarity(quality);
@@ -690,8 +727,10 @@ const createLoot = (difficulty, forcedCategory = null) => {
         stats.critDmg = Math.round(quality * randomBetween(2, 4) * rarity.multiplier);
         stats.critRate = Math.round(randomBetween(1, 2) * quality * rarity.multiplier);
     }
+    const selectedPrefix = getLootPrefix(itemType);
+    const itemDisplayName = getLootDisplayName(itemType, categoryKey || itemType.category || 'Loot');
     const item = {
-        name: `${itemType.prefix} ${itemType.category}`,
+        name: selectedPrefix ? `${selectedPrefix} ${itemDisplayName}` : `${itemDisplayName}`,
         category: itemType.category,
         quality,
         rarityName: rarity.name,
