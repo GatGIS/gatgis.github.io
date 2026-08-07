@@ -60,6 +60,9 @@ const elements = {
     questionText: document.querySelector('#question-text'),
     questionOptions: document.querySelector('#question-options'),
     questionFeedback: document.querySelector('#question-feedback'),
+    answerResultFx: document.querySelector('#answer-result-fx'),
+    answerResultIcon: document.querySelector('#answer-result-icon'),
+    answerResultLabel: document.querySelector('#answer-result-label'),
     btnSubmitAnswer: document.querySelector('#btn-submit-answer'),
     btnBackLocations: document.querySelector('#btn-back-locations'),
 
@@ -206,6 +209,14 @@ const RARITY_TIERS = [
     { name: 'Legendary', className: 'rarity-legendary', multiplier: 1.7, min: 10, max: 99 }
 ];
 
+const MAX_SINGLE_ITEM_CRIT_RATE = 10;
+const MIN_HP_BONUS_PER_ITEM = 10;
+const MAX_TOTAL_CRIT_RATE = 65;
+const MAX_TOTAL_CRIT_DMG = 300;
+const MAX_TOTAL_THORNS = 120;
+const MAX_TOTAL_REGEN = 60;
+const MAX_TOTAL_SPD = 2.5;
+
 const getLootRarity = (quality) => {
     return RARITY_TIERS.find(tier => quality >= tier.min && quality <= tier.max) || RARITY_TIERS[0];
 };
@@ -337,6 +348,7 @@ const state = {
     fightRunning: false,
     fightLog: [],
     fightSession: null,
+    questionDraftAnswers: {},
     videoStream: null,
     avatarSeed: null,
     avatarStyle: null,
@@ -346,6 +358,30 @@ const state = {
 let locationMap = null;
 let locationMarkerGroup = null;
 let userLocationMarker = null;
+let answerResultFxTimer = null;
+
+const showAnswerResultAnimation = (correct) => {
+    if (!elements.answerResultFx || !elements.answerResultIcon || !elements.answerResultLabel) {
+        return;
+    }
+
+    if (answerResultFxTimer) {
+        clearTimeout(answerResultFxTimer);
+    }
+
+    elements.answerResultFx.classList.remove('show', 'success', 'failure');
+    elements.answerResultIcon.textContent = correct ? '✓' : '✕';
+    elements.answerResultLabel.textContent = correct ? 'Correct' : 'Wrong';
+    elements.answerResultFx.classList.add(correct ? 'success' : 'failure');
+
+    void elements.answerResultFx.offsetWidth;
+    elements.answerResultFx.classList.add('show');
+
+    answerResultFxTimer = setTimeout(() => {
+        elements.answerResultFx.classList.remove('show', 'success', 'failure');
+        answerResultFxTimer = null;
+    }, 920);
+};
 
 const showScreen = (key) => {
     Object.values(screens).forEach(screen => screen.classList.remove('active'));
@@ -535,6 +571,7 @@ const resetPlayer = () => {
     state.visitedLocationIds = [];
     state.currentLocation = null;
     state.pendingLoot = null;
+    state.questionDraftAnswers = {};
     state.fightLog.length = 0;
     state.debugMode = false;
     localStorage.removeItem(STORAGE_KEY);
@@ -681,15 +718,18 @@ const createLoot = (difficulty, forcedCategory = null) => {
     };
     const categoryKey = itemType.type || itemType.category;
     if (categoryKey === 'Weapon') {
-        stats.atk = Math.round(quality * randomBetween(6, 10) * rarity.multiplier);
-        stats.critRate = Math.round(randomBetween(1, 2) * quality * rarity.multiplier);
+        stats.atk = Math.round(quality * randomBetween(4, 7) * rarity.multiplier);
+        stats.critRate = Math.min(
+            MAX_SINGLE_ITEM_CRIT_RATE,
+            Math.round(randomBetween(1, 2) * quality * 0.45 * rarity.multiplier)
+        );
         stats.critDmg = Math.round(randomBetween(1, 2) * quality * rarity.multiplier);
         if (state.player?.playerClass === 'dps' && Math.random() < 0.25) {
             stats.rage = Math.round(quality * randomBetween(2, 4) * rarity.multiplier);
         }
     } else if (categoryKey === 'Armor') {
-        stats.def = Math.round(quality * randomBetween(5, 9) * rarity.multiplier);
-        stats.hp = Math.round(quality * randomBetween(4, 8) * rarity.multiplier);
+        stats.def = Math.round(quality * randomBetween(4, 8) * rarity.multiplier);
+        stats.hp = Math.round(quality * randomBetween(3, 7) * rarity.multiplier);
         const thornsChance = state.player?.playerClass === 'tank' ? 0.6 : 0;
         if (Math.random() < thornsChance) {
             stats.thorns = Math.round(quality * randomBetween(1, 3) * rarity.multiplier);
@@ -704,8 +744,8 @@ const createLoot = (difficulty, forcedCategory = null) => {
             stats.regen = rollRegen(rarity, 20);
         }
     } else if (categoryKey === 'Cup') {
-        stats.hp = Math.round(quality * randomBetween(4, 7) * rarity.multiplier);
-        stats.atk = Math.round(quality * randomBetween(2, 4) * rarity.multiplier);
+        stats.hp = Math.round(quality * randomBetween(3, 6) * rarity.multiplier);
+        stats.atk = Math.round(quality * randomBetween(2, 3) * rarity.multiplier);
     } else if (categoryKey === 'Consumable') {
         const healPower = Math.round(quality * randomBetween(4, 8) * rarity.multiplier);
         const regenValue = rollRegen(rarity, 20);
@@ -725,7 +765,13 @@ const createLoot = (difficulty, forcedCategory = null) => {
     } else {
         stats.spd = Number((quality * randomBetween(1, 2) * 0.05 * rarity.multiplier).toFixed(2));
         stats.critDmg = Math.round(quality * randomBetween(2, 4) * rarity.multiplier);
-        stats.critRate = Math.round(randomBetween(1, 2) * quality * rarity.multiplier);
+        stats.critRate = Math.min(
+            MAX_SINGLE_ITEM_CRIT_RATE,
+            Math.round(randomBetween(1, 2) * quality * 0.45 * rarity.multiplier)
+        );
+    }
+    if (stats.hp > 0) {
+        stats.hp = Math.max(MIN_HP_BONUS_PER_ITEM, stats.hp);
     }
     const selectedPrefix = getLootPrefix(itemType);
     const itemDisplayName = getLootDisplayName(itemType, categoryKey || itemType.category || 'Loot');
@@ -759,18 +805,18 @@ const applyLoot = (item) => {
     state.player.lootQuality += item.quality;
     if (item.type === 'healing') {
         state.player.healingOutput += item.heal;
-        state.player.regen = Math.max(0, (state.player.regen || 0) + (item.stats.regen || 0));
+        state.player.regen = Math.min(MAX_TOTAL_REGEN, Math.max(0, (state.player.regen || 0) + (item.stats.regen || 0)));
         return;
     }
     state.player.hpMax += item.stats.hp;
     state.player.atk += item.stats.atk;
     state.player.def += item.stats.def;
-    state.player.spd = Math.min(2.5, state.player.spd + item.stats.spd);
-    state.player.critRate += item.stats.critRate;
-    state.player.critDmg += item.stats.critDmg;
+    state.player.spd = Math.min(MAX_TOTAL_SPD, state.player.spd + item.stats.spd);
+    state.player.critRate = Math.min(MAX_TOTAL_CRIT_RATE, state.player.critRate + item.stats.critRate);
+    state.player.critDmg = Math.min(MAX_TOTAL_CRIT_DMG, state.player.critDmg + item.stats.critDmg);
     state.player.rage = Math.max(0, (state.player.rage || 0) + (item.stats.rage || 0));
-    state.player.thorns = Math.max(0, (state.player.thorns || 0) + (item.stats.thorns || 0));
-    state.player.regen = Math.max(0, (state.player.regen || 0) + (item.stats.regen || 0));
+    state.player.thorns = Math.min(MAX_TOTAL_THORNS, Math.max(0, (state.player.thorns || 0) + (item.stats.thorns || 0)));
+    state.player.regen = Math.min(MAX_TOTAL_REGEN, Math.max(0, (state.player.regen || 0) + (item.stats.regen || 0)));
     state.player.currentHp = Math.min(state.player.currentHp + Math.round(item.stats.hp * 0.4), state.player.hpMax);
 };
 
@@ -782,11 +828,13 @@ const scaleLoot = (item, multiplier) => {
         rarityName: getLootRarity(scaledQuality).name,
         rarityClass: getLootRarity(scaledQuality).className,
         stats: {
-            hp: Math.round(item.stats.hp * multiplier),
+            hp: item.stats.hp > 0
+                ? Math.max(MIN_HP_BONUS_PER_ITEM, Math.round(item.stats.hp * multiplier))
+                : 0,
             atk: Math.round(item.stats.atk * multiplier),
             def: Math.round(item.stats.def * multiplier),
             spd: Number((item.stats.spd * multiplier).toFixed(2)),
-            critRate: Math.round(item.stats.critRate * multiplier),
+            critRate: Math.min(MAX_SINGLE_ITEM_CRIT_RATE, Math.round(item.stats.critRate * multiplier)),
             critDmg: Math.round(item.stats.critDmg * multiplier),
             rage: Math.round(item.stats.rage * multiplier),
             thorns: Math.round(item.stats.thorns * multiplier),
@@ -817,6 +865,46 @@ const formatStatsLine = (stats) => {
     return lines.length > 0 ? lines.join(' • ') : 'No stat bonus';
 };
 
+const getStatCapWarning = (label, currentValue, bonusValue, capValue) => {
+    if (!Number.isFinite(currentValue) || !Number.isFinite(bonusValue) || !Number.isFinite(capValue) || bonusValue <= 0) {
+        return null;
+    }
+    const appliedValue = Math.min(capValue, currentValue + bonusValue);
+    const effectiveGain = Math.max(0, appliedValue - currentValue);
+    if (effectiveGain >= bonusValue) {
+        return null;
+    }
+    if (effectiveGain <= 0) {
+        return `${label} cap reached (${capValue})`;
+    }
+    return `${label} limited by cap: +${effectiveGain}/${bonusValue} (cap ${capValue})`;
+};
+
+const getLootCapWarnings = (item) => {
+    if (!item || !state.player) {
+        return [];
+    }
+
+    const warnings = [];
+    const stats = item.stats || {};
+    const capRules = [
+        { label: 'SPD', current: Number(state.player.spd || 0), bonus: Number(stats.spd || 0), cap: MAX_TOTAL_SPD },
+        { label: 'CRIT', current: Number(state.player.critRate || 0), bonus: Number(stats.critRate || 0), cap: MAX_TOTAL_CRIT_RATE },
+        { label: 'CDMG', current: Number(state.player.critDmg || 0), bonus: Number(stats.critDmg || 0), cap: MAX_TOTAL_CRIT_DMG },
+        { label: 'THORNS', current: Number(state.player.thorns || 0), bonus: Number(stats.thorns || 0), cap: MAX_TOTAL_THORNS },
+        { label: 'REGEN', current: Number(state.player.regen || 0), bonus: Number(stats.regen || 0), cap: MAX_TOTAL_REGEN }
+    ];
+
+    capRules.forEach(rule => {
+        const warning = getStatCapWarning(rule.label, rule.current, rule.bonus, rule.cap);
+        if (warning) {
+            warnings.push(warning);
+        }
+    });
+
+    return warnings;
+};
+
 const openLootChoice = (location, correct) => {
     const multiplier = correct ? 1.2 : 0.7;
     const label = correct ? 'Correct answer! Pick a boosted reward.' : 'Incorrect answer. Loot is reduced but still salvageable.';
@@ -833,15 +921,18 @@ const openLootChoice = (location, correct) => {
         const healingDetails = item.type === 'healing'
             ? `Heals ${item.heal} HP in boss fight${item.stats.regen ? ` • REGEN ${item.stats.regen}` : ''}`
             : formatStatsLine(item.stats);
+        const capWarnings = getLootCapWarnings(item);
         card.innerHTML = `
             <h3>${item.icon ? item.icon + ' ' : ''}${item.name}</h3>
             <p class="loot-rarity">${item.rarityName || rarity.name} • Quality ${item.quality}</p>
             <p>${healingDetails}</p>
+            ${capWarnings.length > 0 ? `<p class="loot-cap-warning">${capWarnings.join(' • ')}</p>` : ''}
             ${item.classBonusLabel ? `<p class="loot-bonus-label">${item.classBonusLabel}</p>` : ''}
             <button type="button" data-index="${index}">Choose this loot</button>
         `;
         card.querySelector('button').addEventListener('click', () => {
             applyLoot(item);
+            state.pendingLoot = null;
             savePlayer();
             updateProfileUI();
             buildLocationCards();
@@ -926,10 +1017,17 @@ const openQuestion = (location) => {
     state.currentLocation = location;
     elements.questionText.textContent = location.question;
     elements.questionOptions.innerHTML = '';
+    const savedAnswer = state.questionDraftAnswers?.[location.id];
     location.answers.forEach((answer, index) => {
         const label = document.createElement('label');
         label.className = 'option-item';
-        label.innerHTML = `<input type="radio" name="answer" value="${index}"><span>${answer}</span>`;
+        label.innerHTML = `<input type="radio" name="answer" value="${index}"${savedAnswer === index ? ' checked' : ''}><span>${answer}</span>`;
+        const input = label.querySelector('input[name="answer"]');
+        if (input) {
+            input.addEventListener('change', () => {
+                state.questionDraftAnswers[location.id] = index;
+            });
+        }
         elements.questionOptions.appendChild(label);
     });
     elements.questionFeedback.textContent = '';
@@ -955,6 +1053,7 @@ const handleAnswerSubmit = () => {
         return;
     }
     const correct = selectedIndex === location.correct;
+    delete state.questionDraftAnswers[location.id];
     location.visited = true;
     location.result = correct ? 'correct' : 'wrong';
     savePlayer();
@@ -962,6 +1061,7 @@ const handleAnswerSubmit = () => {
         ? 'Correct! Choose your loot from the options available.'
         : 'Incorrect answer. The reward is reduced, but still choose one salvage item.';
     elements.questionFeedback.style.color = correct ? '#c8f7c5' : '#f2a6a6';
+    showAnswerResultAnimation(correct);
     buildLocationCards();
     openLootChoice(location, correct);
 };
@@ -1814,7 +1914,13 @@ const initialize = async () => {
         showScreen('locations');
     });
 
-    elements.btnBackLoot.addEventListener('click', () => showScreen('locations'));
+    elements.btnBackLoot.addEventListener('click', () => {
+        if (state.pendingLoot?.items?.length) {
+            elements.lootMessage.textContent = 'Choose your loot first before leaving this screen.';
+            return;
+        }
+        showScreen('locations');
+    });
 
     elements.btnToggleDebug.addEventListener('click', () => {
         if (!state.debugMode) {
@@ -1840,6 +1946,12 @@ const initialize = async () => {
         showScreen('player');
     });
     elements.btnBackPlayer4.addEventListener('click', () => showScreen('player'));
+    elements.btnBackLocations.addEventListener('click', () => {
+        if (state.currentLocation && !state.currentLocation.visited) {
+            elements.locationStatus.textContent = `Question for ${state.currentLocation.name} is still open. Return to the location to finish it.`;
+        }
+        showScreen('locations');
+    });
 
     elements.btnSubmitAnswer.addEventListener('click', handleAnswerSubmit);
     elements.btnScanQr.addEventListener('click', activateBossScan);

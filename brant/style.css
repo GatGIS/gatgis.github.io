@@ -296,6 +296,88 @@ label {
     display: none !important;
 }
 
+.answer-result-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.answer-result-fx.success {
+    background: radial-gradient(circle at center, rgba(52, 211, 153, 0.2) 0%, rgba(12, 9, 22, 0) 58%);
+}
+
+.answer-result-fx.failure {
+    background: radial-gradient(circle at center, rgba(248, 113, 113, 0.2) 0%, rgba(12, 9, 22, 0) 58%);
+}
+
+.answer-result-badge {
+    min-width: 160px;
+    text-align: center;
+    border: 2px solid rgba(255,255,255,0.32);
+    border-radius: 1.25rem;
+    background: rgba(9, 8, 14, 0.86);
+    padding: 1rem 1.35rem;
+    box-shadow: 0 22px 50px rgba(0,0,0,0.45);
+}
+
+.answer-result-fx.success .answer-result-badge {
+    border-color: rgba(74, 222, 128, 0.7);
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25), 0 22px 50px rgba(0,0,0,0.45);
+}
+
+.answer-result-fx.failure .answer-result-badge {
+    border-color: rgba(248, 113, 113, 0.7);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.25), 0 22px 50px rgba(0,0,0,0.45);
+}
+
+.answer-result-icon {
+    font-size: clamp(3rem, 11vw, 4.8rem);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.answer-result-label {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e8e3f6;
+}
+
+.answer-result-fx.show {
+    animation: answerFxFade 900ms ease forwards;
+}
+
+.answer-result-fx.show .answer-result-badge {
+    animation: answerBadgePop 900ms cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+}
+
+.answer-result-fx.success .answer-result-icon {
+    color: #4ade80;
+}
+
+.answer-result-fx.failure .answer-result-icon {
+    color: #f87171;
+}
+
+@keyframes answerFxFade {
+    0% { opacity: 0; }
+    12% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes answerBadgePop {
+    0% { transform: scale(0.75); opacity: 0; }
+    22% { transform: scale(1.08); opacity: 1; }
+    68% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.92); opacity: 0; }
+}
+
 .top-bar {
     display: flex;
     justify-content: space-between;
@@ -859,6 +941,15 @@ footer {
 .loot-card p {
     margin: 0.45rem 0;
     color: #d7d1e1;
+}
+
+.loot-card .loot-cap-warning {
+    color: #ffd591;
+    border: 1px solid rgba(255, 213, 145, 0.4);
+    background: rgba(255, 174, 66, 0.12);
+    border-radius: 0.75rem;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.9rem;
 }
 
 .inventory-item {
