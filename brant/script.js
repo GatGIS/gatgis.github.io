@@ -345,6 +345,7 @@ const state = {
     currentLocation: null,
     debugMode: false,
     scannedPlayers: [],
+    lastScannedToken: null,
     fightRunning: false,
     fightLog: [],
     fightSession: null,
@@ -1177,6 +1178,30 @@ const normalizePlayerPayload = (raw) => {
     return payload;
 };
 
+const getPlayerScanSignature = (player) => {
+    if (!player) {
+        return '';
+    }
+    const signatureSource = {
+        name: player.name || '',
+        role: player.role || '',
+        playerClass: player.playerClass || '',
+        hpMax: Number(player.hpMax) || 0,
+        atk: Number(player.atk) || 0,
+        def: Number(player.def) || 0,
+        spd: Number(player.spd) || 0,
+        critRate: Number(player.critRate) || 0,
+        critDmg: Number(player.critDmg) || 0,
+        rage: Number(player.rage) || 0,
+        thorns: Number(player.thorns) || 0,
+        regen: Number(player.regen) || 0,
+        healingOutput: Number(player.healingOutput) || 0,
+        avatarSeed: player.avatarSeed || '',
+        avatarStyle: player.avatarStyle || ''
+    };
+    return JSON.stringify(signatureSource);
+};
+
 const parsePlayerToken = (token) => {
     if (!token || typeof token !== 'string') {
         return null;
@@ -1202,13 +1227,16 @@ const addScannedPlayer = (payload, rawToken = null) => {
         elements.scanStatus.textContent = 'QR does not contain a valid raider profile.';
         return;
     }
-    if (state.scannedPlayers.find(p => p.name === payload.name)) {
+    const normalizedToken = typeof rawToken === 'string' ? rawToken.trim() : '';
+    const payloadSignature = getPlayerScanSignature(payload);
+    if (state.scannedPlayers.some(player => getPlayerScanSignature(player) === payloadSignature)) {
         elements.scanStatus.textContent = `${payload.name} is already scanned.`;
         return;
     }
-    if (typeof rawToken === 'string' && rawToken.trim().length > 0) {
-        payload.token = rawToken.trim();
+    if (normalizedToken.length > 0) {
+        payload.token = normalizedToken;
     }
+    payload.signature = payloadSignature;
     if (payload.avatarSeed && payload.avatarStyle) {
         payload.avatarUrl = getAvatarUrl(payload.avatarStyle, payload.avatarSeed);
     }
@@ -1346,8 +1374,16 @@ const scanTick = () => {
 
         const payload = parsePlayerToken(code.data);
         if (payload) {
-            // Check if this specific player token has already been added to the game state
-            const isDuplicate = state.scannedPlayers && state.scannedPlayers.some(p => p.token === code.data || p.V === payload.V);
+            const currentToken = code.data.trim();
+            if (state.lastScannedToken === currentToken) {
+                window.setTimeout(() => requestAnimationFrame(scanTick), 250);
+                return;
+            }
+            state.lastScannedToken = currentToken;
+
+            // Check if this specific player profile has already been added to the game state
+            const payloadSignature = getPlayerScanSignature(payload);
+            const isDuplicate = state.scannedPlayers && state.scannedPlayers.some(p => getPlayerScanSignature(p) === payloadSignature);
             
             if (isDuplicate) {
                 // Update text to notify that they are already in the party
@@ -1800,6 +1836,7 @@ const runFight = () => {
 const activateBossScan = () => {
     showScreen('scan');
     renderScannedList();
+    state.lastScannedToken = null;
     
     // Ensure the camera wrapper is completely visible
     const stageContainer = document.querySelector('.scan-stage');
