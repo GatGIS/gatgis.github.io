@@ -1197,7 +1197,7 @@ const parsePlayerToken = (token) => {
     return normalizePlayerPayload(parsed);
 };
 
-const addScannedPlayer = (payload) => {
+const addScannedPlayer = (payload, rawToken = null) => {
     if (!payload || payload.role !== 'raider') {
         elements.scanStatus.textContent = 'QR does not contain a valid raider profile.';
         return;
@@ -1205,6 +1205,9 @@ const addScannedPlayer = (payload) => {
     if (state.scannedPlayers.find(p => p.name === payload.name)) {
         elements.scanStatus.textContent = `${payload.name} is already scanned.`;
         return;
+    }
+    if (typeof rawToken === 'string' && rawToken.trim().length > 0) {
+        payload.token = rawToken.trim();
     }
     if (payload.avatarSeed && payload.avatarStyle) {
         payload.avatarUrl = getAvatarUrl(payload.avatarStyle, payload.avatarSeed);
@@ -1352,7 +1355,7 @@ const scanTick = () => {
                 elements.scanStatus.style.color = "#fbbf24"; // Warning Orange/Yellow
             } else {
                 // Not a duplicate - register the player safely
-                addScannedPlayer(payload);
+                addScannedPlayer(payload, code.data);
                 
                 // Force-update the visual roster array right away so it renders below the camera
                 if (typeof renderScannedList === 'function') {
@@ -1367,29 +1370,8 @@ const scanTick = () => {
             elements.scanStatus.style.color = "#ef4444"; // Error Red
         }
 
-        // 2. Generate the floating prompt overlay button
-        const stageContainer = document.querySelector('.scan-stage');
-        const oldBtn = document.getElementById('btn-scan-next');
-        if (oldBtn) oldBtn.remove();
-
-        const nextBtn = document.createElement('button');
-        nextBtn.id = 'btn-scan-next';
-        nextBtn.textContent = '➕ Scan Next Raider';
-        nextBtn.className = 'scan-next-overlay-btn';
-        
-        // Button callback behavior
-        nextBtn.addEventListener('click', () => {
-            nextBtn.remove();
-            elements.scanStatus.textContent = "Scanning for Raiders...";
-            elements.scanStatus.style.color = "";
-            
-            // Re-fire the loop request sequence
-            requestAnimationFrame(scanTick);
-        });
-
-        stageContainer.appendChild(nextBtn);
-        
-        // Stop execution here to pause the loop camera frame until they click the action button
+        // Keep the camera loop alive so the next raider can be scanned immediately.
+        window.setTimeout(() => requestAnimationFrame(scanTick), 250);
         return;
     }
     
@@ -1958,7 +1940,7 @@ const initialize = async () => {
 
     elements.btnParseQr.addEventListener('click', () => {
         const payload = parsePlayerToken(elements.scanInput.value);
-        addScannedPlayer(payload);
+        addScannedPlayer(payload, elements.scanInput.value);
     });
     elements.btnGoLocationsBoss.addEventListener('click', () => {
         refreshUserLocation();
