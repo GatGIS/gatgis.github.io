@@ -19,6 +19,9 @@ const elements = {
     playerRoleInput: document.querySelector('#player-role'),
     playerClassInputs: document.querySelectorAll('input[name="player-class"]'),
     playerClassSelector: document.querySelector('.class-selector'),
+    btnClassInfo: document.querySelector('#btn-class-info'),
+    classInfoModal: document.querySelector('#class-info-modal'),
+    btnClassInfoClose: document.querySelector('#btn-class-info-close'),
     avatarPreview: document.querySelector('#avatar-preview'),
     btnRandomAvatar: document.querySelector('#btn-random-avatar'),
     playerAvatarImg: document.querySelector('#player-avatar-img'),
@@ -601,6 +604,22 @@ const clearStorageWithPassword = () => {
 const getSelectedPlayerClass = () => {
     const selected = document.querySelector('input[name="player-class"]:checked');
     return selected ? selected.value : 'dps';
+};
+
+const openClassInfoModal = () => {
+    if (!elements.classInfoModal) {
+        return;
+    }
+    elements.classInfoModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+};
+
+const closeClassInfoModal = () => {
+    if (!elements.classInfoModal) {
+        return;
+    }
+    elements.classInfoModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
 };
 
 const createNewPlayer = (name, role, playerClass) => {
@@ -1880,6 +1899,7 @@ const initialize = async () => {
         state.role = 'raider';
         elements.playerRoleInput.value = 'Raider';
         elements.playerClassSelector.classList.remove('hidden');
+        elements.btnClassInfo.classList.remove('hidden');
         elements.bossOnlyHint.classList.add('hidden');
         elements.setupForm.querySelector('button[type=submit]').textContent = 'Create Raider';
         showScreen('setup');
@@ -1889,9 +1909,24 @@ const initialize = async () => {
         state.role = 'boss';
         elements.playerRoleInput.value = 'Boss';
         elements.playerClassSelector.classList.add('hidden');
+        elements.btnClassInfo.classList.add('hidden');
+        closeClassInfoModal();
         elements.bossOnlyHint.classList.remove('hidden');
         elements.setupForm.querySelector('button[type=submit]').textContent = 'Create Boss';
         showScreen('setup');
+    });
+
+    elements.btnClassInfo.addEventListener('click', openClassInfoModal);
+    elements.btnClassInfoClose.addEventListener('click', closeClassInfoModal);
+    elements.classInfoModal.addEventListener('click', (event) => {
+        if (event.target === elements.classInfoModal) {
+            closeClassInfoModal();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !elements.classInfoModal.classList.contains('hidden')) {
+            closeClassInfoModal();
+        }
     });
 
     elements.btnBackWelcome.addEventListener('click', () => showScreen('welcome'));

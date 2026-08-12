@@ -30,7 +30,10 @@
                     <input id="player-name" type="text" maxlength="15" required>
                     <label for="player-role">Role</label>
                     <input id="player-role" type="text" disabled>
-                    <label>Class</label>
+                    <div class="class-label-row">
+                        <label>Class</label>
+                        <button id="btn-class-info" class="secondary small" type="button">Class and Healer Info</button>
+                    </div>
                     <div class="class-selector">
                         <label><input type="radio" name="player-class" value="dps" checked> ⚔️ DPS <span>HP 650, ATK 105, DEF 45, SPD 1.10, CRIT 13%, CDMG 150, Rage 25</span></label>
                         <label><input type="radio" name="player-class" value="tank"> 🛡️ Tank <span>HP 780, ATK 80, DEF 60, SPD 0.95, CRIT 6%, CDMG 130, Thorns 25</span></label>
@@ -199,6 +202,64 @@
             </div>
         </section>
     </main>
+    <div id="class-info-modal" class="class-info-modal hidden" role="dialog" aria-modal="true" aria-labelledby="class-info-title">
+        <div class="class-info-card">
+            <div class="class-info-header">
+                <h3 id="class-info-title">Raider Class Guide</h3>
+                <button id="btn-class-info-close" class="secondary small" type="button" aria-label="Close class guide">Close</button>
+            </div>
+            <p class="class-info-lead">How classes play in the fight, what healer does each turn, and what loot each class is best at finding.</p>
+
+            <h4>Core Stat Meanings</h4>
+            <ul class="class-info-list">
+                <li><strong>HP</strong>: Max health. If this reaches 0, the raider is down.</li>
+                <li><strong>ATK</strong>: Base outgoing damage.</li>
+                <li><strong>DEF</strong>: Damage reduction in damage formula.</li>
+                <li><strong>SPD</strong>: Speed stat used in scaling and fight setup.</li>
+                <li><strong>CRIT %</strong>: Chance to critically strike and boost output.</li>
+                <li><strong>CRIT DMG</strong>: Critical damage/heal multiplier strength.</li>
+                <li><strong>Rage</strong>: Extra damage multiplier for DPS-style hits.</li>
+                <li><strong>Thorns</strong>: Reflect damage when hit.</li>
+                <li><strong>Regen</strong>: Self-heal after own action.</li>
+                <li><strong>Heal</strong>: Healer's direct healing power.</li>
+            </ul>
+
+            <h4>Class Roles and Base Stats</h4>
+            <ul class="class-info-list">
+                <li><strong>DPS</strong>: HP 650, ATK 105, DEF 45, SPD 1.10, CRIT 13%, CRIT DMG 150, Rage 25. Best raw damage and crit pressure.</li>
+                <li><strong>Tank</strong>: HP 780, ATK 80, DEF 60, SPD 0.95, CRIT 6%, CRIT DMG 130, Thorns 25. Soaks hits, punishes boss with thorns, and is more likely to be targeted by basic boss attacks.</li>
+                <li><strong>Healer</strong>: HP 620, ATK 75, DEF 45, SPD 1.00, CRIT 8%, CRIT DMG 140, Heal 50. Hybrid support that still attacks.</li>
+            </ul>
+
+            <h4>Important Fight Rules</h4>
+            <ul class="class-info-list">
+                <li><strong>Tank aggro tendency</strong>: Boss basic targeting is weighted to tanks (about 70% tank / 30% non-tank when possible).</li>
+                <li><strong>Thorns retaliation</strong>: If you hit a raider with Thorns, the attacker takes reflected damage immediately.</li>
+                <li><strong>Regen timing</strong>: Regen triggers after that raider acts. At 20% HP or lower, regen heals double.</li>
+                <li><strong>Boss enrage</strong>: When boss HP drops to 20% or less, boss damage increases by 50%.</li>
+                <li><strong>One-shot protection</strong>: A full-HP unit cannot be dropped from full to 0 in one hit; it survives at 1 HP.</li>
+            </ul>
+
+            <h4>Healer Turn Logic (Exact)</h4>
+            <ul class="class-info-list">
+                <li><strong>When everyone is alive</strong>: Healer attacks every turn. Every second healer turn, it also heals the lowest-HP-ratio ally.</li>
+                <li><strong>If any ally is down</strong>: Healer enters a 3-step loop: heal, heal, then revive.</li>
+                <li><strong>Revive timing</strong>: The revive happens on every 3rd healer action while at least one ally is down.</li>
+                <li><strong>Revive amount</strong>: Revived ally returns at 25% of their max HP.</li>
+                <li><strong>Heal target rule</strong>: Heals the ally with the lowest HP ratio.</li>
+                <li><strong>Repeat-heal penalty</strong>: If healer heals the same target as last healer turn, heal amount is reduced to 75%.</li>
+                <li><strong>Critical heal rule</strong>: If target is at or below 30% HP, healer can critically heal based on healer CRIT % and CRIT DMG.</li>
+            </ul>
+
+            <h4>Class Loot Bias and Specials</h4>
+            <ul class="class-info-list">
+                <li><strong>DPS loot bias</strong>: More Weapons and Cups. Weapon drops can roll extra Rage (25% chance).</li>
+                <li><strong>Tank loot bias</strong>: More Armor and Helmets. Armor has 60% chance and Helmet has 50% chance to roll Thorns plus Regen.</li>
+                <li><strong>Healer loot bias</strong>: More Cups and Consumables. Healer can get Heal Potions that add healing power and Regen.</li>
+                <li><strong>Universal categories</strong>: Weapon, Armor, Helmet, Cup. Healer pool also includes Consumable by design.</li>
+            </ul>
+        </div>
+    </div>
     <div id="answer-result-fx" class="answer-result-fx" aria-hidden="true">
         <div class="answer-result-badge">
             <div id="answer-result-icon" class="answer-result-icon">✓</div>
