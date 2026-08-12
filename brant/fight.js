@@ -10,10 +10,16 @@
         bossAbilityInterval: 3,
         bossAoeInterval: 3,
         bossVampInterval: 3,
+        bossBaseHpMultiplier: 1.8,
+        bossBaseAtkMultiplier: 1.4,
+        bossBaseDefMultiplier: 1.25,
+        bossHpPerRaider: 0.16,
+        bossAtkPerRaider: 0.10,
+        bossDefPerRaider: 0.07,
         healerRepeatTargetPenalty: 0.75,
         healerRepeatTargetPenaltyBias: 0.08,
         bossEnrageThreshold: 0.20,
-        bossEnrageDamageMultiplier: 1.5,
+        bossEnrageDamageMultiplier: 1.8,
         bossBasicTargetTankChance: 0.70,
         bossBasicTargetNonTankChance: 0.30
     };
@@ -21,9 +27,15 @@
     const createFightSession = ({ boss, party, config = {} }) => {
         const mergedConfig = { ...defaultConfig, ...config };
         const partyCount = Math.max(1, Array.isArray(party) ? party.length : 0);
-        const hpMultiplier = 1 + (partyCount - 1) * 0.2;
-        const atkMultiplier = 1 + (partyCount - 1) * 0.11;
-        const defMultiplier = 1 + (partyCount - 1) * 0.08;
+        const hpBase = Number(mergedConfig.bossBaseHpMultiplier) || defaultConfig.bossBaseHpMultiplier;
+        const atkBase = Number(mergedConfig.bossBaseAtkMultiplier) || defaultConfig.bossBaseAtkMultiplier;
+        const defBase = Number(mergedConfig.bossBaseDefMultiplier) || defaultConfig.bossBaseDefMultiplier;
+        const hpPerRaider = Number(mergedConfig.bossHpPerRaider) || defaultConfig.bossHpPerRaider;
+        const atkPerRaider = Number(mergedConfig.bossAtkPerRaider) || defaultConfig.bossAtkPerRaider;
+        const defPerRaider = Number(mergedConfig.bossDefPerRaider) || defaultConfig.bossDefPerRaider;
+        const hpMultiplier = Math.max(0.1, hpBase + (partyCount - 1) * hpPerRaider);
+        const atkMultiplier = Math.max(0.1, atkBase + (partyCount - 1) * atkPerRaider);
+        const defMultiplier = Math.max(0.1, defBase + (partyCount - 1) * defPerRaider);
         const scaledBoss = {
             ...boss,
             hpMax: Math.max(1, Math.round((boss.hpMax ?? boss.currentHp ?? 1000) * hpMultiplier)),

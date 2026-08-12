@@ -219,6 +219,10 @@ const MAX_TOTAL_CRIT_DMG = 300;
 const MAX_TOTAL_THORNS = 120;
 const MAX_TOTAL_REGEN = 60;
 const MAX_TOTAL_SPD = 2.5;
+const LOOT_REWARD_MULTIPLIERS = {
+    boss: { correct: 1.35, wrong: 0.85 },
+    raider: { correct: 1.0, wrong: 0.55 }
+};
 
 const getLootRarity = (quality) => {
     return RARITY_TIERS.find(tier => quality >= tier.min && quality <= tier.max) || RARITY_TIERS[0];
@@ -926,7 +930,9 @@ const getLootCapWarnings = (item) => {
 };
 
 const openLootChoice = (location, correct) => {
-    const multiplier = correct ? 1.2 : 0.7;
+    const roleKey = state.role === 'boss' ? 'boss' : 'raider';
+    const roleMultipliers = LOOT_REWARD_MULTIPLIERS[roleKey] || LOOT_REWARD_MULTIPLIERS.raider;
+    const multiplier = correct ? roleMultipliers.correct : roleMultipliers.wrong;
     const label = correct ? 'Correct answer! Pick a boosted reward.' : 'Incorrect answer. Loot is reduced but still salvageable.';
     state.pendingLoot = {
         locationId: location.id,

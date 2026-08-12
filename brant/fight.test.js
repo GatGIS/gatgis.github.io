@@ -282,19 +282,35 @@ test('healer alternates attack and heal turns instead of doing both each time', 
     assert.ok(secondTurnHealActions.length >= 1);
 });
 
-test('boss hp and damage scale more aggressively with more raiders', () => {
-    const session = createFightSession({
+test('boss scaling grows with raider count using base plus per-raider increments', () => {
+    const createParty = (size) => Array.from({ length: size }, (_, index) => ({
+        name: `Raider${index + 1}`,
+        playerClass: index % 3 === 0 ? 'tank' : index % 3 === 1 ? 'dps' : 'healer',
+        hpMax: 650,
+        atk: 90,
+        def: 45,
+        spd: 1,
+        critRate: 8,
+        critDmg: 130,
+        currentHp: 650,
+        regen: 0,
+        thorns: 0,
+        healingOutput: 0
+    }));
+
+    const sessionSmall = createFightSession({
         boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
-        party: [
-            { name: 'Tank', playerClass: 'tank', hpMax: 700, atk: 80, def: 90, spd: 1, critRate: 0, critDmg: 100, currentHp: 700, regen: 0, thorns: 0 },
-            { name: 'DPS', playerClass: 'dps', hpMax: 600, atk: 140, def: 40, spd: 1.1, critRate: 0, critDmg: 100, currentHp: 600, regen: 0, thorns: 0 },
-            { name: 'Healer', playerClass: 'healer', hpMax: 550, atk: 90, def: 35, spd: 1, critRate: 0, critDmg: 100, currentHp: 550, regen: 0, thorns: 0, healingOutput: 60 },
-            { name: 'Support', playerClass: 'dps', hpMax: 500, atk: 100, def: 35, spd: 1, critRate: 0, critDmg: 100, currentHp: 500, regen: 0, thorns: 0 }
-        ]
+        party: createParty(4)
+    });
+    const sessionLarge = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: createParty(6)
     });
 
-    assert.ok(session.boss.hpMax >= 1200);
-    assert.ok(session.boss.atk >= 120);
+    assert.ok(sessionSmall.boss.hpMax > 800);
+    assert.ok(sessionLarge.boss.hpMax > sessionSmall.boss.hpMax);
+    assert.ok(sessionLarge.boss.atk > sessionSmall.boss.atk);
+    assert.ok(sessionLarge.boss.def > sessionSmall.boss.def);
 });
 
 test('basic attack target preference uses configurable tank and non-tank pools', () => {
