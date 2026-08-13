@@ -6,10 +6,10 @@
     root.BrantFight = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     const defaultConfig = {
-        bossAbilityNames: ['Ground Slam', 'Arcane Pulse', 'Shadow Burst'],
+        bossAbilityNames: ['Bitch slap', 'Beer vomit', 'Fisting'],
         bossAbilityInterval: 3,
         bossAoeInterval: 3,
-        bossAoeDamageMultiplier: 0.65,
+        bossAoeDamageMultiplier: 0.62,
         bossVampInterval: 3,
         bossBaseHpMultiplier: 1.8,
         bossBaseAtkMultiplier: 1.4,
@@ -17,10 +17,10 @@
         bossHpPerRaider: 0.16,
         bossAtkPerRaider: 0.10,
         bossDefPerRaider: 0.07,
-        healerRepeatTargetPenalty: 0.75,
+        healerRepeatTargetPenalty: 0.80,
         healerRepeatTargetPenaltyBias: 0.08,
         bossEnrageThreshold: 0.20,
-        bossEnrageDamageMultiplier: 1.8,
+        bossEnrageDamageMultiplier: 1.7,
         bossBasicTargetTankChance: 0.70,
         bossBasicTargetNonTankChance: 0.30
     };
