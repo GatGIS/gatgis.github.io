@@ -9,6 +9,7 @@
         bossAbilityNames: ['Ground Slam', 'Arcane Pulse', 'Shadow Burst'],
         bossAbilityInterval: 3,
         bossAoeInterval: 3,
+        bossAoeDamageMultiplier: 0.65,
         bossVampInterval: 3,
         bossBaseHpMultiplier: 1.8,
         bossBaseAtkMultiplier: 1.4,
@@ -451,7 +452,14 @@
                 previewKey
             };
         } else if (abilityToUse === 'aoe') {
-            const aoeRanges = aliveRaiders.map(raider => calculateDamageBounds(session.boss, raider, session));
+            const aoeDamageMultiplier = session.config.bossAoeDamageMultiplier ?? defaultConfig.bossAoeDamageMultiplier;
+            const aoeRanges = aliveRaiders.map(raider => {
+                const damageBounds = calculateDamageBounds(session.boss, raider, session);
+                return {
+                    min: Math.max(1, Math.round(damageBounds.min * aoeDamageMultiplier)),
+                    max: Math.max(1, Math.round(damageBounds.max * aoeDamageMultiplier))
+                };
+            });
             const minDamage = Math.max(1, Math.min(...aoeRanges.map(entry => entry.min)));
             const maxDamage = Math.max(...aoeRanges.map(entry => entry.max));
             preview = {
@@ -530,10 +538,11 @@
             session.bossAbilityTargetName = target.name;
         } else if (abilityToUse === 'aoe') {
             detail = 'AoE Attack';
+            const aoeDamageMultiplier = session.config.bossAoeDamageMultiplier ?? defaultConfig.bossAoeDamageMultiplier;
             const targets = aliveParty;
             targets.forEach(raider => {
                 const result = calculateDamageResult(session.boss, raider, session);
-                const hitDamage = result.damage;
+                const hitDamage = Math.max(1, Math.round(result.damage * aoeDamageMultiplier));
                 const damageResult = applyDamage(session, raider, hitDamage);
                 const previousHp = damageResult.previousHp;
                 const critSuffix = result.crit ? ' (critical)' : '';

@@ -394,6 +394,34 @@ test('boss previews expose a deterministic min-max damage range based on defende
     assert.ok(preview.amountRange.min <= preview.amount && preview.amount <= preview.amountRange.max);
 });
 
+test('AoE attacks deal 65% of the normal rolled damage to each living raider', () => {
+    const originalRandom = Math.random;
+    const session = createFightSession({
+        boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
+        party: [
+            { name: 'Tank', playerClass: 'tank', hpMax: 700, atk: 80, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 700, regen: 0, thorns: 0 },
+            { name: 'DPS', playerClass: 'dps', hpMax: 600, atk: 140, def: 50, spd: 1.1, critRate: 0, critDmg: 100, currentHp: 600, regen: 0, thorns: 0 }
+        ]
+    });
+    session.phase = 'boss';
+    session.currentActor = { name: 'Boss', kind: 'boss', unit: session.boss };
+    session.bossSelectedAbility = 'aoe';
+
+    try {
+        Math.random = () => 0.5;
+        const preview = getBossPreview(session);
+        advanceTurn(session);
+
+        const aoeActions = session.actions.filter(action => action.type === 'boss' && action.detail === 'AoE Attack');
+        assert.equal(preview?.amountRange.min, 44);
+        assert.equal(preview?.amountRange.max, 55);
+        assert.equal(aoeActions.length, 2);
+        assert.deepEqual(aoeActions.map(action => action.amount), [49, 49]);
+    } finally {
+        Math.random = originalRandom;
+    }
+});
+
 test('changing the selected boss ability rebuilds the preview instead of reusing the old one', () => {
     const session = createFightSession({
         boss: { name: 'Boss', hpMax: 800, atk: 100, def: 50, spd: 1, critRate: 0, critDmg: 100, currentHp: 800 },
