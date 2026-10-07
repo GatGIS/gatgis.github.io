@@ -825,29 +825,23 @@
       }
     });
 
-    // Proxy fallback: AllOrigins -> ThingProxy
+    // CORS proxy with a direct-request fallback.
     async function fetchWithFallback(remoteUrl) {
-      const proxies = [
-        'https://api.codetabs.com/v1/proxy?quest=',
-        'https://api.allorigins.win/raw?url=',
-        'https://corsproxy.io/?'
-      ];
-
-      // try each proxy in order
-      for (const p of proxies) {
-        const url = p + encodeURIComponent(remoteUrl);
-        try {
-          const r = await fetch(url);
-          if (r.ok) {
-            const text = await r.text();
+      // Prefer Corsfix's supported SDK path; its free tier supports browser use
+      // without a key, including live sites, subject to its published quotas.
+      try {
+        if (window.corsfix && typeof window.corsfix.fetch === 'function') {
+          const response = await window.corsfix.fetch(remoteUrl);
+          if (response.ok) {
+            const text = await response.text();
             if (text && text.trim().length > 0) return text;
           }
-        } catch (e) {
-          // ignore and try next proxy
         }
+      } catch (e) {
+        // Continue to the other proxies if Corsfix is unavailable or limited.
       }
 
-      // final attempt: direct fetch (may fail due to CORS)
+      // Try direct fetch only if the proxy is unavailable (may fail due to CORS).
       try {
         const direct = await fetch(remoteUrl);
         if (direct.ok) {
@@ -865,7 +859,7 @@
       // x = latitude, y = longitude (followed Android mapping)
       const ndata = 'v1.2';
       const build = '13';
-      const remoteUrl = `http://www.modlab.lv/kalme/realdata/MOSYSmobile.php?x=${encodeURIComponent(latStr)}&y=${encodeURIComponent(lonStr)}&ndata=${encodeURIComponent(ndata)}&posmethod=${encodeURIComponent(posMethod)}&build=${encodeURIComponent(build)}`;
+      const remoteUrl = `https://www.modlab.lv/kalme/realdata/MOSYSmobile.php?x=${encodeURIComponent(latStr)}&y=${encodeURIComponent(lonStr)}&ndata=${encodeURIComponent(ndata)}&posmethod=${encodeURIComponent(posMethod)}&build=${encodeURIComponent(build)}`;
       if (webAnswer) webAnswer.textContent = 'Calculate on server ...';
       try { if (mosysSpinner) mosysSpinner.style.display = 'inline-block'; } catch (e) {}
       if (tableContainer) tableContainer.innerHTML = '';
